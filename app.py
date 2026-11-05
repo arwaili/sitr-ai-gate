@@ -51,7 +51,8 @@ def render(result: dict) -> tuple[str, str, list, str, str, str]:
         f'font-size:1.25rem;font-weight:700">{escape(label)}</div>'
     )
     reasons = ", ".join(analysis["reason_codes"]) or "None"
-    risk = "Not assessed" if is_error else f"{analysis['risk_level']} ({analysis['risk_score']}/100)"
+    score = f"{analysis['risk_level']} ({analysis['risk_score']}/100)"
+    risk = "Not assessed" if is_error else score
     why = f"**Risk:** {risk}\n\n**Why:** {result['user_message']}\n\n**Reason codes:** {reasons}"
     redaction = result["redaction"]
     original = highlight(redaction["original_text"], analysis["entities"]) if redaction else []
