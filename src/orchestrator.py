@@ -51,9 +51,9 @@ _DECISIONS = {
 }
 
 _MOCK_RESPONSES = {
-    "allow": "[Mock approved model] A {intent} response would appear here.",
-    "redact": "[Mock approved model] A {intent} of the sanitized text would appear here.",
-    "private": "[Mock private model] A {intent} from the private route would appear here.",
+    "allow": "[Mock approved model] The '{intent}' response would appear here.",
+    "redact": "[Mock approved model] The '{intent}' response for the sanitized text goes here.",
+    "private": "[Mock private model] The '{intent}' response from the private route goes here.",
 }
 
 
