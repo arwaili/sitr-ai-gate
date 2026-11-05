@@ -1,7 +1,12 @@
+import json
+import logging
+
 import pytest
 
-from src.contracts import FinalResponse
+from src import router
+from src.contracts import FinalResponse, SensitiveEntity
 from src.orchestrator import inspect_and_process
+from src.redactor import redact
 
 CV = "Curriculum vitae: Mariam, test.applicant@example.com, +974 5555 0100"
 CONTRACT = "عقد عمل: الراتب 15000 ريال، الرقم الشخصي 28400000000"
@@ -65,6 +70,85 @@ def test_redaction_is_stable_for_repeated_values() -> None:
         "a@example.com",
         "b@example.com",
     ]
+
+
+@pytest.fixture
+def model_calls(monkeypatch) -> list[tuple[str, str]]:
+    calls: list[tuple[str, str]] = []
+    monkeypatch.setattr(
+        router, "call_model", lambda route, prompt, intent: calls.append((route, prompt)) or "ok"
+    )
+    return calls
+
+
+def test_critical_input_never_reaches_any_model(model_calls) -> None:
+    inspect_and_process(text=LEAKY_CODE)
+    inspect_and_process(text=f"{CONTRACT}\n{LEAKY_CODE}")
+    assert model_calls == []
+
+
+def test_high_risk_original_goes_only_to_the_private_route(model_calls) -> None:
+    inspect_and_process(text=CONTRACT)
+    assert model_calls == [("private_simulation", CONTRACT)]
+
+
+def test_redact_route_receives_no_detected_value(model_calls) -> None:
+    result = inspect_and_process(text=CV)
+    [(route, prompt)] = model_calls
+    assert route == "sanitized_external"
+    for entity in result["analysis"]["entities"]:
+        assert entity["value"] not in prompt
+
+
+def test_unexpected_failure_fails_closed(monkeypatch, model_calls) -> None:
+    def explode(*_):
+        raise RuntimeError(LEAKY_CODE)
+
+    monkeypatch.setattr("src.orchestrator.decide", explode)
+    result = inspect_and_process(text=CV)
+    assert (result["status"], result["action_taken"]) == ("error", "block")
+    assert "sk-synthetic" not in result["user_message"]
+    assert model_calls == []
+
+
+def test_audit_log_contains_metadata_only(caplog) -> None:
+    with caplog.at_level(logging.INFO, logger="sitr.audit"):
+        inspect_and_process(text=CV)
+        inspect_and_process(text=LEAKY_CODE)
+    events = [json.loads(record.message) for record in caplog.records]
+    assert [event["action"] for event in events] == ["redact", "block"]
+    assert events[0]["entity_counts"] == {"EMAIL": 1, "PHONE": 1}
+    logged = caplog.text
+    for secret in ("test.applicant@example.com", "5555 0100", "sk-synthetic", "Mariam"):
+        assert secret not in logged
+
+
+def _entity(entity_type: str, text: str, value: str) -> SensitiveEntity:
+    start = text.index(value)
+    return SensitiveEntity(
+        entity_type=entity_type,
+        value=value,
+        start=start,
+        end=start + len(value),
+        confidence=0.9,
+        source="regex",
+        severity="medium",
+    )
+
+
+def test_overlapping_entities_leave_no_fragment() -> None:
+    text = "Contact Mariam Al-Example now"
+    entities = [
+        _entity("PERSON", text, "Mariam Al-Example"),
+        _entity("PERSON", text, "Al-Example now"),
+    ]
+    assert redact(text, entities).safe_text == "Contact [PERSON_1]"
+
+
+def test_redaction_preserves_arabic_and_punctuation() -> None:
+    text = "البريد: a@example.com، شكرًا"
+    result = redact(text, [_entity("EMAIL", text, "a@example.com")])
+    assert result.safe_text == "البريد: [EMAIL_1]، شكرًا"
 
 
 def test_entity_offsets_select_exact_values() -> None:
