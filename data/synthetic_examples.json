@@ -1,0 +1,4970 @@
+[
+ {
+  "id": "sitr-0001",
+  "language": "en",
+  "scenario": "safe_code",
+  "text": "def add(a, b):\n    return a + b\n",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0002",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Bring your friends to taste our new saffron desserts.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0003",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Our bakery now offers gluten free bread every day.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0004",
+  "language": "en",
+  "scenario": "documentation",
+  "text": "API keys look like sk-XXXXXXXXXXXX. Store yours in an environment variable.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0006",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Improve this marketing sentence: Explore traditional crafts at the heritage village this month.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0007",
+  "language": "en",
+  "scenario": "safe_code",
+  "text": "names = [line.strip() for line in open(path)]\nprint(len(names))\n",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0008",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Improve this marketing sentence: Learn the basics of photography in our free online workshop.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0009",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "The new metro line makes it easier to reach the old market.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0011",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Cheer for your favorite team at the open air fan zone.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0012",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Our gym now offers early morning classes for beginners.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0013",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Improve this marketing sentence: Join us this weekend for a family day at the public park.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0014",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Enjoy a calm evening by the sea with live oud music.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0016",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Improve this marketing sentence: The community garden welcomes volunteers every Friday.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0017",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Discover the new seasonal menu at our cafe by the Corniche.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0018",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Explore traditional crafts at the heritage village this month.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0019",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Celebrate the desert spring with a guided walk through the dunes.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0021",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Improve this marketing sentence: Try our fresh karak tea, now served all day.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0022",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "The community garden welcomes volunteers every Friday.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0023",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Improve this marketing sentence: Our bakery now offers gluten free bread every day.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0024",
+  "language": "en",
+  "scenario": "public_prompt",
+  "text": "Try our fresh karak tea, now served all day.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0026",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "زر المتحف لمشاهدة معرض عن تاريخ الغوص على اللؤلؤ.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0027",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "اكتشف قائمة الموسم الجديدة في مقهانا على الكورنيش.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0028",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: أحضر أصدقاءك لتذوق حلويات الزعفران الجديدة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0029",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: يقدّم النادي الرياضي حصصًا صباحية للمبتدئين.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0031",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: يسهّل خط المترو الجديد الوصول إلى السوق القديم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0032",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: جرّب شاي الكرك الطازج المتوفر طوال اليوم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0033",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: يقدّم مخبزنا خبزًا خاليًا من الغلوتين كل يوم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0034",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "تعرّف على الحرف التقليدية في القرية التراثية هذا الشهر.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0036",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "استمتع بأمسية هادئة على البحر مع عزف العود.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0037",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "شجّع فريقك المفضل في منطقة المشجعين المفتوحة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0038",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: ترحب الحديقة المجتمعية بالمتطوعين كل جمعة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0039",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "يقدّم مخبزنا خبزًا خاليًا من الغلوتين كل يوم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0041",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: استمتع بنزهة إرشادية بين الكثبان الرملية في الربيع.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0042",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "يسهّل خط المترو الجديد الوصول إلى السوق القديم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0043",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "جرّب شاي الكرك الطازج المتوفر طوال اليوم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0044",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "يقدّم النادي الرياضي حصصًا صباحية للمبتدئين.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0046",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "حسّن هذه الجملة التسويقية: شجّع فريقك المفضل في منطقة المشجعين المفتوحة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0047",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "أحضر أصدقاءك لتذوق حلويات الزعفران الجديدة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0048",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "استمتع بنزهة إرشادية بين الكثبان الرملية في الربيع.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0049",
+  "language": "ar",
+  "scenario": "public_prompt",
+  "text": "انضموا إلينا في يوم عائلي ممتع في الحديقة العامة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0051",
+  "language": "mixed",
+  "scenario": "safe_code",
+  "text": "# دالة لجمع رقمين\ndef add(a, b):\n    return a + b\n",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0052",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "Translate to English: يسهّل خط المترو الجديد الوصول إلى السوق القديم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0053",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Cheer for your favorite team at the open air fan zone.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0054",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Join us this weekend for a family day at the public park.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0056",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Visit the museum to see an exhibition of pearl diving history.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0057",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Try our fresh karak tea, now served all day.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0058",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: The new metro line makes it easier to reach the old market.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0059",
+  "language": "mixed",
+  "scenario": "documentation",
+  "text": "تبدو المفاتيح بهذا الشكل sk-XXXXXXXXXXXX، احفظها في متغيرات البيئة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0061",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "Translate to English: يقدّم مخبزنا خبزًا خاليًا من الغلوتين كل يوم.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0062",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "Translate to English: يقدّم النادي الرياضي حصصًا صباحية للمبتدئين.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0063",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Our gym now offers early morning classes for beginners.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0064",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "Translate to English: تعرّف على الحرف التقليدية في القرية التراثية هذا الشهر.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0066",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Learn the basics of photography in our free online workshop.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0067",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Enjoy a calm evening by the sea with live oud music.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0068",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "Translate to English: أحضر أصدقاءك لتذوق حلويات الزعفران الجديدة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0069",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Explore traditional crafts at the heritage village this month.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0071",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "Translate to English: ترحب الحديقة المجتمعية بالمتطوعين كل جمعة.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0072",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "Translate to English: تعلّم أساسيات التصوير في ورشتنا المجانية عبر الإنترنت.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0073",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: Our bakery now offers gluten free bread every day.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0074",
+  "language": "mixed",
+  "scenario": "public_prompt",
+  "text": "ترجم إلى العربية: The community garden welcomes volunteers every Friday.",
+  "entities": [],
+  "expected_risk": "low",
+  "expected_action": "allow",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0076",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Faris Saleh (hr.contact96@example.com), reachable on +974 5555 0196.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Saleh",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact96@example.com",
+    "start": 38,
+    "end": 62
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0196",
+    "start": 78,
+    "end": 92
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0077",
+  "language": "en",
+  "scenario": "cv",
+  "text": "Please summarize this CV. Name: Adam Karim. Email: hr.contact57@example.com. Phone: +974 5555 0157.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Adam Karim",
+    "start": 32,
+    "end": 42
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact57@example.com",
+    "start": 51,
+    "end": 75
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0157",
+    "start": 84,
+    "end": 98
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0078",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Huda Saleh (employee19@example.com), reachable on +974 5555 0119.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Saleh",
+    "start": 25,
+    "end": 35
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee19@example.com",
+    "start": 37,
+    "end": 59
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0119",
+    "start": 75,
+    "end": 89
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0079",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Noor Hamdan, I will send the files to hr.contact80@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Noor Hamdan",
+    "start": 26,
+    "end": 37
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact80@example.com",
+    "start": 64,
+    "end": 88
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0081",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Omar Mansour, I will send the files to staff2@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Omar Mansour",
+    "start": 26,
+    "end": 38
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff2@example.com",
+    "start": 65,
+    "end": 83
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0082",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Sara Karim, I will send the files to employee18@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Karim",
+    "start": 26,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee18@example.com",
+    "start": 63,
+    "end": 85
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0083",
+  "language": "en",
+  "scenario": "cv",
+  "text": "Please summarize this CV. Name: Adam Karim. Email: employee30@example.com. Phone: +974 5555 0130.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Adam Karim",
+    "start": 32,
+    "end": 42
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee30@example.com",
+    "start": 51,
+    "end": 73
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0130",
+    "start": 82,
+    "end": 96
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0084",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Omar Hamdan (hr.contact41@example.com), reachable on +974 5555 0141.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Omar Hamdan",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact41@example.com",
+    "start": 38,
+    "end": 62
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0141",
+    "start": 78,
+    "end": 92
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0086",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Maya Karim (applicant31@example.com), reachable on +974 5555 0131.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Maya Karim",
+    "start": 25,
+    "end": 35
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant31@example.com",
+    "start": 37,
+    "end": 60
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0131",
+    "start": 76,
+    "end": 90
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0087",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Yousef Haddad (hr.contact11@example.com), reachable on +974 5555 0111.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Yousef Haddad",
+    "start": 25,
+    "end": 38
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact11@example.com",
+    "start": 40,
+    "end": 64
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0111",
+    "start": 80,
+    "end": 94
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0088",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Omar Saleh (hr.contact88@example.com), reachable on +974 5555 0188.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Omar Saleh",
+    "start": 25,
+    "end": 35
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact88@example.com",
+    "start": 37,
+    "end": 61
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0188",
+    "start": 77,
+    "end": 91
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0089",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Maya Mansour, I will send the files to hr.contact53@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Maya Mansour",
+    "start": 26,
+    "end": 38
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact53@example.com",
+    "start": 65,
+    "end": 89
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0091",
+  "language": "en",
+  "scenario": "cv",
+  "text": "Please summarize this CV. Name: Faris Hamdan. Email: applicant16@example.com. Phone: +974 5555 0116.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Hamdan",
+    "start": 32,
+    "end": 44
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant16@example.com",
+    "start": 53,
+    "end": 76
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0116",
+    "start": 85,
+    "end": 99
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0092",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Huda Mansour (staff15@example.com), reachable on +974 5555 0115.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Mansour",
+    "start": 25,
+    "end": 37
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff15@example.com",
+    "start": 39,
+    "end": 58
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0115",
+    "start": 74,
+    "end": 88
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0093",
+  "language": "en",
+  "scenario": "cv",
+  "text": "Please summarize this CV. Name: Faris Rahman. Email: hr.contact94@example.com. Phone: +974 5555 0194.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Rahman",
+    "start": 32,
+    "end": 44
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact94@example.com",
+    "start": 53,
+    "end": 77
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0194",
+    "start": 86,
+    "end": 100
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0094",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Faris Karim, I will send the files to employee48@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Karim",
+    "start": 26,
+    "end": 37
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee48@example.com",
+    "start": 64,
+    "end": 86
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0096",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Yousef Rahman, I will send the files to hr.contact29@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Yousef Rahman",
+    "start": 26,
+    "end": 39
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact29@example.com",
+    "start": 66,
+    "end": 90
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0097",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Khalid Mansour, I will send the files to staff20@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Khalid Mansour",
+    "start": 26,
+    "end": 40
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff20@example.com",
+    "start": 67,
+    "end": 86
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0098",
+  "language": "en",
+  "scenario": "email_reply",
+  "text": "Rewrite this politely: Hi Maya Nasser, I will send the files to hr.contact69@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Maya Nasser",
+    "start": 26,
+    "end": 37
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact69@example.com",
+    "start": 64,
+    "end": 88
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0099",
+  "language": "en",
+  "scenario": "contact",
+  "text": "Draft a welcome note for Omar Hamdan (applicant98@example.com), reachable on +974 5555 0198.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Omar Hamdan",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant98@example.com",
+    "start": 38,
+    "end": 61
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0198",
+    "start": 77,
+    "end": 91
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0101",
+  "language": "ar",
+  "scenario": "contact",
+  "text": "اكتب رسالة ترحيب إلى خالد الحمدان على البريد staff34@example.com أو الهاتف +974 5555 0134.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد الحمدان",
+    "start": 21,
+    "end": 33
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff34@example.com",
+    "start": 45,
+    "end": 64
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0134",
+    "start": 75,
+    "end": 89
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0102",
+  "language": "ar",
+  "scenario": "contact",
+  "text": "اكتب رسالة ترحيب إلى مايا المنصور على البريد hr.contact41@example.com أو الهاتف +974 5555 0141.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "مايا المنصور",
+    "start": 21,
+    "end": 33
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact41@example.com",
+    "start": 45,
+    "end": 69
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0141",
+    "start": 80,
+    "end": 94
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0103",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: فارس العزيز. البريد: hr.contact44@example.com. الهاتف: +974 5555 0144.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس العزيز",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact44@example.com",
+    "start": 53,
+    "end": 77
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0144",
+    "start": 87,
+    "end": 101
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0104",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: عمر المنصور. البريد: staff12@example.com. الهاتف: +974 5555 0112.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "عمر المنصور",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff12@example.com",
+    "start": 53,
+    "end": 72
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0112",
+    "start": 82,
+    "end": 96
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0106",
+  "language": "ar",
+  "scenario": "contact",
+  "text": "اكتب رسالة ترحيب إلى فارس الناصر على البريد hr.contact56@example.com أو الهاتف +974 5555 0156.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس الناصر",
+    "start": 21,
+    "end": 32
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact56@example.com",
+    "start": 44,
+    "end": 68
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0156",
+    "start": 79,
+    "end": 93
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0107",
+  "language": "ar",
+  "scenario": "contact",
+  "text": "اكتب رسالة ترحيب إلى خالد الكريم على البريد staff60@example.com أو الهاتف +974 5555 0160.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد الكريم",
+    "start": 21,
+    "end": 32
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff60@example.com",
+    "start": 44,
+    "end": 63
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0160",
+    "start": 74,
+    "end": 88
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0108",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: مايا الحداد. البريد: hr.contact68@example.com. الهاتف: +974 5555 0168.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "مايا الحداد",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact68@example.com",
+    "start": 53,
+    "end": 77
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0168",
+    "start": 87,
+    "end": 101
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0109",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: هدى المنصور. البريد: applicant11@example.com. الهاتف: +974 5555 0111.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "هدى المنصور",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant11@example.com",
+    "start": 53,
+    "end": 76
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0111",
+    "start": 86,
+    "end": 100
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0111",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: سارة الصالح. البريد: applicant41@example.com. الهاتف: +974 5555 0141.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "سارة الصالح",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant41@example.com",
+    "start": 53,
+    "end": 76
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0141",
+    "start": 86,
+    "end": 100
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0112",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: فارس الرحمن. البريد: applicant29@example.com. الهاتف: +974 5555 0129.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس الرحمن",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant29@example.com",
+    "start": 53,
+    "end": 76
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0129",
+    "start": 86,
+    "end": 100
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0113",
+  "language": "ar",
+  "scenario": "contact",
+  "text": "اكتب رسالة ترحيب إلى سارة المنصور على البريد applicant2@example.com أو الهاتف +974 5555 0102.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "سارة المنصور",
+    "start": 21,
+    "end": 33
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant2@example.com",
+    "start": 45,
+    "end": 67
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0102",
+    "start": 78,
+    "end": 92
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0114",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: فارس العزيز. البريد: hr.contact98@example.com. الهاتف: +974 5555 0198.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس العزيز",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact98@example.com",
+    "start": 53,
+    "end": 77
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0198",
+    "start": 87,
+    "end": 101
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0116",
+  "language": "ar",
+  "scenario": "contact",
+  "text": "اكتب رسالة ترحيب إلى فارس الكريم على البريد employee47@example.com أو الهاتف +974 5555 0147.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس الكريم",
+    "start": 21,
+    "end": 32
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee47@example.com",
+    "start": 44,
+    "end": 66
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0147",
+    "start": 77,
+    "end": 91
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0117",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: نور الكريم. البريد: hr.contact82@example.com. الهاتف: +974 5555 0182.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "نور الكريم",
+    "start": 32,
+    "end": 42
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact82@example.com",
+    "start": 52,
+    "end": 76
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0182",
+    "start": 86,
+    "end": 100
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0118",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: يوسف الكريم. البريد: employee8@example.com. الهاتف: +974 5555 0108.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الكريم",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee8@example.com",
+    "start": 53,
+    "end": 74
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0108",
+    "start": 84,
+    "end": 98
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0119",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: آدم العزيز. البريد: employee64@example.com. الهاتف: +974 5555 0164.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "آدم العزيز",
+    "start": 32,
+    "end": 42
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee64@example.com",
+    "start": 52,
+    "end": 74
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0164",
+    "start": 84,
+    "end": 98
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0121",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: آدم الصالح. البريد: employee65@example.com. الهاتف: +974 5555 0165.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "آدم الصالح",
+    "start": 32,
+    "end": 42
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee65@example.com",
+    "start": 52,
+    "end": 74
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0165",
+    "start": 84,
+    "end": 98
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0122",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: يوسف الصالح. البريد: applicant24@example.com. الهاتف: +974 5555 0124.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الصالح",
+    "start": 32,
+    "end": 43
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant24@example.com",
+    "start": 53,
+    "end": 76
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0124",
+    "start": 86,
+    "end": 100
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0123",
+  "language": "ar",
+  "scenario": "contact",
+  "text": "اكتب رسالة ترحيب إلى هدى العزيز على البريد staff21@example.com أو الهاتف +974 5555 0121.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "هدى العزيز",
+    "start": 21,
+    "end": 31
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff21@example.com",
+    "start": 43,
+    "end": 62
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0121",
+    "start": 73,
+    "end": 87
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0124",
+  "language": "ar",
+  "scenario": "cv",
+  "text": "لخّص هذه السيرة الذاتية. الاسم: نور الكريم. البريد: employee1@example.com. الهاتف: +974 5555 0101.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "نور الكريم",
+    "start": 32,
+    "end": 42
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee1@example.com",
+    "start": 52,
+    "end": 73
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0101",
+    "start": 83,
+    "end": 97
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0126",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم لينا الكريم، email staff34@example.com، phone +974 5555 0134.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "لينا الكريم",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff34@example.com",
+    "start": 44,
+    "end": 63
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0134",
+    "start": 71,
+    "end": 85
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0127",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Huda Saleh at staff9@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Saleh",
+    "start": 17,
+    "end": 27
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff9@example.com",
+    "start": 31,
+    "end": 49
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0128",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم خالد الرحمن، email hr.contact42@example.com، phone +974 5555 0142.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد الرحمن",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact42@example.com",
+    "start": 44,
+    "end": 68
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0142",
+    "start": 76,
+    "end": 90
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0129",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم سارة الكريم، email hr.contact59@example.com، phone +974 5555 0159.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "سارة الكريم",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact59@example.com",
+    "start": 44,
+    "end": 68
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0159",
+    "start": 76,
+    "end": 90
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0131",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Huda Nasser at applicant31@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Nasser",
+    "start": 17,
+    "end": 28
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant31@example.com",
+    "start": 32,
+    "end": 55
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0132",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Omar Saleh at hr.contact83@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Omar Saleh",
+    "start": 17,
+    "end": 27
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact83@example.com",
+    "start": 31,
+    "end": 55
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0133",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم آدم الصالح، email applicant1@example.com، phone +974 5555 0101.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "آدم الصالح",
+    "start": 25,
+    "end": 35
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant1@example.com",
+    "start": 43,
+    "end": 65
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0101",
+    "start": 73,
+    "end": 87
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0134",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Faris Saleh at staff83@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Saleh",
+    "start": 17,
+    "end": 28
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff83@example.com",
+    "start": 32,
+    "end": 51
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0136",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم يوسف العزيز، email staff26@example.com، phone +974 5555 0126.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف العزيز",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff26@example.com",
+    "start": 44,
+    "end": 63
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0126",
+    "start": 71,
+    "end": 85
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0137",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم هدى الكريم، email hr.contact38@example.com، phone +974 5555 0138.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "هدى الكريم",
+    "start": 25,
+    "end": 35
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact38@example.com",
+    "start": 43,
+    "end": 67
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0138",
+    "start": 75,
+    "end": 89
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0138",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Huda Hamdan at staff95@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Hamdan",
+    "start": 17,
+    "end": 28
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff95@example.com",
+    "start": 32,
+    "end": 51
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0139",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم يوسف الرحمن، email hr.contact74@example.com، phone +974 5555 0174.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الرحمن",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "hr.contact74@example.com",
+    "start": 44,
+    "end": 68
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0174",
+    "start": 76,
+    "end": 90
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0141",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Noor Haddad at applicant70@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Noor Haddad",
+    "start": 17,
+    "end": 28
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "applicant70@example.com",
+    "start": 32,
+    "end": 55
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0142",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Sara Rahman at employee19@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Rahman",
+    "start": 17,
+    "end": 28
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee19@example.com",
+    "start": 32,
+    "end": 54
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0143",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Huda Saleh at employee94@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Saleh",
+    "start": 17,
+    "end": 27
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee94@example.com",
+    "start": 31,
+    "end": 53
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0144",
+  "language": "mixed",
+  "scenario": "cv",
+  "text": "Summarize this CV: الاسم خالد العزيز، email employee53@example.com، phone +974 5555 0153.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد العزيز",
+    "start": 25,
+    "end": 36
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee53@example.com",
+    "start": 44,
+    "end": 66
+   },
+   {
+    "entity_type": "PHONE",
+    "value": "+974 5555 0153",
+    "start": 74,
+    "end": 88
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0146",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Sara Hamdan at staff0@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Hamdan",
+    "start": 17,
+    "end": 28
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff0@example.com",
+    "start": 32,
+    "end": 50
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0147",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Huda Aziz at employee95@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Aziz",
+    "start": 17,
+    "end": 26
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee95@example.com",
+    "start": 30,
+    "end": 52
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0148",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Sara Saleh at staff57@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Saleh",
+    "start": 17,
+    "end": 27
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "staff57@example.com",
+    "start": 31,
+    "end": 50
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0149",
+  "language": "mixed",
+  "scenario": "contact",
+  "text": "أرسل تذكيرًا إلى Sara Mansour at employee72@example.com.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Mansour",
+    "start": 17,
+    "end": 29
+   },
+   {
+    "entity_type": "EMAIL",
+    "value": "employee72@example.com",
+    "start": 33,
+    "end": 55
+   }
+  ],
+  "expected_risk": "medium",
+  "expected_action": "redact",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0151",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Faris Rahman, IBAN QA00SYNT156495502239291932794, for 17,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Rahman",
+    "start": 31,
+    "end": 43
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT156495502239291932794",
+    "start": 50,
+    "end": 79
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "17,000 QAR",
+    "start": 85,
+    "end": 95
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0152",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Faris Mansour, IBAN QA00SYNT848484832679006668218, for 35,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Mansour",
+    "start": 31,
+    "end": 44
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT848484832679006668218",
+    "start": 51,
+    "end": 80
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "35,000 QAR",
+    "start": 86,
+    "end": 96
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0153",
+  "language": "en",
+  "scenario": "employment_contract",
+  "text": "Summarize this employment contract. Employee: Khalid Hamdan. Salary: 39,000 QAR. QID: 28400009208.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Khalid Hamdan",
+    "start": 46,
+    "end": 59
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "39,000 QAR",
+    "start": 69,
+    "end": 79
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400009208",
+    "start": 86,
+    "end": 97
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0154",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Noor Rahman, IBAN QA00SYNT598825544552336093293, for 31,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Noor Rahman",
+    "start": 31,
+    "end": 42
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT598825544552336093293",
+    "start": 49,
+    "end": 78
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "31,000 QAR",
+    "start": 84,
+    "end": 94
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0156",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Khalid Nasser, IBAN QA00SYNT647043720919331890021, for 52,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Khalid Nasser",
+    "start": 31,
+    "end": 44
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT647043720919331890021",
+    "start": 51,
+    "end": 80
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "52,000 QAR",
+    "start": 86,
+    "end": 96
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0157",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Omar Mansour, IBAN QA00SYNT042266220643103807735, for 35,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Omar Mansour",
+    "start": 31,
+    "end": 43
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT042266220643103807735",
+    "start": 50,
+    "end": 79
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "35,000 QAR",
+    "start": 85,
+    "end": 95
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0158",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Khalid Mansour, IBAN QA00SYNT939223748500427841254, for 54,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Khalid Mansour",
+    "start": 31,
+    "end": 45
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT939223748500427841254",
+    "start": 52,
+    "end": 81
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "54,000 QAR",
+    "start": 87,
+    "end": 97
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0159",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Faris Haddad, IBAN QA00SYNT336669698465583771057, for 46,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Haddad",
+    "start": 31,
+    "end": 43
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT336669698465583771057",
+    "start": 50,
+    "end": 79
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "46,000 QAR",
+    "start": 85,
+    "end": 95
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0161",
+  "language": "en",
+  "scenario": "employment_contract",
+  "text": "Summarize this employment contract. Employee: Khalid Rahman. Salary: 15,000 QAR. QID: 28400002413.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Khalid Rahman",
+    "start": 46,
+    "end": 59
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "15,000 QAR",
+    "start": 69,
+    "end": 79
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400002413",
+    "start": 86,
+    "end": 97
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0162",
+  "language": "en",
+  "scenario": "employment_contract",
+  "text": "Summarize this employment contract. Employee: Faris Haddad. Salary: 26,000 QAR. QID: 28400001935.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Haddad",
+    "start": 46,
+    "end": 58
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "26,000 QAR",
+    "start": 68,
+    "end": 78
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400001935",
+    "start": 85,
+    "end": 96
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0163",
+  "language": "en",
+  "scenario": "employment_contract",
+  "text": "Summarize this employment contract. Employee: Sara Saleh. Salary: 13,000 QAR. QID: 28400005153.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Saleh",
+    "start": 46,
+    "end": 56
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "13,000 QAR",
+    "start": 66,
+    "end": 76
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400005153",
+    "start": 83,
+    "end": 94
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0164",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Faris Rahman, IBAN QA00SYNT899359236894486816001, for 37,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Rahman",
+    "start": 31,
+    "end": 43
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT899359236894486816001",
+    "start": 50,
+    "end": 79
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "37,000 QAR",
+    "start": 85,
+    "end": 95
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0166",
+  "language": "en",
+  "scenario": "performance_evaluation",
+  "text": "Improve this performance evaluation for Faris Saleh: missed two deadlines.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Faris Saleh",
+    "start": 40,
+    "end": 51
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0167",
+  "language": "en",
+  "scenario": "payroll",
+  "text": "Check this payroll transfer to Lina Saleh, IBAN QA00SYNT329849680886411797210, for 55,000 QAR.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Lina Saleh",
+    "start": 31,
+    "end": 41
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT329849680886411797210",
+    "start": 48,
+    "end": 77
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "55,000 QAR",
+    "start": 83,
+    "end": 93
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0168",
+  "language": "en",
+  "scenario": "employment_contract",
+  "text": "Summarize this employment contract. Employee: Lina Mansour. Salary: 13,000 QAR. QID: 28400006185.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Lina Mansour",
+    "start": 46,
+    "end": 58
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "13,000 QAR",
+    "start": 68,
+    "end": 78
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400006185",
+    "start": 85,
+    "end": 96
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0169",
+  "language": "en",
+  "scenario": "performance_evaluation",
+  "text": "Improve this performance evaluation for Yousef Aziz: missed two deadlines.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Yousef Aziz",
+    "start": 40,
+    "end": 51
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0171",
+  "language": "en",
+  "scenario": "employment_contract",
+  "text": "Summarize this employment contract. Employee: Adam Hamdan. Salary: 37,000 QAR. QID: 28400003716.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Adam Hamdan",
+    "start": 46,
+    "end": 57
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "37,000 QAR",
+    "start": 67,
+    "end": 77
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400003716",
+    "start": 84,
+    "end": 95
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0172",
+  "language": "en",
+  "scenario": "performance_evaluation",
+  "text": "Improve this performance evaluation for Omar Rahman: missed two deadlines.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Omar Rahman",
+    "start": 40,
+    "end": 51
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0173",
+  "language": "en",
+  "scenario": "performance_evaluation",
+  "text": "Improve this performance evaluation for Khalid Saleh: missed two deadlines.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Khalid Saleh",
+    "start": 40,
+    "end": 52
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0174",
+  "language": "en",
+  "scenario": "performance_evaluation",
+  "text": "Improve this performance evaluation for Sara Mansour: missed two deadlines.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Mansour",
+    "start": 40,
+    "end": 52
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0176",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى عمر الحداد على الحساب QA00SYNT640475652962363946371 بمبلغ 18000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "عمر الحداد",
+    "start": 22,
+    "end": 32
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT640475652962363946371",
+    "start": 44,
+    "end": 73
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "18000 ريال",
+    "start": 80,
+    "end": 90
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0177",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى هدى الناصر على الحساب QA00SYNT838468773892498505414 بمبلغ 50000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "هدى الناصر",
+    "start": 22,
+    "end": 32
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT838468773892498505414",
+    "start": 44,
+    "end": 73
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "50000 ريال",
+    "start": 80,
+    "end": 90
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0178",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى خالد الكريم على الحساب QA00SYNT528824202213123906870 بمبلغ 55000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد الكريم",
+    "start": 22,
+    "end": 33
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT528824202213123906870",
+    "start": 45,
+    "end": 74
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "55000 ريال",
+    "start": 81,
+    "end": 91
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0179",
+  "language": "ar",
+  "scenario": "employment_contract",
+  "text": "لخّص عقد العمل التالي. الموظف: لينا المنصور. الراتب: 54000 ريال. الرقم الشخصي: 28400005471.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "لينا المنصور",
+    "start": 31,
+    "end": 43
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "54000 ريال",
+    "start": 53,
+    "end": 63
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400005471",
+    "start": 79,
+    "end": 90
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0181",
+  "language": "ar",
+  "scenario": "performance_evaluation",
+  "text": "حسّن صياغة تقييم الأداء للموظف فارس الناصر: تأخر في مشروعين.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس الناصر",
+    "start": 31,
+    "end": 42
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0182",
+  "language": "ar",
+  "scenario": "employment_contract",
+  "text": "لخّص عقد العمل التالي. الموظف: مايا العزيز. الراتب: 28000 ريال. الرقم الشخصي: 28400007908.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "مايا العزيز",
+    "start": 31,
+    "end": 42
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "28000 ريال",
+    "start": 52,
+    "end": 62
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400007908",
+    "start": 78,
+    "end": 89
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0183",
+  "language": "ar",
+  "scenario": "employment_contract",
+  "text": "لخّص عقد العمل التالي. الموظف: يوسف الصالح. الراتب: 31000 ريال. الرقم الشخصي: 28400007491.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الصالح",
+    "start": 31,
+    "end": 42
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "31000 ريال",
+    "start": 52,
+    "end": 62
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400007491",
+    "start": 78,
+    "end": 89
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0184",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى مايا الناصر على الحساب QA00SYNT659069068844981032008 بمبلغ 21000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "مايا الناصر",
+    "start": 22,
+    "end": 33
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT659069068844981032008",
+    "start": 45,
+    "end": 74
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "21000 ريال",
+    "start": 81,
+    "end": 91
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0186",
+  "language": "ar",
+  "scenario": "performance_evaluation",
+  "text": "حسّن صياغة تقييم الأداء للموظف نور الحداد: تأخر في مشروعين.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "نور الحداد",
+    "start": 31,
+    "end": 41
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0187",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى مايا الرحمن على الحساب QA00SYNT089149975831070016939 بمبلغ 37000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "مايا الرحمن",
+    "start": 22,
+    "end": 33
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT089149975831070016939",
+    "start": 45,
+    "end": 74
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "37000 ريال",
+    "start": 81,
+    "end": 91
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0188",
+  "language": "ar",
+  "scenario": "employment_contract",
+  "text": "لخّص عقد العمل التالي. الموظف: هدى الرحمن. الراتب: 36000 ريال. الرقم الشخصي: 28400004724.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "هدى الرحمن",
+    "start": 31,
+    "end": 41
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "36000 ريال",
+    "start": 51,
+    "end": 61
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400004724",
+    "start": 77,
+    "end": 88
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0189",
+  "language": "ar",
+  "scenario": "performance_evaluation",
+  "text": "حسّن صياغة تقييم الأداء للموظف خالد الرحمن: تأخر في مشروعين.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد الرحمن",
+    "start": 31,
+    "end": 42
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0191",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى نور المنصور على الحساب QA00SYNT887641044353626496268 بمبلغ 50000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "نور المنصور",
+    "start": 22,
+    "end": 33
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT887641044353626496268",
+    "start": 45,
+    "end": 74
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "50000 ريال",
+    "start": 81,
+    "end": 91
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0192",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى مايا الحداد على الحساب QA00SYNT873314690092471631690 بمبلغ 51000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "مايا الحداد",
+    "start": 22,
+    "end": 33
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT873314690092471631690",
+    "start": 45,
+    "end": 74
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "51000 ريال",
+    "start": 81,
+    "end": 91
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0193",
+  "language": "ar",
+  "scenario": "performance_evaluation",
+  "text": "حسّن صياغة تقييم الأداء للموظف يوسف الحداد: تأخر في مشروعين.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الحداد",
+    "start": 31,
+    "end": 42
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0194",
+  "language": "ar",
+  "scenario": "employment_contract",
+  "text": "لخّص عقد العمل التالي. الموظف: خالد الحداد. الراتب: 10000 ريال. الرقم الشخصي: 28400002703.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد الحداد",
+    "start": 31,
+    "end": 42
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "10000 ريال",
+    "start": 52,
+    "end": 62
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400002703",
+    "start": 78,
+    "end": 89
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0196",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى يوسف الحمدان على الحساب QA00SYNT874450196383588397741 بمبلغ 50000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الحمدان",
+    "start": 22,
+    "end": 34
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT874450196383588397741",
+    "start": 46,
+    "end": 75
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "50000 ريال",
+    "start": 82,
+    "end": 92
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0197",
+  "language": "ar",
+  "scenario": "performance_evaluation",
+  "text": "حسّن صياغة تقييم الأداء للموظف نور الصالح: تأخر في مشروعين.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "نور الصالح",
+    "start": 31,
+    "end": 41
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0198",
+  "language": "ar",
+  "scenario": "payroll",
+  "text": "راجع تحويل الراتب إلى يوسف الصالح على الحساب QA00SYNT145842046602284550174 بمبلغ 13000 ريال.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الصالح",
+    "start": 22,
+    "end": 33
+   },
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT145842046602284550174",
+    "start": 45,
+    "end": 74
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "13000 ريال",
+    "start": 81,
+    "end": 91
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0199",
+  "language": "ar",
+  "scenario": "performance_evaluation",
+  "text": "حسّن صياغة تقييم الأداء للموظف يوسف الصالح: تأخر في مشروعين.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الصالح",
+    "start": 31,
+    "end": 42
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0201",
+  "language": "mixed",
+  "scenario": "payroll",
+  "text": "Payroll تحويل الراتب: IBAN QA00SYNT536608157228315152352، المبلغ 28000 ريال.",
+  "entities": [
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT536608157228315152352",
+    "start": 27,
+    "end": 56
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "28000 ريال",
+    "start": 65,
+    "end": 75
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0202",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Sara Saleh: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Saleh",
+    "start": 33,
+    "end": 43
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0203",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Maya Karim: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Maya Karim",
+    "start": 33,
+    "end": 43
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0204",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee يوسف الرحمن, Salary 59,000 QAR, QID 28400000887.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الرحمن",
+    "start": 40,
+    "end": 51
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "59,000 QAR",
+    "start": 60,
+    "end": 70
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400000887",
+    "start": 76,
+    "end": 87
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0206",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Huda Nasser: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Nasser",
+    "start": 33,
+    "end": 44
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0207",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Yousef Hamdan: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Yousef Hamdan",
+    "start": 33,
+    "end": 46
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0208",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee هدى الصالح, Salary 29,000 QAR, QID 28400007623.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "هدى الصالح",
+    "start": 40,
+    "end": 50
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "29,000 QAR",
+    "start": 59,
+    "end": 69
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400007623",
+    "start": 75,
+    "end": 86
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0209",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee لينا الحمدان, Salary 25,000 QAR, QID 28400001488.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "لينا الحمدان",
+    "start": 40,
+    "end": 52
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "25,000 QAR",
+    "start": 61,
+    "end": 71
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400001488",
+    "start": 77,
+    "end": 88
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0211",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Huda Saleh: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Saleh",
+    "start": 33,
+    "end": 43
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0212",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee خالد الصالح, Salary 22,000 QAR, QID 28400003837.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "خالد الصالح",
+    "start": 40,
+    "end": 51
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "22,000 QAR",
+    "start": 60,
+    "end": 70
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400003837",
+    "start": 76,
+    "end": 87
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0213",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee فارس المنصور, Salary 46,000 QAR, QID 28400008726.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس المنصور",
+    "start": 40,
+    "end": 52
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "46,000 QAR",
+    "start": 61,
+    "end": 71
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400008726",
+    "start": 77,
+    "end": 88
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0214",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee سارة الناصر, Salary 42,000 QAR, QID 28400002114.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "سارة الناصر",
+    "start": 40,
+    "end": 51
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "42,000 QAR",
+    "start": 60,
+    "end": 70
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400002114",
+    "start": 76,
+    "end": 87
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0216",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Sara Nasser: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Sara Nasser",
+    "start": 33,
+    "end": 44
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0217",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Huda Mansour: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Huda Mansour",
+    "start": 33,
+    "end": 45
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0218",
+  "language": "mixed",
+  "scenario": "payroll",
+  "text": "Payroll تحويل الراتب: IBAN QA00SYNT416804192119320833738، المبلغ 48000 ريال.",
+  "entities": [
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT416804192119320833738",
+    "start": 27,
+    "end": 56
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "48000 ريال",
+    "start": 65,
+    "end": 75
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0219",
+  "language": "mixed",
+  "scenario": "payroll",
+  "text": "Payroll تحويل الراتب: IBAN QA00SYNT244325515007650236378، المبلغ 21000 ريال.",
+  "entities": [
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT244325515007650236378",
+    "start": 27,
+    "end": 56
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "21000 ريال",
+    "start": 65,
+    "end": 75
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0221",
+  "language": "mixed",
+  "scenario": "performance_evaluation",
+  "text": "Employee evaluation تقييم الموظف Lina Saleh: يحتاج تدريبًا.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "Lina Saleh",
+    "start": 33,
+    "end": 43
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0222",
+  "language": "mixed",
+  "scenario": "payroll",
+  "text": "Payroll تحويل الراتب: IBAN QA00SYNT567653765990328991044، المبلغ 17000 ريال.",
+  "entities": [
+   {
+    "entity_type": "IBAN",
+    "value": "QA00SYNT567653765990328991044",
+    "start": 27,
+    "end": 56
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "17000 ريال",
+    "start": 65,
+    "end": 75
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0223",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee يوسف الصالح, Salary 10,000 QAR, QID 28400003924.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "يوسف الصالح",
+    "start": 40,
+    "end": 51
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "10,000 QAR",
+    "start": 60,
+    "end": 70
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400003924",
+    "start": 76,
+    "end": 87
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0224",
+  "language": "mixed",
+  "scenario": "employment_contract",
+  "text": "عقد عمل / Employment contract: Employee فارس الكريم, Salary 18,000 QAR, QID 28400005261.",
+  "entities": [
+   {
+    "entity_type": "PERSON",
+    "value": "فارس الكريم",
+    "start": 40,
+    "end": 51
+   },
+   {
+    "entity_type": "SALARY",
+    "value": "18,000 QAR",
+    "start": 60,
+    "end": 70
+   },
+   {
+    "entity_type": "QATAR_ID",
+    "value": "28400005261",
+    "start": 76,
+    "end": 87
+   }
+  ],
+  "expected_risk": "high",
+  "expected_action": "private",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0226",
+  "language": "en",
+  "scenario": "database_url",
+  "text": "DATABASE_URL = \"postgresql://app:synthetic88@db.example.internal:5432/hr\"\nengine = create_engine(DATABASE_URL)\n",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic88@db.example.internal:5432/hr",
+    "start": 16,
+    "end": 72
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0227",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-4ea954c0afa00c26aa4ae76a\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-4ea954c0afa00c26aa4ae76a",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0228",
+  "language": "en",
+  "scenario": "database_url",
+  "text": "DATABASE_URL = \"postgresql://app:synthetic22@db.example.internal:5432/hr\"\nengine = create_engine(DATABASE_URL)\n",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic22@db.example.internal:5432/hr",
+    "start": 16,
+    "end": 72
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0229",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-3d27897b8526494e72a7edc8\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-3d27897b8526494e72a7edc8",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0231",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-04bca7633f9687466ee473f2\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-04bca7633f9687466ee473f2",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0232",
+  "language": "en",
+  "scenario": "password_config",
+  "text": "DB_USER = \"app\"\nDB_PASSWORD = \"Synthetic-Pass-68\"\n",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-68",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0233",
+  "language": "en",
+  "scenario": "database_url",
+  "text": "DATABASE_URL = \"postgresql://app:synthetic63@db.example.internal:5432/hr\"\nengine = create_engine(DATABASE_URL)\n",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic63@db.example.internal:5432/hr",
+    "start": 16,
+    "end": 72
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0234",
+  "language": "en",
+  "scenario": "password_config",
+  "text": "DB_USER = \"app\"\nDB_PASSWORD = \"Synthetic-Pass-87\"\n",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-87",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0236",
+  "language": "en",
+  "scenario": "database_url",
+  "text": "DATABASE_URL = \"postgresql://app:synthetic20@db.example.internal:5432/hr\"\nengine = create_engine(DATABASE_URL)\n",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic20@db.example.internal:5432/hr",
+    "start": 16,
+    "end": 72
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0237",
+  "language": "en",
+  "scenario": "database_url",
+  "text": "DATABASE_URL = \"postgresql://app:synthetic91@db.example.internal:5432/hr\"\nengine = create_engine(DATABASE_URL)\n",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic91@db.example.internal:5432/hr",
+    "start": 16,
+    "end": 72
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0238",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-f3e5395f9141785a7da4d030\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-f3e5395f9141785a7da4d030",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0239",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-421883814a282e3eef4a1fb0\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-421883814a282e3eef4a1fb0",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0241",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-6c1b2cbefe209e4f3e155b8a\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-6c1b2cbefe209e4f3e155b8a",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0242",
+  "language": "en",
+  "scenario": "database_url",
+  "text": "DATABASE_URL = \"postgresql://app:synthetic66@db.example.internal:5432/hr\"\nengine = create_engine(DATABASE_URL)\n",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic66@db.example.internal:5432/hr",
+    "start": 16,
+    "end": 72
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0243",
+  "language": "en",
+  "scenario": "password_config",
+  "text": "DB_USER = \"app\"\nDB_PASSWORD = \"Synthetic-Pass-55\"\n",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-55",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0244",
+  "language": "en",
+  "scenario": "database_url",
+  "text": "DATABASE_URL = \"postgresql://app:synthetic47@db.example.internal:5432/hr\"\nengine = create_engine(DATABASE_URL)\n",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic47@db.example.internal:5432/hr",
+    "start": 16,
+    "end": 72
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0246",
+  "language": "en",
+  "scenario": "password_config",
+  "text": "DB_USER = \"app\"\nDB_PASSWORD = \"Synthetic-Pass-11\"\n",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-11",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0247",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-a0f3ba376261bf8682bb161b\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-a0f3ba376261bf8682bb161b",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0248",
+  "language": "en",
+  "scenario": "api_key_code",
+  "text": "import requests\n\nAPI_KEY = \"sk-synthetic-8f20126aab8272c67075dcbd\"\nrequests.get(URL, headers={\"Authorization\": \"Bearer \" + API_KEY})\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-8f20126aab8272c67075dcbd",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0249",
+  "language": "en",
+  "scenario": "password_config",
+  "text": "DB_USER = \"app\"\nDB_PASSWORD = \"Synthetic-Pass-34\"\n",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-34",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0251",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-29، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-29",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0252",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-44، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-44",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0253",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-75، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-75",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0254",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-64، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-64",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0256",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-07، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-07",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0257",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-81، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-81",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0258",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-51، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-51",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0259",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-d3898963adaaf49da08d36f7 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-d3898963adaaf49da08d36f7",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0261",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-24، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-24",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0262",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-a6d83c7f92065f69e77e8d79 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-a6d83c7f92065f69e77e8d79",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0263",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-2ead9363f6d55daafe7536f1 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-2ead9363f6d55daafe7536f1",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0264",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-1b04905cb62cd168b3d9cfaa لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-1b04905cb62cd168b3d9cfaa",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0266",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-82، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-82",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0267",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-1e3bf74f476024c2f2aa1a85 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-1e3bf74f476024c2f2aa1a85",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0268",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-23، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-23",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0269",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-b5ac5712c4b6b41a4377eb67 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-b5ac5712c4b6b41a4377eb67",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0271",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-45f227559f605d603355ab02 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-45f227559f605d603355ab02",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0272",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-95a2711a63f4872fce4eef22 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-95a2711a63f4872fce4eef22",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0273",
+  "language": "ar",
+  "scenario": "api_key_message",
+  "text": "هذا مفتاح الوصول الخاص بنا: sk-synthetic-46b4df37286fbfcd6a15ef27 لماذا لا يعمل الطلب؟",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-46b4df37286fbfcd6a15ef27",
+    "start": 28,
+    "end": 65
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0274",
+  "language": "ar",
+  "scenario": "password_message",
+  "text": "كلمة المرور لقاعدة البيانات هي Synthetic-Pass-31، ساعدني في إعداد الاتصال.",
+  "entities": [
+   {
+    "entity_type": "PASSWORD",
+    "value": "Synthetic-Pass-31",
+    "start": 31,
+    "end": 48
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0276",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic27@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic27@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0277",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic57@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic57@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0278",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-7dfe9e4e0b3de2e114ed6b69\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-7dfe9e4e0b3de2e114ed6b69",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0279",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-ba1e2a316ed47285c68c38c7\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-ba1e2a316ed47285c68c38c7",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0281",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic47@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic47@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0282",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic58@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic58@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0283",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-23fd35943d1a67dbc0cc03bd\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-23fd35943d1a67dbc0cc03bd",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0284",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-f9b1f163f77c353a76efa919\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-f9b1f163f77c353a76efa919",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0286",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-37837e7fb2eb73a3726f989a\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-37837e7fb2eb73a3726f989a",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0287",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-74c4d674e3def1d243a7f3c7\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-74c4d674e3def1d243a7f3c7",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0288",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-50ed02407db8f4549717fe9d\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-50ed02407db8f4549717fe9d",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0289",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic89@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic89@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0291",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic94@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic94@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0292",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-03c87c67480ecfa8648cb08d\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-03c87c67480ecfa8648cb08d",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0293",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-abb0d0347162551c03e6f488\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-abb0d0347162551c03e6f488",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0294",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic51@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic51@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0296",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-5b4ded068629126f6faae9b7\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-5b4ded068629126f6faae9b7",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0297",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-2d3e687c5835144b22fa1dc9\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-2d3e687c5835144b22fa1dc9",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0298",
+  "language": "mixed",
+  "scenario": "database_url",
+  "text": "اربط التطبيق بقاعدة البيانات postgresql://app:synthetic17@db.example.internal:5432/hr من فضلك.",
+  "entities": [
+   {
+    "entity_type": "DATABASE_URL",
+    "value": "postgresql://app:synthetic17@db.example.internal:5432/hr",
+    "start": 29,
+    "end": 85
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ },
+ {
+  "id": "sitr-0299",
+  "language": "mixed",
+  "scenario": "api_key_code",
+  "text": "# مفتاح الإنتاج\nSERVICE_KEY = \"sk-synthetic-0a027ac65901f4f5bc7e434d\"\nprint(\"جاهز\")\n",
+  "entities": [
+   {
+    "entity_type": "API_KEY",
+    "value": "sk-synthetic-0a027ac65901f4f5bc7e434d",
+    "start": 31,
+    "end": 68
+   }
+  ],
+  "expected_risk": "critical",
+  "expected_action": "block",
+  "carrier_source": "static",
+  "split": "dev"
+ }
+]
