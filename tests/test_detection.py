@@ -78,6 +78,10 @@ def test_static_carriers_pass_the_safety_filter(language: str) -> None:
         ("اقرأ عقد العمل قبل يوم الأحد من فضلك.", "ar"),
         ("استمتع بالقهوة في Doha هذا المساء.", "ar"),
         ("Short.", "en"),
+        ("نقدم لكم خدمات نقل جديدة تلبي احتياجاتكم في أقصى便利!", "ar"),
+        ("Learn photography in our free workshop! #PhotographyBeginners", "en"),
+        ("استمتع بتجربة عائلية مميزة في الحديقة العامة مع الألعاب", "ar"),
+        ('توفير الراحة الكاملة في رحلات التنقل العامة".', "ar"),
     ],
 )
 def test_safety_filter_rejects_unsafe_carriers(text: str, language: str) -> None:

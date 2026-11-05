@@ -190,11 +190,15 @@ _UNSAFE_CARRIER = re.compile(
     r"[0-9٠-٩۰-۹]|@|https?://|www\.|sk-|password|كلمة المرور", re.IGNORECASE
 )
 _CONFIDENTIAL = ("contract", "salary", "evaluation", "confidential", "عقد", "راتب", "تقييم", "سري")
+# Small models drift into other scripts (CJK, kana) and stray quotes or hashtags; reject those.
+_ALLOWED_CHARS = re.compile(r"[؀-ۿA-Za-z\s.,!?'’&:;()\-–—،؛؟]+")
 
 
 def is_safe_carrier(text: str, language: str) -> bool:
-    """Accept only benign single-script sentences with no numbers, contacts, or business terms."""
+    """Accept only complete, benign single-script sentences with no numbers or contacts."""
     if not 15 <= len(text) <= 200 or _UNSAFE_CARRIER.search(text):
+        return False
+    if not _ALLOWED_CHARS.fullmatch(text) or not text.endswith((".", "!", "?", "؟")):
         return False
     if any(term in text.lower() for term in _CONFIDENTIAL):
         return False
@@ -311,7 +315,7 @@ def generate_carriers(per_language: int, seed: int) -> dict[str, list[str]]:
             ]
             batch = tokenizer(prompts, return_tensors="pt", padding=True).to(device)
             output = model.generate(
-                **batch, max_new_tokens=60, do_sample=True, temperature=0.9, top_p=0.95
+                **batch, max_new_tokens=80, do_sample=True, temperature=0.9, top_p=0.95
             )
             replies = tokenizer.batch_decode(
                 output[:, batch["input_ids"].shape[1] :], skip_special_tokens=True
