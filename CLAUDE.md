@@ -1,6 +1,6 @@
 # Claude Instructions - Sitr AI Gate
 
-Read `INSTRUCTIONS.md`, `README.md`, and `src/contracts.py` completely before editing anything.
+Read `PROJECT_OVERVIEW.md`, `INSTRUCTIONS.md`, `README.md`, and `src/contracts.py` completely before editing anything. `PROJECT_OVERVIEW.md` is the agreed plan and wins where documents conflict, except on security requirements and frozen contracts.
 
 ## Objective
 
