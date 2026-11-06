@@ -30,6 +30,8 @@ _MAX_CHARS = 4000
 # is informational and never decides on its own.
 _FALLBACK_CONFIDENCE = 0.3
 
+# Substrings are enough here: the fallback sits below the policy limit, so it never decides alone.
+# src/policy_engine.py holds the whole-word list that does: change the two together.
 _CONFIDENTIAL_TERMS = (
     "contract", "salary", "payroll", "evaluation", "appraisal", "confidential", "termination",
     "عقد", "راتب", "رواتب", "تقييم", "سري", "إنهاء الخدمة",

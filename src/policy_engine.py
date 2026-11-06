@@ -15,12 +15,16 @@ import re
 from src.contracts import Action, AnalysisResult, ModelMetadata, SensitiveEntity
 
 # Whole words only, so "contraction", سريع (quick) and معقدة (complex) do not match. Arabic words
-# may carry attached prefixes and pronoun endings, as in العقد and راتبي.
-_ARABIC_LETTER = "\u0600-\u06ff"
+# may carry attached prefixes and pronoun endings, as in العقد, وبالعقد and راتبي. Code names count
+# as word breaks, as in payroll_2026 and salary2026, and Arabic punctuation is not a letter.
+# src/risk_classifier.py keeps a looser list for its fallback: change the two together.
+_ARABIC_LETTER = "\u0620-\u063f\u0641-\u064a\u066e-\u06d3\u06d5"
+_ARABIC_MARKS = re.compile("[\u064b-\u065f\u0640\u0670]")
+_CAMEL_CASE_BREAK = re.compile(r"(?<=[a-z])(?=[A-Z])")
 _CONFIDENTIAL_PATTERN = re.compile(
-    r"(?i)\b(?:contracts?|salary|salaries|payroll|evaluations?|appraisals?|confidential"
-    r"|terminations?)\b"
-    rf"|(?<![{_ARABIC_LETTER}])(?:[وفبكل]?(?:ال|لل)?)"
+    r"(?i)(?<![a-z])(?:contracts?|salary|salaries|payroll|evaluations?|appraisals?|confidential"
+    r"|terminations?)(?![a-z])"
+    rf"|(?<![{_ARABIC_LETTER}])(?:[وف]?[بكل]?(?:ال|لل)?)"
     r"(?:عقد|عقود|راتب|رواتب|تقييم|تقييمات|سري|سرية|سريا|تسريح|إنهاء الخدمة|انهاء الخدمة)"
     rf"(?:ي|ك|ه|ها|نا|هم|هن|كم)?(?![{_ARABIC_LETTER}])"
 )
@@ -42,6 +46,12 @@ _CREDENTIAL_CODES = {
 # 0.35 to 0.6 gave the same accuracy, and the lower limit catches confidential prose with no
 # keywords.
 SEMANTIC_THRESHOLD = 0.4
+
+def _has_confidential_term(text: str) -> bool:
+    # Only a yes or no comes back, so changing the text here cannot move any entity offset.
+    plain = _CAMEL_CASE_BREAK.sub(" ", _ARABIC_MARKS.sub("", text))
+    return bool(_CONFIDENTIAL_PATTERN.search(plain))
+
 
 _DECISIONS = {
     "block": ("critical", 95, "Restricted content was found, so nothing was sent to any model."),
@@ -94,7 +104,7 @@ def _assess(text: str, entities: list[SensitiveEntity], semantic) -> tuple[Actio
     if any(e.severity == "critical" for e in entities):
         # Only the model saw it: suspicious, but not proof, so keep it off external routes.
         private.append("MODEL_SUSPECTED_CREDENTIAL")
-    if _CONFIDENTIAL_PATTERN.search(text):
+    if _has_confidential_term(text):
         private.append("CONFIDENTIAL_CONTENT")
     if (
         semantic is not None
