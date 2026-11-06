@@ -114,10 +114,19 @@ CSS = f"""
 footer {{ display: none !important; }}
 /* The chat scrolls across the whole main area (scrollbar at the window's edge); the
    messages, composer and other pages keep a centered reading width. */
-@media (min-width: 769px) {{
-  .gradio-container > .main.fillable {{ max-width: none !important; padding-right: 0 !important; }}
-}}
+.gradio-container > .main.fillable {{ max-width: none !important; padding-right: 0 !important; }}
+/* Gradio scopes rules inside @media to the app body, so phones get their right margin here. */
+@media (max-width: 768px) {{ #sitr-main {{ padding-right: 14px !important; }} }}
 .sitr-copy {{ white-space: nowrap; }}
+/* Copy buttons appear when the pointer is over their message; touch screens always show them. */
+@media (hover: hover) {{
+  #sitr-chat .message-buttons-left, #sitr-chat .message-buttons-right, #sitr-chat .sitr-copy {{
+    opacity: 0; transition: opacity .15s; }}
+  #sitr-chat .message-row:hover .message-buttons-left,
+  #sitr-chat .message-row:hover .message-buttons-right,
+  #sitr-chat .message-buttons-left:hover, #sitr-chat .message-buttons-right:hover,
+  #sitr-chat .sitr-ready:hover .sitr-copy, #sitr-chat .sitr-copy:focus-visible {{ opacity: 1; }}
+}}
 #sitr-main {{ width: 100%; padding: 0; }}
 #sitr-main > .column > :not(#sitr-chat) {{ width: 100%; max-width: 900px; margin-inline: auto; }}
 #sitr-chat .message-wrap {{ max-width: 900px; margin: 0 auto !important; padding-inline: 16px; }}
@@ -131,16 +140,20 @@ footer {{ display: none !important; }}
   border-top: 1px solid var(--border-color-primary); }}
 #sitr-foot .block {{ background: transparent !important; border: 0 !important;
   box-shadow: none !important; padding: 0 !important; }}
-.sitr-brand {{ position: relative; overflow: hidden; padding: 18px 16px 16px; border-radius: 14px;
-  background: linear-gradient(180deg, rgba(138, 21, 56, .07), transparent 70%),
+/* The header is a band across the whole top of the sidebar: the negative margins cancel the
+   sidebar's and the HTML block's padding (20/32/20 and 10/12). The id raises specificity over
+   Gradio's ".prose *" color, which loads after this sheet on Spaces. */
+#sitr-sidebar .sitr-brand {{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  margin: -30px -44px 0 -32px; padding: 24px 48px 18px 22px;
+  background: linear-gradient(180deg, rgba(138, 21, 56, .10), rgba(138, 21, 56, .03)),
     url("{_LATTICE}") repeat;
-  border: 1px solid var(--border-color-primary); }}
-.sitr-brand .ar {{ display: block; font-family: "Reem Kufi", "Readex Pro", sans-serif;
-  font-weight: 700; font-size: 2.6rem; line-height: 1; color: var(--sitr-maroon); }}
-.sitr-brand .en {{ display: block; margin-top: 8px; font-weight: 600; font-size: .95rem; }}
-.sitr-brand .tag {{ display: block; margin-top: 2px; font-size: .8rem; color: var(--sitr-muted); }}
-.sitr-brand::after {{ content: ""; position: absolute; inset-inline: 16px; bottom: 0; height: 3px;
-  border-radius: 3px 3px 0 0; background: var(--sitr-maroon); }}
+  border-bottom: 2px solid var(--sitr-maroon); }}
+#sitr-sidebar .sitr-brand .ar {{ font-family: "Reem Kufi", "Readex Pro", sans-serif;
+  font-weight: 700; font-size: 2.7rem; line-height: 1; color: var(--sitr-maroon) !important;
+  padding-inline-end: 14px; border-inline-end: 1px solid rgba(138, 21, 56, .35); }}
+#sitr-sidebar .sitr-brand .en {{ font-weight: 700; font-size: 1.02rem; }}
+#sitr-sidebar .sitr-brand .tag {{ flex-basis: 100%; font-size: .8rem;
+  color: var(--sitr-muted) !important; }}
 #sitr-new {{ justify-content: flex-start !important; }}
 .sitr-nav {{ gap: 2px !important; margin-top: 10px; }}
 .sitr-nav button {{ justify-content: flex-start !important; text-align: start;
@@ -162,7 +175,8 @@ footer {{ display: none !important; }}
 #sitr-toggles button {{ min-width: 0 !important; background: transparent !important;
   border: 1px solid var(--border-color-primary) !important; box-shadow: none !important; }}
 #sitr-toggles button:hover {{ border-color: var(--sitr-maroon) !important; }}
-#sitr-theme {{ flex: 0 0 44px !important; font-size: 1.1rem; }}
+#sitr-toggles > button {{ flex: 1 1 0 !important; }}
+#sitr-theme {{ font-size: 1.1rem; }}
 
 .sitr-kpis {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
   margin: 10px 0 18px; }}
@@ -191,7 +205,7 @@ footer {{ display: none !important; }}
 #sitr-task {{ width: 260px; }}
 .sitr-empty {{ text-align: center; padding: 28px 12px 8px; }}
 .sitr-empty .ar {{ font-family: "Reem Kufi", "Readex Pro", sans-serif; font-size: 3.2rem;
-  color: var(--sitr-block); line-height: 1; }}
+  color: var(--sitr-block) !important; line-height: 1; }}
 .sitr-empty h3 {{ margin: 14px 0 6px; font-size: 1.25rem; }}
 .sitr-empty p {{ margin: 0 auto; max-width: 46ch; color: var(--sitr-muted); }}
 
@@ -809,7 +823,7 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
     with gr.Column(elem_id="sitr-main"):
         with gr.Column(visible=True) as chat_page:
             chat = gr.Chatbot(
-                elem_id="sitr-chat", show_label=False, height="calc(100dvh - 190px)",
+                elem_id="sitr-chat", show_label=False, height="calc(100dvh - 150px)",
                 min_height=360, placeholder=empty_chat(), examples=chat_examples(),
                 sanitize_html=False, render_markdown=False, layout="bubble", autoscroll=True,
                 buttons=["copy"],
