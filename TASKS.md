@@ -86,11 +86,11 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| P1 | Orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk`; models are skipped when a rule finds a credential; metadata says which models ran or fell back; app warms all models at start | Rashid | Abdulaziz | in review | |
-| P2 | `policy_engine.merge_findings`: rules first, overlapping model findings dropped; T7 passes | Rashid | Abdulaziz | in review | |
-| P3 | All Phase 5 overrides: credentials, private keys and restricted operational information block; HR/financial data, a model-only credential or the classifier (confidence 0.6 or more) route private; models can never block or lower a decision | Rashid | Abdulaziz | in review | |
-| P4 | Hosted Qwen via HF Inference Providers (`featherless-ai`) for allow and redact; local Qwen inside Sitr for private, so originals never leave; timeouts and a notice on failure | Rashid | Abdulaziz | in review | |
-| P5 | `inspect_and_process(..., delete_file=True)` removes the upload on success and failure; the app uses it | Rashid | Abdulaziz | in review | |
+| P1 | Orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk`; models are skipped when a rule finds a credential; metadata says which models ran or fell back; app warms all models at start | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P2 | `policy_engine.merge_findings`: rules first, overlapping model findings dropped; T7 passes | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P3 | All Phase 5 overrides: credentials, private keys and restricted operational information block; HR/financial data, a model-only credential or the classifier (confidence 0.6 or more) route private; models can never block or lower a decision | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P4 | Hosted Qwen via HF Inference Providers (`featherless-ai`) for allow and redact; local Qwen inside Sitr for private, so originals never leave; timeouts and a notice on failure | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P5 | `inspect_and_process(..., delete_file=True)` removes the upload on success and failure; the app uses it | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
 
 ## Phase 6 and 7 - Product and deployment (Abdulaziz)
 
@@ -119,7 +119,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
-- 2026-11-06 - Abdulaziz - Phase 5 (P1-P5) built on `feature/policy-routing`: real pipeline end to end. 160 tests pass (CI: 148 pass, 12 model tests skip); T7 passes. Test split through the full pipeline: action accuracy 0.95, entities 0.968 / 0.938. Live check: four examples and two PDF uploads in the running app give the right badge, uploads are deleted, the audit log holds no values.
+- 2026-11-06 - Abdulaziz - Phase 5 (P1-P5) built on `feature/policy-routing`: real pipeline end to end. 160 tests pass (CI: 148 pass, 12 model tests skip); T7 passes. Test split through the full pipeline: action accuracy 0.95, entities 0.968 / 0.938. Live check: four examples and two PDF uploads in the running app give the right badge, uploads are deleted, the audit log holds no values. [#14](https://github.com/arwaili/sitr-ai-gate/pull/14)
 - 2026-11-06 - Abdulaziz - Added Phase 4 testing steps to Blockers; deleted the merged `chore/phase-1-setup` branch.
 - 2026-11-06 - Abdulaziz - PR #11 merged into `main` (132 tests pass after merge, CI green), H1-H4 marked done, lane branches synced to `main`, docs updated to match.
 - 2026-11-06 - Abdulaziz - Phase 4 (H1-H4) built on `feature/hf-intelligence`. Held-out test split (60 rows), rules plus models: entity precision 0.967, recall 0.927; names 0.897/0.897; action accuracy 0.95 (all misses are public prompts with a false Arabic name); risk model alone 0.85. Median latency: PII model 234 ms, risk model 146 ms. 132 tests pass locally; CI skips the 7 real-model tests. Dataset republished with `+974 0000` phones. [#11](https://github.com/arwaili/sitr-ai-gate/pull/11)
