@@ -73,7 +73,7 @@ Owns:
 - `src/orchestrator.py`
 - `tests/test_policy.py`
 
-Delivers deterministic allow/redact/private/block decisions and the single public `inspect_and_process` entry point. Status: built on `feature/policy-routing`, in review.
+Delivers deterministic allow/redact/private/block decisions and the single public `inspect_and_process` entry point. Status: done in PR #14.
 
 ### Lane 4 - Product and deployment
 
@@ -118,7 +118,7 @@ All four must pass on the deployed Hugging Face Space before additional features
 
 ## GitHub setup
 
-Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5), Phase 3 (#8) and Phase 4 (#11) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
+Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5), Phase 3 (#8), Phase 4 (#11) and Phase 5 (#14) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
 
 Still to do (tracked in `TASKS.md`):
 
