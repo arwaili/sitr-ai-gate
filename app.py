@@ -48,6 +48,7 @@ SEAL_WORDS_AR = {"allow": "مسموح", "redact": "منقّح", "private": "خا
 ACTION_ORDER = ("allow", "redact", "private", "block", "error")
 # Uploads are stored by Gradio on drop, so one that is never sent is purged on this schedule.
 CACHE_PURGE_SECONDS = (600, 600)
+CHAT_MAX_CHARS = 280  # longer text is something to check, not small talk
 
 MAROON = "#8A1538"
 THEME = gr.themes.Base(
@@ -118,6 +119,7 @@ footer {{ display: none !important; }}
 /* Gradio scopes rules inside @media to the app body, so phones get their right margin here. */
 @media (max-width: 768px) {{ #sitr-main {{ padding-right: 14px !important; }} }}
 .sitr-copy {{ white-space: nowrap; }}
+.sitr-talk p[dir="auto"] {{ margin: 0; white-space: pre-line; }}
 /* Copy buttons appear when the pointer is over their message; touch screens always show them. */
 @media (hover: hover) {{
   #sitr-chat .message-buttons-left, #sitr-chat .message-buttons-right, #sitr-chat .sitr-copy {{
@@ -607,17 +609,39 @@ def user_bubble(item: dict, lang: str = "en") -> str:
     return f'<div class="sitr-user">{text}{attached}</div>'
 
 
+def small_talk(item: dict) -> bool:
+    """A short typed message with nothing found, and no content pasted under a question.
+
+    Only these get a conversational reply from Qwen; everything else gets Sitr's verdict.
+    """
+    result = item["result"]
+    return (
+        not item["filename"] and len(item["text"]) <= CHAT_MAX_CHARS
+        and not split_question(item["text"])[0] and _decision(result) == "allow"
+        and not result["analysis"]["entities"]
+    )
+
+
+def talk_reply(text: str, lang: str = "en") -> str:
+    return (
+        f'<div class="sitr-reply sitr-talk"><p dir="auto">{escape(text)}</p>'
+        f'<p class="sitr-note" dir="{_dir(lang)}">{TEXT[lang]["talk_checked"]}</p></div>'
+    )
+
+
 def messages(items: list[dict], lang: str = "en") -> list[dict]:
     """The whole conversation, rebuilt from what was sent and decided."""
     chat = []
     for item in items:
         chat.append({"role": "user", "content": user_bubble(item, lang)})
-        content = (
-            f'<div class="sitr-pending">{TEXT[lang]["pending"]}</div>'
-            if item["result"] is None else reply(
+        if item["result"] is None:
+            content = f'<div class="sitr-pending">{TEXT[lang]["pending"]}</div>'
+        elif item.get("chat"):
+            content = talk_reply(item["chat"], lang)
+        else:
+            content = reply(
                 item["result"], lang, destination(item["text"], lang), bool(item["filename"])
             )
-        )
         chat.append({"role": "assistant", "content": content})
         if item.get("files") or item.get("pdf_failed"):
             note = TEXT[lang]["pdf_not_safe"] if item.get("pdf_failed") else ""
@@ -746,15 +770,21 @@ def send(message: dict | None, items: list[dict], lang: str = "en"):
     pending = [*items, item]
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=False), items, \
         dashboard(lang)
-    # With a file, the typed text is the question and the file is what gets checked. No model is
-    # called: Sitr answers, and the user takes the safe version to their own assistant. Uploads
-    # are Gradio temp copies, kept until their redacted copy is made, then deleted.
+    # With a file, the typed text is the question and the file is what gets checked. The check
+    # sends nothing to Qwen: Sitr answers, and the user takes the safe version to their own
+    # assistant. Uploads are Gradio temp copies, kept until their redacted copy is made, then
+    # deleted.
     try:
         item["result"] = inspect_and_process(text=content, file_path=path, route_to_model=False)
         item["files"], item["pdf_failed"] = exports(item["result"], path, lang)
     finally:
         if path:
             Path(path).unlink(missing_ok=True)
+    # Small talk with nothing found gets a real answer from Qwen, after the check, never before.
+    # Only earlier small-talk turns go with it, so no checked content reaches the model.
+    if small_talk(item):
+        history = [(i["text"], i["chat"]) for i in items if i.get("chat")]
+        item["chat"] = router.chat(history, text)
     record(item["result"])
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=True), pending, \
         dashboard(lang)

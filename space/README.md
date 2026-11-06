@@ -31,7 +31,9 @@ light and dark.
 - `Horizon-Labs/multilingual-zeroshot-small` reads what the text is about.
 - `Qwen/Qwen2.5-1.5B-Instruct` is the pipeline's model: allowed and redacted requests go
   through Hugging Face Inference Providers, private requests stay inside this Space. The chat
-  itself only checks: your text is read by the detectors inside this Space and is not sent to Qwen or any outside service.
+  checks every message first, inside this Space. Only short small talk with nothing sensitive in it
+  ("hello", "what can you do?") is then answered by Qwen; files, content pasted under a question,
+  and anything with findings get Sitr's verdict and are not sent to Qwen.
 
 **Use synthetic data only.** This is a security decision-support prototype; the private route is
 a demonstration, not an isolated environment. The models load when the Space starts: wait until

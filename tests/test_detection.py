@@ -282,3 +282,27 @@ def test_ai_product_names_are_not_people() -> None:
     people = [e for e in detect_entities("Can I upload this contract to Claude or ChatGPT?")
               if e.entity_type == "PERSON"]
     assert people == []
+
+
+def _finding(entity_type: str, value: str):
+    from src.contracts import SensitiveEntity
+
+    return SensitiveEntity(entity_type=entity_type, value=value, start=0, end=len(value),
+                           confidence=0.9, source="hf_ner", severity="medium")
+
+
+@pytest.mark.parametrize("value", ["hello", "Hello!", "thank you", "مرحبا", "السلام عليكم"])
+def test_greetings_are_not_usernames_or_names(value: str) -> None:
+    # Regression: the model read a lone "hello" as a username, so small talk got a verdict.
+    for kind in ("USERNAME", "PERSON"):
+        assert not hf_detection._plausible(_finding(kind, value))
+
+
+def test_real_usernames_and_names_are_kept() -> None:
+    assert hf_detection._plausible(_finding("USERNAME", "test.applicant01"))
+    assert hf_detection._plausible(_finding("PERSON", "Mariam Al-Example"))
+
+
+@needs_pii_model
+def test_a_greeting_has_no_findings() -> None:
+    assert detect_entities("hello") == []

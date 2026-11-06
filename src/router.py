@@ -4,12 +4,15 @@
   Qwen/Qwen2.5-1.5B-Instruct through Hugging Face Inference Providers.
 - private_simulation (private) runs the same Qwen model inside the Sitr process, so the
   original text never leaves it. It is a demonstration, not an isolated environment.
+- chat() answers small talk the chat app has already checked and allowed with nothing found,
+  through the same hosted Qwen.
 SITR_LLM=mock returns canned text (tests use it); a model failure returns a notice, never
 raises, and never changes Sitr's decision.
 """
 
 import logging
 import os
+import re
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
@@ -102,6 +105,49 @@ def call_model(route: str, prompt: str, user_intent: str) -> str:
         reason = type(exc).__name__
         logger.warning("Model route %s failed (%s).", route, reason)
     return f"The model could not answer ({reason}). Sitr's decision above still applies."
+
+
+_CHAT_SYSTEM = (
+    "You are Sitr (ستر), a friendly assistant that tells people whether text or files are safe "
+    "to share with an AI assistant. Sitr has already checked this message and found nothing "
+    "personal, confidential or secret in it. Reply in two or three short sentences, in the "
+    "user's language (English or Arabic), with warmth and common sense. Never ask for personal "
+    "data, IDs, passwords or keys. When it fits, remind the user they can paste text or attach a "
+    "file with + and ask whether it is safe to send."
+)
+_CHAT_TURNS = 3
+_ARABIC = re.compile(r"[؀-ۿ]")
+_CJK = re.compile(r"[぀-ヿ㐀-鿿가-힯]")
+
+
+def chat(history: list[tuple[str, str]], text: str) -> str | None:
+    """A short conversational reply from hosted Qwen, or None if it fails. Never raises.
+
+    Only for messages Sitr has allowed with nothing found; history holds earlier such turns.
+    """
+    if os.environ.get("SITR_LLM", "live") == "mock":
+        return "[Mock chat] Hello! Paste text or attach a file and ask if it is safe to share."
+    # The small Qwen drifts into Chinese on Arabic input unless the language is spelled out.
+    language = "Arabic" if _ARABIC.search(text) else "English"
+    system = f"{_CHAT_SYSTEM} Reply only in {language}."
+    turns = [{"role": "system", "content": system}]
+    for asked, answered in history[-_CHAT_TURNS:]:
+        turns += [{"role": "user", "content": asked}, {"role": "assistant", "content": answered}]
+    turns.append({"role": "user", "content": text[:_MAX_PROMPT_CHARS]})
+    try:
+        from huggingface_hub import InferenceClient
+
+        client = InferenceClient(model=MODEL_ID, provider=PROVIDER, timeout=EXTERNAL_TIMEOUT)
+        for _ in range(2):
+            reply = client.chat_completion(messages=turns, max_tokens=200, temperature=0.3)
+            answer = reply.choices[0].message.content.strip()
+            if answer and not _CJK.search(answer):
+                return answer
+        return None
+    except Exception as exc:
+        # Log the error type only; messages can quote the user's text.
+        logger.warning("Chat reply failed (%s).", type(exc).__name__)
+        return None
 
 
 def warm_up() -> None:

@@ -28,6 +28,7 @@
 | 3 | `src.router.route(action, redaction, user_intent)` | model response, or `None` on block |
 | 3 | `src.export.redacted_pdf(source, redaction)`, `src.export.redacted_text_file(redaction)` | safe copies for the user; the PDF is scrubbed (page text, metadata, outline, links, comments, attachments), read back, and `None` if any value remains |
 | 3 | `src.router.call_model(route, prompt, user_intent)` | the replaceable model adapter; never raises. `SITR_LLM=mock` returns canned text (tests set it) |
+| 3 | `src.router.chat(history, text)` | a short reply from hosted Qwen for small talk, or `None` on failure; never raises. The app calls it only after the check, for a short typed message with action `allow` and no findings; `history` holds only earlier such turns. Replies in the user's script (Arabic or English) and retries once if another script comes back |
 | 3 | `src.orchestrator.inspect_and_process(text=None, file_path=None, user_intent="summarize", delete_file=False, route_to_model=True)` | `FinalResponse` as a dict |
 
 Entity offsets are Python string indices into the exact inspected text. Every occurrence is a separate entity.

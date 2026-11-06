@@ -55,6 +55,14 @@ NOT_NAMES = {
     # AI products the app is asked about all the time.
     "chatgpt", "claude", "gemini", "copilot", "deepseek", "كلود",
 }
+# Greetings and thanks: the model reads a lone "hello" as a username. A PERSON or USERNAME
+# finding made only of these words is dropped.
+GREETINGS = {
+    "hello", "hi", "hey", "hiya", "thanks", "thank", "you", "bye", "goodbye", "morning",
+    "evening", "good", "salam", "marhaba", "ahlan", "shukran",
+    "مرحبا", "مرحباً", "أهلا", "أهلاً", "اهلا", "السلام", "عليكم", "سلام", "شكرا", "شكراً",
+    "صباح", "مساء", "الخير", "النور",
+}
 
 logger = logging.getLogger("sitr.hf_detection")
 _executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="sitr-ner")
@@ -159,8 +167,11 @@ def decode(text: str, offsets, labels, scores) -> list[SensitiveEntity]:
 
 def _plausible(entity: SensitiveEntity) -> bool:
     """Cheap shape checks that drop model fragments such as a port number tagged as an email."""
+    words = [word.strip(".,!?؟،").casefold() for word in entity.value.split()]
+    if entity.entity_type in ("PERSON", "USERNAME") and all(w in GREETINGS for w in words):
+        return False
     if entity.entity_type == "PERSON":
-        return not all(word.casefold() in NOT_NAMES for word in entity.value.split())
+        return not all(word in NOT_NAMES for word in words)
     if entity.entity_type == "EMAIL":
         return "@" in entity.value
     if entity.entity_type in ("PHONE", "ACCOUNT_NUMBER", "CREDIT_CARD"):
