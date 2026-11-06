@@ -9,7 +9,6 @@ from src.orchestrator import inspect_and_process
 gradio = pytest.importorskip("gradio")  # CI installs only the core test dependencies.
 
 import app  # noqa: E402
-from app import EXAMPLES  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -20,97 +19,120 @@ def _rules_only(monkeypatch) -> None:
     monkeypatch.setattr(app, "_entity_stats", app.Counter())
 
 
-def _chat(text: str | None = None, path: str | None = None, task: str = "summarize",
-          lang: str = "en") -> list:
-    message = {"text": text or "", "files": [path] if path else []}
-    return list(app.send(message, task, [], lang))
+def _ask(text: str = "", path: str | None = None, lang: str = "en") -> list:
+    return list(app.send({"text": text, "files": [path] if path else []}, [], lang))
+
+
+def _visible(html: str) -> str:
+    """The answer as the user first sees it, without the collapsed details."""
+    shown = re.sub(r"<details.*?</details>", " ", html, flags=re.S)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", shown)).strip()
 
 
 @pytest.mark.parametrize(
-    ("name", "action", "word"),
+    ("index", "action", "headline"),
     [
-        ("Safe public prompt", "allow", "Allowed"),
-        ("Synthetic CV", "redact", "Redacted"),
-        ("Synthetic Arabic-English contract", "private", "Private route"),
-        ("Code with a synthetic API key", "block", "Blocked"),
+        (0, "allow", "Yes, you can send it to ChatGPT."),
+        (1, "redact", "Not as it is. Send this version to ChatGPT instead."),
+        (2, "private", "No, keep this one inside the company."),
+        (3, "block", "No, don&#x27;t send this to ChatGPT."),
     ],
 )
-def test_each_example_gets_its_decision_card(name: str, action: str, word: str) -> None:
-    result = inspect_and_process(text=EXAMPLES[name])
-    assert result["action_taken"] == action
-    card = app.reply(result)
-    assert f'class="sitr-seal {action}"' in card and word in card
-    assert "What Sitr found" in card and f'class="sitr-next {action}"' in card
+def test_each_question_gets_a_plain_answer(index: int, action: str, headline: str) -> None:
+    example = app.chat_examples()[index]
+    *_, (chat, _, items, _) = _ask(example["text"])
+    answer = chat[1]["content"]
+    assert items[-1]["result"]["action_taken"] == action
+    assert f'class="sitr-chip {action}"' in answer and headline in answer
 
 
-def test_reply_runs_in_order_decision_findings_sent_answer() -> None:
-    card = app.reply(inspect_and_process(text=EXAMPLES["Synthetic CV"]))
-    order = [card.index(marker) for marker in
-             ("sitr-seal", "sitr-next", "What Sitr found", "Answer", "Technical details")]
-    assert order == sorted(order)
+def test_answers_name_what_was_found_in_plain_words() -> None:
+    *_, (chat, _, _, _) = _ask(app.chat_examples()[1]["text"])
+    assert "It has an email address and a phone number." in _visible(chat[1]["content"])
 
 
-def test_redacted_reply_shows_placeholders_as_what_was_sent() -> None:
-    card = app.reply(inspect_and_process(text=EXAMPLES["Synthetic CV"]))
-    to_send = card.split('class="sitr-next')[1].split("What Sitr found")[0]
-    assert "Send this version instead" in to_send
-    assert "[EMAIL_1]" in to_send and "test.applicant@example.com" not in to_send
-    assert '<mark class="medium">test.applicant@example.com<small>EMAIL</small></mark>' in card
+def test_redacted_answer_offers_only_the_safe_version_without_the_question() -> None:
+    *_, (chat, _, items, _) = _ask(app.chat_examples()[1]["text"])
+    ready = chat[1]["content"].split('class="sitr-ready"')[1].split("</div></div>")[0]
+    assert "[EMAIL_1]" in ready and "test.applicant@example.com" not in ready
+    assert "Can I send" not in ready
+    assert Path(items[-1]["files"][0]).read_text(encoding="utf-8").startswith("Curriculum")
 
 
-def test_blocked_reply_says_nothing_was_sent_and_has_no_answer() -> None:
-    card = app.reply(inspect_and_process(text=EXAMPLES["Code with a synthetic API key"]))
-    to_send = card.split('class="sitr-next')[1].split("What Sitr found")[0]
-    assert "Don&#x27;t send this" in to_send
-    assert "[API_KEY_1]" in to_send and "sk-synthetic" not in to_send
-    assert "<h4>Answer</h4>" not in card
+def test_blocked_answer_says_no_and_hides_the_secret() -> None:
+    *_, (chat, _, _, _) = _ask(app.chat_examples()[3]["text"])
+    ready = chat[1]["content"].split('class="sitr-ready"')[1].split("<details")[0]
+    assert "[API_KEY_1]" in ready and "sk-synthetic" not in ready
 
 
-def test_error_reply_is_not_assessed() -> None:
-    card = app.reply(inspect_and_process(text=" "))
-    assert 'class="sitr-seal error"' in card and "Not assessed" in card
+def test_developer_details_are_collapsed() -> None:
+    *_, (chat, _, _, _) = _ask(app.chat_examples()[1]["text"])
+    shown = _visible(chat[1]["content"])
+    for technical in ("Risk", "Reason codes", "Detector", "40 of 100", "regex"):
+        assert technical not in shown
+    assert "See what I found" in chat[1]["content"]
 
 
-def test_user_text_and_model_answer_are_escaped() -> None:
-    result = inspect_and_process(text="<script>alert(1)</script> hello")
-    item = {"text": result["redaction"]["original_text"], "filename": None, "task": "summarize",
-            "result": result}
-    rendered = "".join(m["content"] for m in app.messages([item]))
+def test_no_model_is_called_from_the_chat() -> None:
+    *_, (_, _, items, _) = _ask(app.chat_examples()[0]["text"])
+    assert items[-1]["result"]["model_response"] is None
+
+
+def test_file_question_checks_the_file_and_offers_redacted_copies(tmp_path) -> None:
+    upload = Path(shutil.copy(Path("examples/synthetic_cv.pdf"), tmp_path / "cv.pdf"))
+    pending, final = _ask("Can I upload this CV to Claude?", str(upload))
+    assert "Checking it" in pending[0][1]["content"]
+    assert "Attached: cv.pdf" in final[0][0]["content"]
+    assert "Send this version to Claude instead." in final[0][1]["content"]
+    assert [Path(f).name for f in final[2][-1]["files"]] == ["cv-redacted.pdf", "cv-redacted.txt"]
+    assert {"path": final[2][-1]["files"][0]} in [m["content"] for m in final[0]]
+    assert not upload.exists()  # the upload is deleted after the check
+
+
+def test_safe_file_can_be_uploaded_as_it_is(tmp_path) -> None:
+    upload = Path(shutil.copy(Path("examples/safe_prompt.txt"), tmp_path / "notes.txt"))
+    *_, (chat, _, items, _) = _ask("Can I send this to ChatGPT?", str(upload))
+    assert "You can upload the original file as it is." in chat[1]["content"]
+    assert items[-1]["files"] == []
+
+
+def test_error_answer_explains_and_offers_nothing_to_copy(tmp_path) -> None:
+    broken = tmp_path / "broken.pdf"
+    broken.write_bytes(b"\xff\xfe broken")
+    *_, (chat, _, _, _) = _ask("Can I send this?", str(broken))
+    assert "I couldn&#x27;t read that." in chat[1]["content"]
+    assert "sitr-copy" not in chat[1]["content"]
+
+
+def test_destination_and_question_detection() -> None:
+    assert app.destination("Can I paste this into chatgpt?") == "ChatGPT"
+    assert app.destination("هل أرفعه إلى كلود؟", "ar") == "Claude"
+    assert app.destination("Is this fine?") == "an AI assistant"
+    assert app.split_question("Can I send it?\n\nBody") == ("Can I send it?", "Body")
+    assert app.split_question("No question here\n\nBody") == ("", "No question here\n\nBody")
+
+
+def test_things_joins_findings_naturally() -> None:
+    entities = [{"entity_type": k, "start": i} for i, k in enumerate(("PERSON", "EMAIL", "PHONE"))]
+    assert app.things(entities) == "a name, an email address and a phone number"
+    assert app.things(entities, "ar") == "اسم، بريد إلكتروني ورقم هاتف"
+    assert app.things([]) == ""
+
+
+def test_user_text_is_escaped() -> None:
+    *_, (chat, _, _, _) = _ask("<script>alert(1)</script> hello")
+    rendered = "".join(m["content"] for m in chat if isinstance(m["content"], str))
     assert "<script>" not in rendered and "&lt;script&gt;" in rendered
 
 
-def test_send_shows_the_message_first_then_the_reply(tmp_path) -> None:
-    upload = Path(shutil.copy(Path("examples/synthetic_cv.pdf"), tmp_path / "cv.pdf"))
-    pending, final = _chat(path=str(upload))
-    assert "Checking your message" in pending[0][1]["content"]
-    assert "Attached: cv.pdf" in final[0][0]["content"]
-    files = [Path(f).name for f in final[2][-1]["files"]]
-    assert files == ["cv-redacted.pdf", "cv-redacted.txt"]
-    assert {"path": final[2][-1]["files"][0]} in [m["content"] for m in final[0]]
-    assert 'class="sitr-seal redact"' in final[0][1]["content"]
-    assert final[2][-1]["result"]["action_taken"] == "redact"  # kept for the language switch
-    assert not upload.exists()  # the upload is deleted after inspection
-
-
-def test_allowed_text_is_offered_as_it_is_with_no_files() -> None:
-    *_, (chat, _, items, _) = _chat(EXAMPLES["Safe public prompt"], task="answer the request")
-    assert "Safe to send" in chat[1]["content"] and items[0]["files"] == []
-    assert len(chat) == 2
-
-
-def test_error_offers_nothing_to_copy() -> None:
-    card = app.reply(inspect_and_process(text=" "))
-    assert "Nothing to send" in card and "sitr-copy" not in card
-
-
 def test_empty_message_sends_nothing() -> None:
-    [(chat, _, items, _)] = _chat(text="   ")
+    [(chat, _, items, _)] = _ask("   ")
     assert chat == [] and items == []
 
 
 def test_dashboard_counts_decisions_and_types_only() -> None:
-    _chat(EXAMPLES["Synthetic CV"])
-    _chat(EXAMPLES["Code with a synthetic API key"], task="answer the request")
+    _ask(app.chat_examples()[1]["text"])
+    _ask(app.chat_examples()[3]["text"])
     board = app.dashboard()
     assert "<b>2</b><span>Messages checked</span>" in board
     assert "<b>1</b><span>Redacted</span>" in board and "<b>1</b><span>Blocked</span>" in board
@@ -121,44 +143,35 @@ def test_empty_dashboard_invites_a_first_message() -> None:
     assert "No inspections yet" in app.dashboard()
 
 
-def test_task_choices_are_a_fixed_short_list() -> None:
-    values = [value for _, value in app.TASKS]
-    assert "summarize" in values and len(app.EXAMPLE_TASKS) == len(EXAMPLES)
-    assert all(task in values for task in app.EXAMPLE_TASKS)
-
-
 @pytest.mark.parametrize(
-    ("name", "word", "reason"),
-    [
-        ("Safe public prompt", "مسموح", "لم يُعثر على محتوى حساس."),
-        ("Synthetic CV", "منقّح", "وُجدت بيانات شخصية"),
-        ("Synthetic Arabic-English contract", "خاص", "المسار الخاص"),
-        ("Code with a synthetic API key", "محظور", "مفتاح أو رمز وصول"),
-    ],
+    ("index", "headline"),
+    [(0, "نعم، يمكنك إرساله إلى ChatGPT."), (1, "ليس كما هو."), (2, "لا، أبقِ هذا داخل المؤسسة."),
+     (3, "لا، لا ترسل هذا إلى ChatGPT.")],
 )
-def test_arabic_shows_only_arabic(name: str, word: str, reason: str) -> None:
-    card = app.reply(inspect_and_process(text=EXAMPLES[name]), "ar")
-    assert word in card and reason in card
-    # Leave out the user's own text, the technical panel, and entity codes such as QATAR_ID.
-    shown = re.sub(r'<div class="sitr-(?:quote|answer)" dir="auto">.*?</div>|<details>.*?'
-                   r"</details>", " ", card, flags=re.S)
-    visible = re.sub(r"<[^>]+>|\b[A-Z][A-Z_]+\b", " ", shown)
-    leftover = set(re.findall(r"[A-Za-z]{3,}", visible)) - {"Qwen", "Hugging", "Face", "ChatGPT",
-                                                           "Claude"}
+def test_arabic_answers_are_in_arabic(index: int, headline: str) -> None:
+    *_, (chat, _, _, _) = _ask(app.chat_examples("ar")[index]["text"], lang="ar")
+    answer = chat[1]["content"]
+    assert headline in answer
+    # Leave out the user's own text, entity placeholders and product names; no English remains.
+    shown = re.sub(r'<div class="sitr-quote" dir="auto">.*?</div>', " ", _visible(answer),
+                   flags=re.S)
+    shown = re.sub(r"\[[A-Z_0-9]+\]|\b[A-Z][A-Z_]+\b", " ", shown)
+    leftover = set(re.findall(r"[A-Za-z]{3,}", shown)) - {"ChatGPT", "Claude", "IBAN", "API"}
+    leftover -= {w for w in re.findall(r"[A-Za-z]{3,}", answer.split("sitr-quote")[-1])}
     assert not leftover, leftover
 
 
-def test_arabic_error_explains_and_says_nothing_was_sent() -> None:
-    result = inspect_and_process(text=" ")
-    assert app.reason(result, "ar") == "لا يوجد محتوى قابل للقراءة. لم يُرسل شيء إلى أي نموذج."
+def test_arabic_error_reason() -> None:
+    assert app.reason(inspect_and_process(text=" "), "ar") == (
+        "لا يوجد محتوى قابل للقراءة. لم يُرسل شيء إلى أي نموذج.")
 
 
 def test_language_switch_redraws_the_whole_conversation() -> None:
-    *_, (_, _, items, _) = _chat(EXAMPLES["Synthetic CV"])
+    *_, (_, _, items, _) = _ask(app.chat_examples()[1]["text"])
     outputs = app.switch_language("en", items)
     assert outputs[0] == "ar"
-    assert "منقّح" in str(outputs[8].value[1]["content"])  # Gradio stores content as parts
-    assert len(outputs) == 17  # one value per component the switch updates
+    assert "ليس كما هو" in str(outputs[8].value[1]["content"])  # Gradio stores content as parts
+    assert len(outputs) == 16  # one value per component the switch updates
     assert app.switch_language("ar", items)[0] == "en"
 
 
@@ -166,13 +179,15 @@ def test_both_languages_have_the_same_keys() -> None:
     from ui_text import TEXT
 
     def shape(value):
-        return {k: shape(v) for k, v in value.items()} if isinstance(value, dict) else (
-            len(value) if isinstance(value, list) else None)
+        if isinstance(value, dict):
+            return {k: shape(v) for k, v in value.items()}
+        return len(value) if isinstance(value, list | tuple) else None
 
     assert shape(TEXT["en"]) == shape(TEXT["ar"])
 
 
-def test_every_example_has_a_label_in_both_languages() -> None:
+def test_every_example_is_a_question_in_both_languages() -> None:
     for lang in ("en", "ar"):
-        labels = [example["display_text"] for example in app.chat_examples(lang)]
-        assert len(labels) == len(EXAMPLES) and all(labels)
+        for example in app.chat_examples(lang):
+            question, content = app.split_question(example["text"])
+            assert question == example["display_text"] and content

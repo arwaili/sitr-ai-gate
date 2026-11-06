@@ -62,7 +62,9 @@ def _detect(text: str, pages) -> tuple[list[SensitiveEntity], object, ModelMetad
     return entities, semantic, ModelMetadata(detector=detector, classifier=classifier)
 
 
-def _process(text: str, pages, user_intent: str, started: float) -> FinalResponse:
+def _process(
+    text: str, pages, user_intent: str, started: float, route_to_model: bool = True
+) -> FinalResponse:
     entities, semantic, metadata = _detect(text, pages)
     analysis = decide(str(uuid.uuid4()), text, entities, metadata, semantic)
     action = analysis.recommended_action
@@ -72,7 +74,7 @@ def _process(text: str, pages, user_intent: str, started: float) -> FinalRespons
         action_taken=action,
         analysis=analysis,
         redaction=redaction,
-        model_response=router.route(action, redaction, user_intent),
+        model_response=router.route(action, redaction, user_intent) if route_to_model else None,
         user_message=analysis.explanation,
         latency_ms=_elapsed_ms(started),
     )
@@ -83,11 +85,13 @@ def inspect_and_process(
     file_path: str | None = None,
     user_intent: str = "summarize",
     delete_file: bool = False,
+    route_to_model: bool = True,
 ) -> dict:
     """Inspect one input and return the frozen FinalResponse schema as a dict.
 
     Pass `delete_file=True` for uploaded temporary files: the file is removed afterwards,
-    whether processing succeeded or failed.
+    whether processing succeeded or failed. Pass `route_to_model=False` to inspect and decide
+    without calling any model; `model_response` is then None.
     """
     started = time.perf_counter()
     try:
@@ -97,7 +101,9 @@ def inspect_and_process(
             # Lane 1's ValueErrors carry content-free messages, so they can be shown.
             response = _error(str(exc), started)
         else:
-            response = _process(ingestion.text, ingestion.pages, user_intent, started)
+            response = _process(
+                ingestion.text, ingestion.pages, user_intent, started, route_to_model
+            )
     except DetectorUnavailable:
         # Rules cannot see names, so without the detector the text is not known to be safe.
         response = _error(DETECTOR_DOWN_MESSAGE, started)

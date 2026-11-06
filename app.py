@@ -276,6 +276,42 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-empty .ar {{ font-size: 2.6rem !important; }}
 .sitr-empty h3 {{ font-size: 1.1rem !important; }}
 
+/* The answer card: a status chip, a yes or no headline, why, and the version to use. */
+.sitr-chip {{ align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  padding: 2px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600;
+  color: var(--chip); background: color-mix(in srgb, var(--chip) 13%, transparent); }}
+.sitr-chip::before {{ content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--chip); }}
+.sitr-chip.allow {{ --chip: var(--sitr-allow); }}
+.sitr-chip.redact {{ --chip: var(--sitr-redact); }}
+.sitr-chip.private {{ --chip: var(--sitr-private); }}
+.sitr-chip.block {{ --chip: var(--sitr-block); }}
+.sitr-chip.error {{ --chip: var(--sitr-error); }}
+.sitr-headline {{ margin: 0 !important; font-size: 1.05rem; font-weight: 600; }}
+.sitr-why {{ margin: 0 !important; color: var(--body-text-color); }}
+.sitr-ready {{ border: 1px solid var(--border-color-primary); border-radius: 12px;
+  overflow: hidden; background: var(--block-background-fill); }}
+.sitr-ready-head {{ display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 6px 8px 6px 12px; font-size: .8rem; color: var(--sitr-muted);
+  border-bottom: 1px solid var(--border-color-primary); }}
+html[dir="rtl"] .sitr-ready-head {{ padding: 6px 12px 6px 8px; }}
+.sitr-ready .sitr-quote {{ border: 0 !important; border-radius: 0 !important;
+  background: transparent !important; max-height: 280px; overflow: auto; }}
+.sitr-copy {{ position: static !important; }}
+.sitr-more summary {{ cursor: pointer; color: var(--sitr-muted); font-size: .85rem; }}
+.sitr-more[open] summary {{ margin-bottom: 8px; }}
+.sitr-more .sitr-quote {{ margin-bottom: 10px; }}
+.sitr-tech h4 {{ margin: 6px 0 4px; }}
+.sitr-tech p {{ margin: 0; font-size: .82rem; color: var(--sitr-muted); }}
+
+/* Four suggestions as an even 2 x 2 grid; replies keep clear of the chat's scrollbar; the
+   user's bubble is wide enough for an email address on one line. */
+#sitr-chat .examples {{ grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  max-width: 620px; margin: 0 auto; }}
+#sitr-chat .bot-row .message {{ padding-inline-end: 14px !important; }}
+#sitr-chat .user-row .message {{ min-width: min(340px, 72vw) !important; }}
+.sitr-user {{ overflow-wrap: anywhere; }}
+
 /* Composer: the +, the text and the send arrow share one centered line. */
 #sitr-composer {{ border: 1px solid var(--border-color-primary) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .04) !important; padding: 6px 8px !important; }}
@@ -367,80 +403,105 @@ def reason(result: dict, lang: str = "en") -> str:
     return DECISION_REASONS_AR[key]
 
 
-def seal(result: dict, lang: str = "en") -> str:
-    key = _decision(result)
-    word = SEAL_WORDS_AR[key] if lang == "ar" else TEXT["en"]["decisions"][key]
-    css = "word" if lang == "ar" else "word latin"
+# Where the user plans to send it, named in the answer when the question mentions it.
+DESTINATIONS = {
+    "chatgpt": "ChatGPT", "chat gpt": "ChatGPT", "شات جي بي تي": "ChatGPT", "claude": "Claude",
+    "كلود": "Claude", "gemini": "Gemini", "copilot": "Copilot", "deepseek": "DeepSeek",
+}
+
+
+def destination(text: str, lang: str = "en") -> str:
+    lowered = text.lower()
+    for needle, name in DESTINATIONS.items():
+        if needle in lowered:
+            return name
+    return TEXT[lang]["default_dest"]
+
+
+def split_question(text: str) -> tuple[str, str]:
+    """A first paragraph that ends in a question mark is the question; the rest is the content."""
+    first, sep, rest = text.partition("\n\n")
+    if sep and rest.strip() and len(first) < 300 and first.strip().endswith(("?", "؟")):
+        return first.strip(), rest
+    return "", text
+
+
+def things(entities: list[dict], lang: str = "en") -> str:
+    """What was found, in plain words: "a name, an email address and a phone number"."""
+    t = TEXT[lang]
+    names = list(dict.fromkeys(
+        t["things"].get(e["entity_type"], e["entity_type"].lower().replace("_", " "))
+        for e in sorted(entities, key=lambda e: e["start"])
+    ))
+    if len(names) < 2:
+        return "".join(names)
+    joiner = "، " if lang == "ar" else ", "
+    return f"{joiner.join(names[:-1])}{t['and']}{names[-1]}"
+
+
+def copy_box(text: str, label: str, lang: str = "en") -> str:
+    t = TEXT[lang]
+    # The button copies the text shown next to it, so nothing else ends up on the clipboard.
     return (
-        f'<div class="sitr-seal {key}" role="status"><div class="{css}">{escape(word)}</div>'
-        f'<div class="what">{escape(reason(result, lang))}</div></div>'
+        f'<div class="sitr-ready"><div class="sitr-ready-head"><span>{escape(label)}</span>'
+        f'<button type="button" class="sitr-copy" data-done="{t["copied"]}" '
+        'onclick="navigator.clipboard.writeText(this.closest(\'.sitr-ready\')'
+        ".querySelector('.sitr-quote').innerText); this.textContent = this.dataset.done;\">"
+        f'{t["copy"]}</button></div><div class="sitr-quote" dir="auto">{escape(text)}</div></div>'
     )
 
 
-def reply(result: dict, lang: str = "en") -> str:
-    """Sitr's answer card, in the order things happen: decision, findings, what left, answer."""
+def reply(result: dict, lang: str = "en", dest: str | None = None, from_file: bool = False,
+          question: str = "") -> str:
+    """The answer to "can I send this?": a verdict, why, and the version that is safe to use."""
     t, analysis, key = TEXT[lang], result["analysis"], _decision(result)
-    risk = t["not_assessed"] if key == "error" else (
-        f"{t['risk_levels'][analysis['risk_level']]}{'، ' if lang == 'ar' else ', '}"
-        + t["of_100"].format(score=analysis["risk_score"])
-    )
-    facts = (
-        f'<dl class="sitr-facts"><dt>{t["risk"]}</dt><dd>{escape(risk)}</dd>'
-        f"<dt>{t['found']}</dt><dd>{escape(entity_counts(analysis['entities'], lang))}</dd>"
-        f"<dt>{t['sent_to']}</dt><dd>{escape(t['routes'][key])}</dd></dl>"
+    dest = dest or t["default_dest"]
+    chip, headline, why = t["answer"][key]
+    found = things(analysis["entities"], lang)
+    why = why.format(
+        things=found, reason=reason(result, lang),
+        with_things=f"{t['with_things_prefix']}{found}" if found else "",
     )
     redaction = result["redaction"]
-    found = ""
+    ready = ""
+    if redaction and key != "error":
+        # The question the user typed is not part of what they would send.
+        content = split_question(redaction["original_text"])[1] if question else (
+            redaction["original_text"])
+        safe = split_question(redaction["safe_text"])[1] if question else redaction["safe_text"]
+        if key == "allow":
+            ready = f'<p class="sitr-note">{t["original_ok"]}</p>' if from_file else copy_box(
+                content, t["ready_text"], lang)
+        else:
+            label = {"redact": t["ready_text"], "private": t["ready_text_limited"],
+                     "block": t["ready_secret"]}[key]
+            ready = copy_box(safe, label, lang)
+    more = ""
     if redaction and analysis["entities"]:
-        found = (
+        more = (
             f'<div class="sitr-quote" dir="auto">'
             f"{findings_html(redaction['original_text'], analysis['entities'])}</div>"
         )
-    sections = [
-        seal(result, lang),
-        next_step(result, lang),
-        f"<section><h4>{t['found_label']}</h4>{facts}{found}</section>",
-    ]
-    if result["model_response"]:
-        # The card already names the route, so the router's private-route tag is not repeated.
-        answer = result["model_response"].removeprefix(router.PRIVATE_LABEL).strip()
-        sections.append(
-            f'<section><h4>{t["answer_label"]}</h4>'
-            f'<div class="sitr-answer" dir="auto">{escape(answer)}</div></section>'
-        )
-    sections.append(technical_details(result, lang))
-    return f'<div class="sitr-reply" dir="{_dir(lang)}">{"".join(sections)}</div>'
-
-
-def next_step(result: dict, lang: str = "en") -> str:
-    """What to give ChatGPT or Claude: the text as it is, a safer version, or nothing."""
-    t, key, redaction = TEXT[lang], _decision(result), result["redaction"]
-    title, advice = t["next"][key]
-    text = ""
-    if redaction and key != "error":
-        # Allowed text goes as written; everything else only with every finding replaced.
-        text = redaction["original_text"] if key == "allow" else redaction["safe_text"]
-    copy = ""
-    if text:
-        # The button copies the text shown next to it, so nothing else ends up on the clipboard.
-        copy = (
-            f'<button type="button" class="sitr-copy" data-done="{t["copied"]}" '
-            'onclick="navigator.clipboard.writeText(this.parentElement.querySelector'
-            "('.sitr-quote').innerText); this.textContent = this.dataset.done;\">"
-            f'{t["copy"]}</button><div class="sitr-quote" dir="auto">{escape(text)}</div>'
-        )
     return (
-        f'<section class="sitr-next {key}"><h3>{escape(title)}</h3><p>{escape(advice)}</p>'
-        f"{copy}</section>"
+        f'<div class="sitr-reply" dir="{_dir(lang)}"><span class="sitr-chip {key}">'
+        f'{escape(chip)}</span><p class="sitr-headline">{escape(headline.format(dest=dest))}</p>'
+        f'<p class="sitr-why">{escape(why)}</p>{ready}'
+        f'<details class="sitr-more"><summary>{t["see_found"]}</summary>{more}'
+        f"{technical_details(result, lang)}</details></div>"
     )
 
 
-def exports(result: dict, path: str | None, lang: str = "en") -> tuple[list[str], bool]:
+def exports(
+    result: dict, path: str | None, lang: str = "en", question: str = ""
+) -> tuple[list[str], bool]:
     """Redacted files to take to an outside assistant, and whether a redacted PDF failed."""
     key, redaction = _decision(result), result["redaction"]
     if key in ("allow", "error") or not redaction or not redaction["replacements"]:
         return [], False
     safe = RedactionResult(**redaction)
+    if question:
+        # The typed question is not part of what the user would send.
+        safe = safe.model_copy(update={"safe_text": split_question(safe.safe_text)[1]})
     files, pdf_failed = [], False
     if path and Path(path).suffix.lower() == ".pdf":
         pdf = redacted_pdf(path, safe)
@@ -462,26 +523,27 @@ def technical_details(result: dict, lang: str = "en") -> str:
     table = f'<table class="sitr-table"><tr>{head}</tr>{rows}</table>' if rows else (
         f"<p>{t['no_findings']}</p>"
     )
+    risk = t["not_assessed"] if _decision(result) == "error" else (
+        f"{t['risk_levels'][analysis['risk_level']]}{'، ' if lang == 'ar' else ', '}"
+        + t["of_100"].format(score=analysis["risk_score"])
+    )
     return (
-        f"<details><summary>{t['details_label']}</summary>"
-        f"<p>{t['reason_codes']}: {escape(', '.join(analysis['reason_codes']) or t['none'])}<br>"
+        f'<div class="sitr-tech"><h4>{t["details_label"]}</h4>'
+        f"<p>{t['risk']}: {escape(risk)}<br>"
+        f"{t['reason_codes']}: {escape(', '.join(analysis['reason_codes']) or t['none'])}<br>"
         f"{t['detector_used']}: {escape(metadata['detector'])}<br>"
         f"{t['classifier_used']}: {escape(metadata['classifier'])}<br>"
-        f"{t['time']}: {result['latency_ms']} ms</p>{table}</details>"
+        f"{t['time']}: {result['latency_ms']} ms</p>{table}</div>"
     )
 
 
 def user_bubble(item: dict, lang: str = "en") -> str:
-    t = TEXT[lang]
-    task = dict(zip(TASK_VALUES, t["tasks"], strict=True)).get(item["task"], item["task"])
-    meta = [f"{t['task_label']}: {task}"]
-    if item["filename"]:
-        meta.insert(0, f"{t['attached']}: {item['filename']}")
     text = f'<span dir="auto">{escape(item["text"])}</span>' if item["text"] else ""
-    return (
-        f'<div class="sitr-user">{text}<span class="meta" dir="{_dir(lang)}">'
-        f"{escape(' · '.join(meta))}</span></div>"
+    attached = (
+        f'<span class="meta" dir="{_dir(lang)}">{TEXT[lang]["attached"]}: '
+        f'{escape(item["filename"])}</span>' if item["filename"] else ""
     )
+    return f'<div class="sitr-user">{text}{attached}</div>'
 
 
 def messages(items: list[dict], lang: str = "en") -> list[dict]:
@@ -491,7 +553,10 @@ def messages(items: list[dict], lang: str = "en") -> list[dict]:
         chat.append({"role": "user", "content": user_bubble(item, lang)})
         content = (
             f'<div class="sitr-pending">{TEXT[lang]["pending"]}</div>'
-            if item["result"] is None else reply(item["result"], lang)
+            if item["result"] is None else reply(
+                item["result"], lang, destination(item["text"], lang), bool(item["filename"]),
+                item.get("question", ""),
+            )
         )
         chat.append({"role": "assistant", "content": content})
         if item.get("files") or item.get("pdf_failed"):
@@ -596,13 +661,13 @@ def empty_chat(lang: str = "en") -> str:
 
 def chat_examples(lang: str = "en") -> list[dict]:
     return [
-        {"text": text, "display_text": label}
+        {"text": f"{label}\n\n{text}", "display_text": label}
         for label, text in zip(TEXT[lang]["examples"], EXAMPLES.values(), strict=True)
     ]
 
 
-def send(message: dict | None, task: str, items: list[dict], lang: str = "en"):
-    """Show the message at once, then Sitr's reply when the inspection finishes."""
+def send(message: dict | None, items: list[dict], lang: str = "en"):
+    """Show the question at once, then Sitr's answer when the check finishes."""
     message = message or {}
     text = (message.get("text") or "").strip()
     files = message.get("files") or []
@@ -612,18 +677,20 @@ def send(message: dict | None, task: str, items: list[dict], lang: str = "en"):
     if not text and not path:
         yield messages(items, lang), gr.MultimodalTextbox(), items, dashboard(lang)
         return
-    item = {"text": text, "filename": Path(path).name if path else None,
-            "task": task or "summarize", "result": None}
+    question = "" if path else split_question(text)[0]
+    item = {"text": text, "filename": Path(path).name if path else None, "question": question,
+            "result": None}
     pending = [*items, item]
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=False), items, \
         dashboard(lang)
-    # Uploads are Gradio temp copies. The upload is kept until its redacted copy is made, then
-    # deleted whatever happens.
+    # With a file, the typed text is the question and the file is what gets checked. No model is
+    # called: Sitr answers, and the user takes the safe version to their own assistant. Uploads
+    # are Gradio temp copies, kept until their redacted copy is made, then deleted.
     try:
         item["result"] = inspect_and_process(
-            text=text or None, file_path=path, user_intent=item["task"]
+            text=None if path else text, file_path=path, route_to_model=False
         )
-        item["files"], item["pdf_failed"] = exports(item["result"], path, lang)
+        item["files"], item["pdf_failed"] = exports(item["result"], path, lang, question)
     finally:
         if path:
             Path(path).unlink(missing_ok=True)
@@ -633,8 +700,7 @@ def send(message: dict | None, task: str, items: list[dict], lang: str = "en"):
 
 
 def send_example(evt: gr.SelectData, items: list[dict], lang: str = "en"):
-    index = list(EXAMPLES.values()).index(evt.value["text"])
-    yield from send({"text": evt.value["text"]}, EXAMPLE_TASKS[index], items, lang)
+    yield from send({"text": evt.value["text"]}, items, lang)
 
 
 def switch_language(lang: str, items: list[dict]) -> tuple:
@@ -653,7 +719,6 @@ def switch_language(lang: str, items: list[dict]) -> tuple:
         gr.Chatbot(value=messages(items, new), placeholder=empty_chat(new),
                    examples=chat_examples(new), rtl=new == "ar"),
         gr.MultimodalTextbox(placeholder=t["placeholder"], rtl=new == "ar"),
-        gr.Dropdown(choices=list(zip(t["tasks"], TASK_VALUES, strict=True))),
         page_title("dashboard", new),
         t["dashboard_intro"],
         dashboard(new),
@@ -713,11 +778,6 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
                 sanitize_html=False, render_markdown=False, layout="bubble", autoscroll=True,
                 buttons=["copy"],
             )
-            with gr.Row(elem_id="sitr-tools"):
-                task_input = gr.Dropdown(
-                    TASKS, value="answer the request", label=EN["task_label"],
-                    show_label=False, container=False, elem_id="sitr-task",
-                )
             composer = gr.MultimodalTextbox(
                 placeholder=EN["placeholder"], show_label=False, file_count="single",
                 file_types=[".pdf", ".txt", ".md", ".csv", ".py", ".js", ".ts", ".java",
@@ -741,7 +801,7 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
             [page_state, *pages, *nav_buttons, dashboard_output],
         ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
     outputs = [chat, composer, conversation, dashboard_output]
-    composer.submit(send, [composer, task_input, conversation, lang_state], outputs)
+    composer.submit(send, [composer, conversation, lang_state], outputs)
     chat.example_select(send_example, [conversation, lang_state], outputs)
     # The trash icon and "New chat" both start a new conversation.
     chat.clear(lambda: [], None, conversation)
@@ -752,7 +812,7 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
     lang_button.click(
         switch_language, [lang_state, conversation],
         [lang_state, lang_button, brand_output, status_output, new_chat_button, *nav_buttons,
-         chat, composer, task_input, dashboard_title, dashboard_intro, dashboard_output,
+         chat, composer, dashboard_title, dashboard_intro, dashboard_output,
          refresh_button, how_title, how_output],
     ).then(None, lang_button, js=SET_DIRECTION_JS)
     theme_button.click(None, None, theme_button, js=THEME_TOGGLE_JS)
