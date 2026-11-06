@@ -84,6 +84,7 @@ Branch: `feature/product`
 Owns:
 
 - `app.py`
+- `ui_text.py`
 - `requirements.txt`
 - `README.md`
 - `assets/`

@@ -38,6 +38,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
 | `INSTRUCTIONS.md` | Lanes, file ownership, and integration rules |
 | `src/contracts.py` | Frozen shared data models |
 | `space/` | Hugging Face Space package: Space README with metadata, CPU-only requirements, deploy script |
+| `ui_text.py` | Every word the interface shows, in English and Arabic (the app shows one at a time) |
 | `examples/` | Synthetic demo files (CV and contract PDFs, vulnerable code, safe prompt); `make_examples.py` rebuilds the PDFs |
 
 ## Hackathon MVP
