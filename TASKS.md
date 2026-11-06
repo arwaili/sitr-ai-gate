@@ -49,13 +49,13 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| I1 | Digital PDF extraction with PyMuPDF, page mapping, Arabic preserved (RTL lines rebuilt in reading order, presentation forms folded) | Saad | Abdulaziz | in review | |
-| I2 | Empty, corrupted, encrypted, oversized (10 MB), too-long (50 pages), image and unsupported files fail with content-free messages. Ingestion creates no temp files; deleting uploads is P5 | Saad | Abdulaziz | in review | |
-| I3 | Detectors: Qatar phone, synthetic QID, passport-like ID, IBAN, account numbers, salaries and amounts (Arabic and English) | Saad | Abdulaziz | in review | |
-| I4 | Secret detectors: API keys (sk-, hf_, gh*_, xox*-, assigned keys), bearer tokens, JWTs, passwords (quoted, unquoted, prose), database URLs, private-key blocks, cloud keys (high: internal IPs and hosts) | Saad | Abdulaziz | in review | |
-| I5 | Placeholder keys in documentation (`sk-XXXX`) are not reported. T7 in `test_policy.py` stays xfail until P1 makes the orchestrator call `detect_deterministic` | Saad | Abdulaziz | in review | |
-| I6 | Demo files in `examples/`: `synthetic_cv.pdf`, `synthetic_contract.pdf` (2 pages), `vulnerable_code.py`, `safe_prompt.txt`; rebuild PDFs with `examples/make_examples.py` (needs Chrome) | Saad | Abdulaziz | in review | |
-| I7 | Demo phone numbers use `+974 0000 01xx` (not assigned to subscribers) in `examples/` and `app.py`. The published dataset and `test_policy.py` still use `+974 5555 01xx`, see H4 | Saad | Abdulaziz | in review | |
+| I1 | Digital PDF extraction with PyMuPDF, page mapping, Arabic preserved (RTL lines rebuilt in reading order, presentation forms folded) | Saad | Abdulaziz | in review | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I2 | Empty, corrupted, encrypted, oversized (10 MB), too-long (50 pages), image and unsupported files fail with content-free messages. Ingestion creates no temp files; deleting uploads is P5 | Saad | Abdulaziz | in review | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I3 | Detectors: Qatar phone, synthetic QID, passport-like ID, IBAN, account numbers, salaries and amounts (Arabic and English) | Saad | Abdulaziz | in review | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I4 | Secret detectors: API keys (sk-, hf_, gh*_, xox*-, assigned keys), bearer tokens, JWTs, passwords (quoted, unquoted, prose), database URLs, private-key blocks, cloud keys (high: internal IPs and hosts) | Saad | Abdulaziz | in review | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I5 | Placeholder keys in documentation (`sk-XXXX`) are not reported. T7 in `test_policy.py` stays xfail until P1 makes the orchestrator call `detect_deterministic` | Saad | Abdulaziz | in review | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I6 | Demo files in `examples/`: `synthetic_cv.pdf`, `synthetic_contract.pdf` (2 pages), `vulnerable_code.py`, `safe_prompt.txt`; rebuild PDFs with `examples/make_examples.py` (needs Chrome) | Saad | Abdulaziz | in review | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I7 | Demo phone numbers use `+974 0000 01xx` (not assigned to subscribers) in `examples/` and `app.py`. The published dataset and `test_policy.py` still use `+974 5555 01xx`, see H4 | Saad | Abdulaziz | in review | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 
 ## Phase 4 - Hugging Face intelligence (Mohammed)
 
@@ -102,7 +102,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
-- 2026-11-06 - Abdulaziz - Phase 3 (I1-I7) built on `feature/ingestion`: real PDF ingestion, 27 deterministic patterns, demo files. 117 tests pass plus T7 (xfail until P1). On the 240-row dev split, structured entities (names excluded) score precision 1.000, recall 0.962; the four demo files give allow, redact, private, block through the policy engine. Worst-case inputs run in about 1 s per 2 MB.
+- 2026-11-06 - Abdulaziz - Phase 3 (I1-I7) built on `feature/ingestion`: real PDF ingestion, 27 deterministic patterns, demo files. 117 tests pass plus T7 (xfail until P1). On the 240-row dev split, structured entities (names excluded) score precision 1.000, recall 0.962; the four demo files give allow, redact, private, block through the policy engine. Worst-case inputs run in about 1 s per 2 MB. [#8](https://github.com/arwaili/sitr-ai-gate/pull/8)
 
 - 2026-11-06 - Abdulaziz - PRs #1, #2, #5, #3, #4 merged in order. Merged `main`: 62 tests pass plus 1 expected failure (T7); Ruff, compile, offline four-scenario check (allow, redact, private, block) and secret scan all pass; contracts unchanged since `887963c`. Clean-venv install confirmed (S7). Collaborators invited (S6). Team HF org skipped (S8): dataset, jobs and the Space stay on `arwaili`.
 - 2026-11-06 - Abdulaziz - Task board and team workflow added to `TASKS.md` and `CLAUDE.md`. [#1](https://github.com/arwaili/sitr-ai-gate/pull/1)
