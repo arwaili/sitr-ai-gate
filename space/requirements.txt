@@ -4,5 +4,5 @@
 torch==2.15.0+cpu
 transformers==5.22.1
 huggingface-hub>=1.0,<2
-pydantic==2.14.3
+pydantic>=2.9,<3  # gradio[mcp] on Spaces pins pydantic to 2.12.x
 pymupdf==1.28.2
