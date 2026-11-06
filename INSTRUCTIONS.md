@@ -118,14 +118,13 @@ All four must pass on the deployed Hugging Face Space before additional features
 
 ## GitHub setup
 
-Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, and CI runs on every PR.
+Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
 
 Still to do (tracked in `TASKS.md`):
 
-1. Add all four members as collaborators.
-2. Protect `main` (needs a public repository or a paid plan): require pull requests, one approval, and passing CI; disable force pushes and branch deletion.
-3. Add the Hugging Face token as a Space secret; never commit it.
-4. Add the four GitHub usernames to `CODEOWNERS` when known.
+1. Protect `main` (needs a public repository or a paid plan): require pull requests, one approval, and passing CI; disable force pushes and branch deletion.
+2. Add the Hugging Face token as a Space secret; never commit it.
+3. Add the four GitHub usernames to `CODEOWNERS` when known.
 
 ## Agent usage
 
