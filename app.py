@@ -12,6 +12,8 @@ from pathlib import Path
 import gradio as gr
 
 from src import hf_detection, risk_classifier, router
+from src.contracts import RedactionResult
+from src.export import redacted_pdf, redacted_text_file
 from src.orchestrator import inspect_and_process
 from ui_text import (
     DECISION_REASONS_AR,
@@ -102,26 +104,43 @@ CSS = f"""
   --sitr-block: #E0708F; --sitr-error: #9DB0AA; --sitr-muted: #9DB0AA;
   --sitr-medium: #5A4220; --sitr-high: #233A52; --sitr-critical: #5A2333;
 }}
-/* One fixed column for every tab, so the header never changes size. */
-.gradio-container {{ width: 100% !important; max-width: 860px !important; margin: 0 auto; }}
+/* A full-page app: a sidebar for navigation and a centered reading column, like a chat app. */
+.gradio-container {{ max-width: none !important; width: 100% !important; }}
 footer {{ display: none !important; }}
-#sitr-top {{ position: relative; gap: 0; border-radius: 10px;
-  background: url("{_LATTICE}") repeat; border-bottom: 3px solid var(--sitr-block); }}
-#sitr-lang {{ position: absolute !important; top: 16px; inset-inline-end: 16px; z-index: 1;
-  width: auto !important; min-width: 92px; height: auto !important; margin: 0; }}
-#sitr-header {{ padding: 20px 22px 16px; }}
-.sitr-wordmark {{ display: flex; align-items: baseline; gap: 12px; }}
-.sitr-wordmark .ar {{ font-family: "Reem Kufi", "Readex Pro", sans-serif; font-weight: 700;
-  font-size: 2.8rem; line-height: 1; color: var(--sitr-block); }}
-.sitr-wordmark .en {{ font-size: 1.05rem; font-weight: 600; }}
-.sitr-purpose {{ margin: 8px 0 10px; max-width: 58ch; color: var(--sitr-muted); }}
-.sitr-ready {{ display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .85rem; }}
+#sitr-main {{ max-width: 820px; width: 100%; margin: 0 auto; padding: 0 8px; }}
+.sitr-page-title {{ font-size: 1.6rem; font-weight: 600; margin: 18px 0 6px; }}
+.sitr-brand {{ display: flex; align-items: baseline; gap: 10px; padding: 14px 12px 12px;
+  border-radius: 10px; background: url("{_LATTICE}") repeat;
+  border-bottom: 2px solid var(--sitr-block); }}
+.sitr-brand .ar {{ font-family: "Reem Kufi", "Readex Pro", sans-serif; font-weight: 700;
+  font-size: 2.3rem; line-height: 1; color: var(--sitr-block); }}
+.sitr-brand .en {{ font-weight: 600; }}
+#sitr-new {{ justify-content: flex-start !important; }}
+.sitr-nav {{ gap: 2px !important; margin-top: 10px; }}
+.sitr-nav button {{ justify-content: flex-start !important; text-align: start;
+  border: 0 !important; box-shadow: none !important; background: transparent !important;
+  color: var(--body-text-color) !important; font-weight: 500; }}
+.sitr-nav button:hover {{ background: var(--border-color-primary) !important; }}
+.sitr-nav button.primary {{ background: var(--color-accent-soft) !important;
+  color: var(--sitr-block) !important; }}
+.sitr-status h4 {{ margin: 18px 0 6px; font-size: .78rem; font-weight: 600;
+  color: var(--sitr-muted); }}
+.sitr-ready {{ display: flex; flex-direction: column; gap: 4px; font-size: .85rem; }}
 .sitr-ready span::before {{ content: ""; display: inline-block; width: 8px; height: 8px;
   border-radius: 50%; margin-inline-end: 7px; background: var(--sitr-redact); }}
 .sitr-ready span.ready::before {{ background: var(--sitr-allow); }}
 .sitr-ready span.down::before {{ background: var(--sitr-block); }}
-button[role="tab"].selected, button[role="tab"][aria-selected="true"] {{
-  color: var(--sitr-block) !important; border-color: var(--sitr-block) !important; }}
+#sitr-toggles {{ gap: 8px; margin-top: 14px; }}
+#sitr-toggles button {{ min-width: 0 !important; }}
+#sitr-theme {{ flex: 0 0 44px !important; font-size: 1.1rem; }}
+
+.sitr-kpis {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin: 10px 0 18px; }}
+@media (max-width: 640px) {{ .sitr-kpis {{ grid-template-columns: repeat(2, 1fr); }} }}
+.sitr-kpi {{ border: 1px solid var(--border-color-primary); border-top: 4px solid var(--kpi);
+  border-radius: 10px; padding: 12px 14px; background: var(--block-background-fill); }}
+.sitr-kpi b {{ display: block; font-size: 1.9rem; line-height: 1.2; }}
+.sitr-kpi span {{ color: var(--sitr-muted); font-size: .88rem; }}
 
 #sitr-chat {{ border: 0 !important; background: transparent !important; }}
 #sitr-chat .message {{ max-width: 100% !important; }}
@@ -190,6 +209,20 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-quote mark.high {{ background: var(--sitr-high); }}
 .sitr-quote mark.critical {{ background: var(--sitr-critical); }}
 .sitr-note {{ margin-top: 6px; font-size: .85rem; color: var(--sitr-muted); }}
+.sitr-next {{ position: relative; border-radius: 10px; padding: 14px 16px;
+  background: var(--block-background-fill); border: 1px solid var(--border-color-primary);
+  border-inline-start: 4px solid var(--seal-next, var(--sitr-muted)); }}
+.sitr-next h3 {{ margin: 0 0 4px; font-size: 1.05rem; }}
+.sitr-next p {{ margin: 0 0 10px; }}
+.sitr-next.allow {{ --seal-next: var(--sitr-allow); }}
+.sitr-next.redact {{ --seal-next: var(--sitr-redact); }}
+.sitr-next.private {{ --seal-next: var(--sitr-private); }}
+.sitr-next.block {{ --seal-next: var(--sitr-block); }}
+.sitr-copy {{ position: absolute; top: 12px; inset-inline-end: 12px; padding: 4px 12px;
+  border-radius: 999px; border: 1px solid var(--border-color-primary); cursor: pointer;
+  background: var(--body-background-fill); color: var(--body-text-color); font: inherit;
+  font-size: .82rem; }}
+.sitr-files p {{ margin: 6px 0 0; color: var(--sitr-muted); font-size: .88rem; }}
 .sitr-answer {{ white-space: pre-wrap; }}
 .sitr-reply details summary {{ cursor: pointer; color: var(--sitr-muted); font-size: .85rem; }}
 .sitr-table {{ border-collapse: collapse; margin-top: 8px; font-size: .85rem; }}
@@ -203,12 +236,98 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-legend b {{ font-size: 1.4rem; margin-inline-start: 6px; }}
 .sitr-legend i {{ display: inline-block; width: 10px; height: 10px; border-radius: 2px;
   margin-inline-end: 6px; }}
+/* Claude-style conversation: Sitr's replies sit on the page with no bubble, the user's
+   messages are small right-aligned bubbles, and the type is set at reading size. */
+:root {{ --sitr-user-bubble: #E6ECE9; }}
+.dark {{ --sitr-user-bubble: #26302D; }}
+#sitr-chat, #sitr-chat .bubble-wrap, #sitr-chat .message-wrap {{
+  background: transparent !important; }}
+#sitr-chat .message-row {{ margin: 6px 0 !important; }}
+/* The new-chat icon floats over the conversation, so it sits on the page color. */
+#sitr-chat .icon-button-wrapper, #sitr-chat .top-panel {{
+  background: var(--body-background-fill) !important; border-radius: 8px; }}
+#sitr-chat .message {{ font-size: .95rem !important; line-height: 1.6 !important; }}
+#sitr-chat .bot-row .message {{ background: transparent !important; border: 0 !important;
+  box-shadow: none !important; padding: 4px 0 !important; width: 100% !important;
+  max-width: 100% !important; }}
+#sitr-chat .user-row .message {{ background: var(--sitr-user-bubble) !important;
+  border: 0 !important; box-shadow: none !important; border-radius: 18px !important;
+  padding: 10px 14px !important; width: fit-content !important;
+  max-width: min(78%, 560px) !important; }}
+#sitr-chat .user-row .flex-wrap {{ width: auto !important; max-width: 100% !important;
+  align-items: flex-end !important; }}
+.sitr-user {{ overflow-wrap: break-word; word-break: normal; }}
+#sitr-chat .user-row {{ justify-content: flex-end !important; }}
+#sitr-chat .bot-row, #sitr-chat .bot-row .flex-wrap {{ width: 100% !important;
+  max-width: 100% !important; }}
+#sitr-chat .bot-row {{ justify-content: flex-start !important; }}
+.sitr-reply {{ gap: 12px !important; }}
+.sitr-seal {{ padding: 10px 14px !important; border-width: 1px !important;
+  border-inline-start-width: 4px !important; }}
+.sitr-seal .word {{ font-size: 1.55rem !important; }}
+.sitr-seal .word.latin {{ font-size: 1.2rem !important; font-weight: 600 !important; }}
+.sitr-seal .what {{ font-size: .92rem; }}
+.sitr-next {{ padding: 12px 14px !important; }}
+.sitr-next h3 {{ font-size: .98rem !important; }}
+.sitr-next p, .sitr-facts, .sitr-answer {{ font-size: .92rem; }}
+.sitr-quote {{ font-size: .9rem; line-height: 1.65 !important; padding: 8px 12px !important; }}
+.sitr-reply h4 {{ font-size: .78rem !important; }}
+.sitr-user .meta {{ font-size: .76rem !important; }}
+.sitr-empty .ar {{ font-size: 2.6rem !important; }}
+.sitr-empty h3 {{ font-size: 1.1rem !important; }}
+
+/* The answer card: a status chip, a yes or no headline, why, and the version to use. */
+.sitr-chip {{ align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  padding: 2px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600;
+  color: var(--chip); background: color-mix(in srgb, var(--chip) 13%, transparent); }}
+.sitr-chip::before {{ content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--chip); }}
+.sitr-chip.allow {{ --chip: var(--sitr-allow); }}
+.sitr-chip.redact {{ --chip: var(--sitr-redact); }}
+.sitr-chip.private {{ --chip: var(--sitr-private); }}
+.sitr-chip.block {{ --chip: var(--sitr-block); }}
+.sitr-chip.error {{ --chip: var(--sitr-error); }}
+.sitr-headline {{ margin: 0 !important; font-size: 1.05rem; font-weight: 600; }}
+.sitr-why {{ margin: 0 !important; color: var(--body-text-color); }}
+.sitr-ready {{ border: 1px solid var(--border-color-primary); border-radius: 12px;
+  overflow: hidden; background: var(--block-background-fill); }}
+.sitr-ready-head {{ display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 6px 8px 6px 12px; font-size: .8rem; color: var(--sitr-muted);
+  border-bottom: 1px solid var(--border-color-primary); }}
+html[dir="rtl"] .sitr-ready-head {{ padding: 6px 12px 6px 8px; }}
+.sitr-ready .sitr-quote {{ border: 0 !important; border-radius: 0 !important;
+  background: transparent !important; max-height: 280px; overflow: auto; }}
+.sitr-copy {{ position: static !important; }}
+.sitr-more summary {{ cursor: pointer; color: var(--sitr-muted); font-size: .85rem; }}
+.sitr-more[open] summary {{ margin-bottom: 8px; }}
+.sitr-more .sitr-quote {{ margin-bottom: 10px; }}
+.sitr-tech h4 {{ margin: 6px 0 4px; }}
+.sitr-tech p {{ margin: 0; font-size: .82rem; color: var(--sitr-muted); }}
+
+/* Four suggestions as an even 2 x 2 grid; replies keep clear of the chat's scrollbar; the
+   user's bubble is wide enough for an email address on one line. */
+#sitr-chat .examples {{ grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  max-width: 620px; margin: 0 auto; }}
+#sitr-chat .bot-row .message {{ padding-inline-end: 14px !important; }}
+#sitr-chat .user-row .message {{ min-width: min(340px, 72vw) !important; }}
+.sitr-user {{ overflow-wrap: anywhere; }}
+
+/* Composer: the +, the text and the send arrow share one centered line. */
+#sitr-composer {{ border: 1px solid var(--border-color-primary) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04) !important; padding: 6px 8px !important; }}
+#sitr-composer .input-row {{ align-items: center !important; gap: 8px !important; }}
+#sitr-composer .upload-button, #sitr-composer .submit-button {{ flex: 0 0 34px !important;
+  margin: 0 !important; align-self: center !important; }}
+#sitr-composer .upload-button::before {{ display: block; transform: translateY(-1px); }}
+#sitr-composer .textarea-wrapper {{ display: flex !important; align-items: center !important;
+  flex: 1 1 auto !important; }}
+#sitr-composer textarea {{ padding: 6px 2px !important; line-height: 1.5 !important;
+  font-size: .95rem !important; min-height: 0 !important; }}
+#sitr-tools {{ max-width: 100%; }}
+#sitr-task {{ width: 230px !important; font-size: .88rem; }}
+
 /* Gradio stamps dir="ltr" on every block; in Arabic mode the page direction wins. */
 html[dir="rtl"] .gradio-container [dir="ltr"] {{ direction: rtl; }}
-@media (max-width: 640px) {{
-  #sitr-header {{ padding: 58px 14px 14px; }}
-  .sitr-wordmark .ar {{ font-size: 2.4rem; }}
-}}
 """
 
 # Arabic reads right to left, so the whole page flips with the language. State never reaches
@@ -216,6 +335,22 @@ html[dir="rtl"] .gradio-container [dir="ltr"] {{ direction: rtl; }}
 SET_DIRECTION_JS = """(label) => { const ar = label === "English";
   document.documentElement.lang = ar ? "ar" : "en";
   document.documentElement.dir = ar ? "rtl" : "ltr"; }"""
+
+# Light or dark: Gradio marks dark mode with a class on <body>; the choice is remembered in this
+# browser only, and the button shows the mode it switches to.
+THEME_TOGGLE_JS = """() => { const dark = document.body.classList.toggle("dark");
+  try { localStorage.setItem("sitr-theme", dark ? "dark" : "light"); } catch (e) {}
+  return dark ? "☀" : "☾"; }"""
+THEME_LOAD_JS = """() => { let saved = null;
+  try { saved = localStorage.getItem("sitr-theme"); } catch (e) {}
+  if (saved) document.body.classList.toggle("dark", saved === "dark");
+  return document.body.classList.contains("dark") ? "☀" : "☾"; }"""
+# On a phone the sidebar covers the chat, so it starts closed and closes after each choice.
+CLOSE_SIDEBAR_ON_PHONE_JS = """() => { const s = document.querySelector("#sitr-sidebar");
+  if (window.innerWidth < 900 && s && s.classList.contains("open"))
+    (s.querySelector(".toggle-button") || s.parentElement.querySelector(".toggle-button"))
+      ?.click(); }"""
+PAGES = ("chat", "dashboard", "how")
 
 # Dashboard counts: decisions and entity types only, in memory, shared by every visitor.
 _stats: Counter = Counter()
@@ -268,57 +403,112 @@ def reason(result: dict, lang: str = "en") -> str:
     return DECISION_REASONS_AR[key]
 
 
-def seal(result: dict, lang: str = "en") -> str:
-    key = _decision(result)
-    word = SEAL_WORDS_AR[key] if lang == "ar" else TEXT["en"]["decisions"][key]
-    css = "word" if lang == "ar" else "word latin"
+# Where the user plans to send it, named in the answer when the question mentions it.
+DESTINATIONS = {
+    "chatgpt": "ChatGPT", "chat gpt": "ChatGPT", "شات جي بي تي": "ChatGPT", "claude": "Claude",
+    "كلود": "Claude", "gemini": "Gemini", "copilot": "Copilot", "deepseek": "DeepSeek",
+}
+
+
+def destination(text: str, lang: str = "en") -> str:
+    lowered = text.lower()
+    for needle, name in DESTINATIONS.items():
+        if needle in lowered:
+            return name
+    return TEXT[lang]["default_dest"]
+
+
+def split_question(text: str) -> tuple[str, str]:
+    """A first paragraph that ends in a question mark is the question; the rest is the content."""
+    first, sep, rest = text.partition("\n\n")
+    if sep and rest.strip() and len(first) < 300 and first.strip().endswith(("?", "؟")):
+        return first.strip(), rest
+    return "", text
+
+
+def things(entities: list[dict], lang: str = "en") -> str:
+    """What was found, in plain words: "a name, an email address and a phone number"."""
+    t = TEXT[lang]
+    names = list(dict.fromkeys(
+        t["things"].get(e["entity_type"], e["entity_type"].lower().replace("_", " "))
+        for e in sorted(entities, key=lambda e: e["start"])
+    ))
+    if len(names) < 2:
+        return "".join(names)
+    joiner = "، " if lang == "ar" else ", "
+    return f"{joiner.join(names[:-1])}{t['and']}{names[-1]}"
+
+
+def copy_box(text: str, label: str, lang: str = "en") -> str:
+    t = TEXT[lang]
+    # The button copies the text shown next to it, so nothing else ends up on the clipboard.
     return (
-        f'<div class="sitr-seal {key}" role="status"><div class="{css}">{escape(word)}</div>'
-        f'<div class="what">{escape(reason(result, lang))}</div></div>'
+        f'<div class="sitr-ready"><div class="sitr-ready-head"><span>{escape(label)}</span>'
+        f'<button type="button" class="sitr-copy" data-done="{t["copied"]}" '
+        'onclick="navigator.clipboard.writeText(this.closest(\'.sitr-ready\')'
+        ".querySelector('.sitr-quote').innerText); this.textContent = this.dataset.done;\">"
+        f'{t["copy"]}</button></div><div class="sitr-quote" dir="auto">{escape(text)}</div></div>'
     )
 
 
-def reply(result: dict, lang: str = "en") -> str:
-    """Sitr's answer card, in the order things happen: decision, findings, what left, answer."""
+def reply(result: dict, lang: str = "en", dest: str | None = None, from_file: bool = False,
+          question: str = "") -> str:
+    """The answer to "can I send this?": a verdict, why, and the version that is safe to use."""
     t, analysis, key = TEXT[lang], result["analysis"], _decision(result)
-    risk = t["not_assessed"] if key == "error" else (
-        f"{t['risk_levels'][analysis['risk_level']]}{'، ' if lang == 'ar' else ', '}"
-        + t["of_100"].format(score=analysis["risk_score"])
-    )
-    facts = (
-        f'<dl class="sitr-facts"><dt>{t["risk"]}</dt><dd>{escape(risk)}</dd>'
-        f"<dt>{t['found']}</dt><dd>{escape(entity_counts(analysis['entities'], lang))}</dd>"
-        f"<dt>{t['sent_to']}</dt><dd>{escape(t['routes'][key])}</dd></dl>"
+    dest = dest or t["default_dest"]
+    chip, headline, why = t["answer"][key]
+    found = things(analysis["entities"], lang)
+    why = why.format(
+        things=found, reason=reason(result, lang),
+        with_things=f"{t['with_things_prefix']}{found}" if found else "",
     )
     redaction = result["redaction"]
-    found = ""
+    ready = ""
+    if redaction and key != "error":
+        # The question the user typed is not part of what they would send.
+        content = split_question(redaction["original_text"])[1] if question else (
+            redaction["original_text"])
+        safe = split_question(redaction["safe_text"])[1] if question else redaction["safe_text"]
+        if key == "allow":
+            ready = f'<p class="sitr-note">{t["original_ok"]}</p>' if from_file else copy_box(
+                content, t["ready_text"], lang)
+        else:
+            label = {"redact": t["ready_text"], "private": t["ready_text_limited"],
+                     "block": t["ready_secret"]}[key]
+            ready = copy_box(safe, label, lang)
+    more = ""
     if redaction and analysis["entities"]:
-        found = (
+        more = (
             f'<div class="sitr-quote" dir="auto">'
             f"{findings_html(redaction['original_text'], analysis['entities'])}</div>"
         )
-    # On block or error nothing left Sitr, so no text is shown as sent.
-    if key in ("block", "error") or not redaction:
-        sent = f'<div class="sitr-note">{t["nothing_sent"]}</div>'
-    else:
-        shown = redaction["safe_text"] if key == "redact" else redaction["original_text"]
-        sent = f'<div class="sitr-quote" dir="auto">{escape(shown)}</div>'
-        if key == "private":
-            sent += f'<div class="sitr-note">{t["private_note"]}</div>'
-    sections = [
-        seal(result, lang),
-        f"<section><h4>{t['found_label']}</h4>{facts}{found}</section>",
-        f"<section><h4>{t['sent_label']}</h4>{sent}</section>",
-    ]
-    if result["model_response"]:
-        # The card already names the route, so the router's private-route tag is not repeated.
-        answer = result["model_response"].removeprefix(router.PRIVATE_LABEL).strip()
-        sections.append(
-            f'<section><h4>{t["answer_label"]}</h4>'
-            f'<div class="sitr-answer" dir="auto">{escape(answer)}</div></section>'
-        )
-    sections.append(technical_details(result, lang))
-    return f'<div class="sitr-reply" dir="{_dir(lang)}">{"".join(sections)}</div>'
+    return (
+        f'<div class="sitr-reply" dir="{_dir(lang)}"><span class="sitr-chip {key}">'
+        f'{escape(chip)}</span><p class="sitr-headline">{escape(headline.format(dest=dest))}</p>'
+        f'<p class="sitr-why">{escape(why)}</p>{ready}'
+        f'<details class="sitr-more"><summary>{t["see_found"]}</summary>{more}'
+        f"{technical_details(result, lang)}</details></div>"
+    )
+
+
+def exports(
+    result: dict, path: str | None, lang: str = "en", question: str = ""
+) -> tuple[list[str], bool]:
+    """Redacted files to take to an outside assistant, and whether a redacted PDF failed."""
+    key, redaction = _decision(result), result["redaction"]
+    if key in ("allow", "error") or not redaction or not redaction["replacements"]:
+        return [], False
+    safe = RedactionResult(**redaction)
+    if question:
+        # The typed question is not part of what the user would send.
+        safe = safe.model_copy(update={"safe_text": split_question(safe.safe_text)[1]})
+    files, pdf_failed = [], False
+    if path and Path(path).suffix.lower() == ".pdf":
+        pdf = redacted_pdf(path, safe)
+        pdf_failed = pdf is None
+        files += [str(pdf)] if pdf else []
+    files.append(str(redacted_text_file(safe, Path(path).name if path else "message")))
+    return files, pdf_failed
 
 
 def technical_details(result: dict, lang: str = "en") -> str:
@@ -333,26 +523,27 @@ def technical_details(result: dict, lang: str = "en") -> str:
     table = f'<table class="sitr-table"><tr>{head}</tr>{rows}</table>' if rows else (
         f"<p>{t['no_findings']}</p>"
     )
+    risk = t["not_assessed"] if _decision(result) == "error" else (
+        f"{t['risk_levels'][analysis['risk_level']]}{'، ' if lang == 'ar' else ', '}"
+        + t["of_100"].format(score=analysis["risk_score"])
+    )
     return (
-        f"<details><summary>{t['details_label']}</summary>"
-        f"<p>{t['reason_codes']}: {escape(', '.join(analysis['reason_codes']) or t['none'])}<br>"
+        f'<div class="sitr-tech"><h4>{t["details_label"]}</h4>'
+        f"<p>{t['risk']}: {escape(risk)}<br>"
+        f"{t['reason_codes']}: {escape(', '.join(analysis['reason_codes']) or t['none'])}<br>"
         f"{t['detector_used']}: {escape(metadata['detector'])}<br>"
         f"{t['classifier_used']}: {escape(metadata['classifier'])}<br>"
-        f"{t['time']}: {result['latency_ms']} ms</p>{table}</details>"
+        f"{t['time']}: {result['latency_ms']} ms</p>{table}</div>"
     )
 
 
 def user_bubble(item: dict, lang: str = "en") -> str:
-    t = TEXT[lang]
-    task = dict(zip(TASK_VALUES, t["tasks"], strict=True)).get(item["task"], item["task"])
-    meta = [f"{t['task_label']}: {task}"]
-    if item["filename"]:
-        meta.insert(0, f"{t['attached']}: {item['filename']}")
     text = f'<span dir="auto">{escape(item["text"])}</span>' if item["text"] else ""
-    return (
-        f'<div class="sitr-user">{text}<span class="meta" dir="{_dir(lang)}">'
-        f"{escape(' · '.join(meta))}</span></div>"
+    attached = (
+        f'<span class="meta" dir="{_dir(lang)}">{TEXT[lang]["attached"]}: '
+        f'{escape(item["filename"])}</span>' if item["filename"] else ""
     )
+    return f'<div class="sitr-user">{text}{attached}</div>'
 
 
 def messages(items: list[dict], lang: str = "en") -> list[dict]:
@@ -362,9 +553,19 @@ def messages(items: list[dict], lang: str = "en") -> list[dict]:
         chat.append({"role": "user", "content": user_bubble(item, lang)})
         content = (
             f'<div class="sitr-pending">{TEXT[lang]["pending"]}</div>'
-            if item["result"] is None else reply(item["result"], lang)
+            if item["result"] is None else reply(
+                item["result"], lang, destination(item["text"], lang), bool(item["filename"]),
+                item.get("question", ""),
+            )
         )
         chat.append({"role": "assistant", "content": content})
+        if item.get("files") or item.get("pdf_failed"):
+            note = TEXT[lang]["pdf_not_safe"] if item.get("pdf_failed") else ""
+            chat.append({"role": "assistant", "content": (
+                f'<div class="sitr-files" dir="{_dir(lang)}">{TEXT[lang]["files_ready"]}'
+                f"{f'<p>{note}</p>' if note else ''}</div>"
+            )})
+            chat += [{"role": "assistant", "content": {"path": f}} for f in item["files"]]
     return chat
 
 
@@ -382,14 +583,17 @@ def dashboard(lang: str = "en") -> str:
     if not total:
         return f'<p dir="{_dir(lang)}">{t["dashboard_empty"]}</p>'
     names = t["decisions"]
+    tiles = f'<div class="sitr-kpi" style="--kpi:var(--sitr-muted)"><b>{total}</b>' \
+        f'<span>{t["kpi_inspected"]}</span></div>'
+    tiles += "".join(
+        f'<div class="sitr-kpi" style="--kpi:var(--sitr-{a})"><b>{stats[a]}</b>'
+        f"<span>{names[a]}</span></div>"
+        for a in ACTION_ORDER
+    )
     bar = "".join(
         f'<span style="width:{stats[a] / total * 100:.2f}%;background:var(--sitr-{a})" '
         f'title="{names[a]}: {stats[a]}"></span>'
         for a in ACTION_ORDER if stats[a]
-    )
-    legend = "".join(
-        f'<span><i style="background:var(--sitr-{a})"></i>{names[a]}<b>{stats[a]}</b></span>'
-        for a in ACTION_ORDER
     )
     rows = "".join(
         f"<tr><td>{escape(kind)}</td><td>{n}</td></tr>" for kind, n in entities.most_common()
@@ -400,9 +604,9 @@ def dashboard(lang: str = "en") -> str:
         if rows else f"<p>{t['nothing_found_yet']}</p>"
     )
     return (
-        f'<div dir="{_dir(lang)}"><p><b>{total}</b> {t["inspected"]}</p>'
+        f'<div dir="{_dir(lang)}"><div class="sitr-kpis">{tiles}</div>'
         f'<div class="sitr-bar" role="img" aria-label="{t["tab_dashboard"]}">{bar}</div>'
-        f'<div class="sitr-legend">{legend}</div>{table}</div>'
+        f"<h4>{t['found_label']}</h4>{table}</div>"
     )
 
 
@@ -417,12 +621,33 @@ def readiness(lang: str = "en") -> str:
     return f'<div class="sitr-ready">{"".join(parts)}</div>'
 
 
-def header(lang: str = "en") -> str:
-    t = TEXT[lang]
+def brand(lang: str = "en") -> str:
     return (
-        f'<div id="sitr-header" dir="{_dir(lang)}"><div class="sitr-wordmark">'
-        f'<span class="ar" lang="ar">سِتر</span><span class="en">{t["product"]}</span></div>'
-        f'<p class="sitr-purpose">{t["purpose"]}</p>{readiness(lang)}</div>'
+        f'<div class="sitr-brand" dir="{_dir(lang)}"><span class="ar" lang="ar">سِتر</span>'
+        f'<span class="en">{TEXT[lang]["product"]}</span></div>'
+    )
+
+
+def status(lang: str = "en") -> str:
+    """Model readiness for the sidebar."""
+    return (
+        f'<div class="sitr-status" dir="{_dir(lang)}"><h4>{TEXT[lang]["models_title"]}</h4>'
+        f"{readiness(lang)}</div>"
+    )
+
+
+def page_title(page: str, lang: str = "en") -> str:
+    key = {"dashboard": "tab_dashboard", "how": "tab_how"}[page]
+    return f'<h2 class="sitr-page-title" dir="{_dir(lang)}">{TEXT[lang][key]}</h2>'
+
+
+def show_page(page: str, lang: str = "en") -> tuple:
+    """Show one page and mark its sidebar entry."""
+    return (
+        page,
+        *(gr.Column(visible=page == p) for p in PAGES),
+        *(gr.Button(variant="primary" if page == p else "secondary") for p in PAGES),
+        dashboard(lang),
     )
 
 
@@ -436,13 +661,13 @@ def empty_chat(lang: str = "en") -> str:
 
 def chat_examples(lang: str = "en") -> list[dict]:
     return [
-        {"text": text, "display_text": label}
+        {"text": f"{label}\n\n{text}", "display_text": label}
         for label, text in zip(TEXT[lang]["examples"], EXAMPLES.values(), strict=True)
     ]
 
 
-def send(message: dict | None, task: str, items: list[dict], lang: str = "en"):
-    """Show the message at once, then Sitr's reply when the inspection finishes."""
+def send(message: dict | None, items: list[dict], lang: str = "en"):
+    """Show the question at once, then Sitr's answer when the check finishes."""
     message = message or {}
     text = (message.get("text") or "").strip()
     files = message.get("files") or []
@@ -452,23 +677,30 @@ def send(message: dict | None, task: str, items: list[dict], lang: str = "en"):
     if not text and not path:
         yield messages(items, lang), gr.MultimodalTextbox(), items, dashboard(lang)
         return
-    item = {"text": text, "filename": Path(path).name if path else None,
-            "task": task or "summarize", "result": None}
+    question = "" if path else split_question(text)[0]
+    item = {"text": text, "filename": Path(path).name if path else None, "question": question,
+            "result": None}
     pending = [*items, item]
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=False), items, \
         dashboard(lang)
-    # Uploads are Gradio temp copies; Sitr deletes them once inspected, even on failure.
-    item["result"] = inspect_and_process(
-        text=text or None, file_path=path, user_intent=item["task"], delete_file=bool(path)
-    )
+    # With a file, the typed text is the question and the file is what gets checked. No model is
+    # called: Sitr answers, and the user takes the safe version to their own assistant. Uploads
+    # are Gradio temp copies, kept until their redacted copy is made, then deleted.
+    try:
+        item["result"] = inspect_and_process(
+            text=None if path else text, file_path=path, route_to_model=False
+        )
+        item["files"], item["pdf_failed"] = exports(item["result"], path, lang, question)
+    finally:
+        if path:
+            Path(path).unlink(missing_ok=True)
     record(item["result"])
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=True), pending, \
         dashboard(lang)
 
 
 def send_example(evt: gr.SelectData, items: list[dict], lang: str = "en"):
-    index = list(EXAMPLES.values()).index(evt.value["text"])
-    yield from send({"text": evt.value["text"]}, EXAMPLE_TASKS[index], items, lang)
+    yield from send({"text": evt.value["text"]}, items, lang)
 
 
 def switch_language(lang: str, items: list[dict]) -> tuple:
@@ -478,18 +710,20 @@ def switch_language(lang: str, items: list[dict]) -> tuple:
     return (
         new,
         gr.Button(value=t["switch"]),
-        header(new),
-        gr.Tab(label=t["tab_inspect"]),
-        gr.Tab(label=t["tab_dashboard"]),
-        gr.Tab(label=t["tab_how"]),
+        brand(new),
+        status(new),
+        gr.Button(value=f"+  {t['new_chat']}"),
+        gr.Button(value=t["tab_inspect"]),
+        gr.Button(value=t["tab_dashboard"]),
+        gr.Button(value=t["tab_how"]),
         gr.Chatbot(value=messages(items, new), placeholder=empty_chat(new),
                    examples=chat_examples(new), rtl=new == "ar"),
         gr.MultimodalTextbox(placeholder=t["placeholder"], rtl=new == "ar"),
-        gr.Dropdown(choices=list(zip(t["tasks"], TASK_VALUES, strict=True)),
-                    label=t["task_label"]),
+        page_title("dashboard", new),
         t["dashboard_intro"],
         dashboard(new),
         gr.Button(value=t["refresh"]),
+        page_title("how", new),
         t["how"],
     )
 
@@ -521,47 +755,72 @@ def warm_up() -> None:
 EN = TEXT["en"]
 with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
     lang_state = gr.State("en")
+    page_state = gr.State("chat")
     conversation = gr.State([])
-    with gr.Row(elem_id="sitr-top"):
-        header_output = gr.HTML(header())
-        lang_button = gr.Button(EN["switch"], size="sm", variant="secondary", elem_id="sitr-lang")
-    with gr.Tab(EN["tab_inspect"]) as inspect_tab:
-        chat = gr.Chatbot(
-            elem_id="sitr-chat", show_label=False, height="62vh", min_height=360,
-            placeholder=empty_chat(), examples=chat_examples(), sanitize_html=False,
-            render_markdown=False, layout="bubble", autoscroll=True, buttons=["copy"],
-        )
-        with gr.Row(elem_id="sitr-tools"):
-            task_input = gr.Dropdown(
-                TASKS, value="answer the request", label=EN["task_label"], show_label=False,
-                container=False, elem_id="sitr-task",
+    with gr.Sidebar(elem_id="sitr-sidebar", width=268, open=True):
+        brand_output = gr.HTML(brand())
+        new_chat_button = gr.Button(f"+  {EN['new_chat']}", variant="secondary", elem_id="sitr-new")
+        with gr.Column(elem_classes="sitr-nav"):
+            nav_buttons = [
+                gr.Button(EN["tab_inspect"], variant="primary"),
+                gr.Button(EN["tab_dashboard"], variant="secondary"),
+                gr.Button(EN["tab_how"], variant="secondary"),
+            ]
+        status_output = gr.HTML(status())
+        with gr.Row(elem_id="sitr-toggles"):
+            lang_button = gr.Button(EN["switch"], size="sm", variant="secondary")
+            theme_button = gr.Button("☾", size="sm", variant="secondary", elem_id="sitr-theme")
+    with gr.Column(elem_id="sitr-main"):
+        with gr.Column(visible=True) as chat_page:
+            chat = gr.Chatbot(
+                elem_id="sitr-chat", show_label=False, height="calc(100dvh - 190px)",
+                min_height=360, placeholder=empty_chat(), examples=chat_examples(),
+                sanitize_html=False, render_markdown=False, layout="bubble", autoscroll=True,
+                buttons=["copy"],
             )
-        composer = gr.MultimodalTextbox(
-            placeholder=EN["placeholder"], show_label=False, file_count="single",
-            file_types=[".pdf", ".txt", ".md", ".csv", ".py", ".js", ".ts", ".java", ".json",
-                        ".yml", ".yaml", ".env", ".sql", ".sh"],
-            sources=["upload"], elem_id="sitr-composer", autofocus=True,
-        )
-    with gr.Tab(EN["tab_dashboard"]) as dashboard_tab:
-        dashboard_intro = gr.Markdown(EN["dashboard_intro"])
-        dashboard_output = gr.HTML(dashboard())
-        refresh_button = gr.Button(EN["refresh"], size="sm")
-        refresh_button.click(dashboard, lang_state, dashboard_output)
-    with gr.Tab(EN["tab_how"]) as how_tab:
-        how_output = gr.Markdown(EN["how"])
+            composer = gr.MultimodalTextbox(
+                placeholder=EN["placeholder"], show_label=False, file_count="single",
+                file_types=[".pdf", ".txt", ".md", ".csv", ".py", ".js", ".ts", ".java",
+                            ".json", ".yml", ".yaml", ".env", ".sql", ".sh"],
+                sources=["upload"], elem_id="sitr-composer", autofocus=True,
+            )
+        with gr.Column(visible=False) as dashboard_page:
+            dashboard_title = gr.HTML(page_title("dashboard"))
+            dashboard_intro = gr.Markdown(EN["dashboard_intro"])
+            dashboard_output = gr.HTML(dashboard())
+            refresh_button = gr.Button(EN["refresh"], size="sm", variant="secondary")
+            refresh_button.click(dashboard, lang_state, dashboard_output)
+        with gr.Column(visible=False) as how_page:
+            how_title = gr.HTML(page_title("how"))
+            how_output = gr.Markdown(EN["how"])
 
+    pages = [chat_page, dashboard_page, how_page]
+    for page, button in zip(PAGES, nav_buttons, strict=True):
+        button.click(
+            lambda lang, page=page: show_page(page, lang), lang_state,
+            [page_state, *pages, *nav_buttons, dashboard_output],
+        ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
     outputs = [chat, composer, conversation, dashboard_output]
-    composer.submit(send, [composer, task_input, conversation, lang_state], outputs)
+    composer.submit(send, [composer, conversation, lang_state], outputs)
     chat.example_select(send_example, [conversation, lang_state], outputs)
-    # The trash icon starts a new conversation, so the remembered one is cleared too.
+    # The trash icon and "New chat" both start a new conversation.
     chat.clear(lambda: [], None, conversation)
+    new_chat_button.click(
+        lambda lang: ([], [], *show_page("chat", lang)), lang_state,
+        [chat, conversation, page_state, *pages, *nav_buttons, dashboard_output],
+    ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
     lang_button.click(
         switch_language, [lang_state, conversation],
-        [lang_state, lang_button, header_output, inspect_tab, dashboard_tab, how_tab, chat,
-         composer, task_input, dashboard_intro, dashboard_output, refresh_button, how_output],
+        [lang_state, lang_button, brand_output, status_output, new_chat_button, *nav_buttons,
+         chat, composer, dashboard_title, dashboard_intro, dashboard_output,
+         refresh_button, how_title, how_output],
     ).then(None, lang_button, js=SET_DIRECTION_JS)
-    gr.Timer(5).tick(header, lang_state, header_output)
-    demo.load(header, lang_state, header_output)
+    theme_button.click(None, None, theme_button, js=THEME_TOGGLE_JS)
+    demo.load(None, None, theme_button, js=THEME_LOAD_JS).then(
+        None, js=CLOSE_SIDEBAR_ON_PHONE_JS
+    )
+    gr.Timer(5).tick(status, lang_state, status_output)
+    demo.load(status, lang_state, status_output)
 
 if __name__ == "__main__":
     enable_audit_log()
