@@ -8,13 +8,14 @@ from pathlib import Path
 from src import audit, hf_detection, risk_classifier, router
 from src.contracts import AnalysisResult, FinalResponse, ModelMetadata, SensitiveEntity
 from src.deterministic import detect_deterministic
-from src.hf_detection import detect_entities
+from src.hf_detection import DetectorUnavailable, require_entities
 from src.ingestion import ingest
 from src.policy_engine import decide, merge_findings
 from src.redactor import redact
 from src.risk_classifier import classify_risk
 
 _ERROR_METADATA = ModelMetadata(detector="not run", classifier="not run")
+DETECTOR_DOWN_MESSAGE = "The privacy detector is not ready, so this input was blocked. Try again."
 
 
 def _elapsed_ms(started: float) -> int:
@@ -46,7 +47,7 @@ def _detect(text: str, pages) -> tuple[list[SensitiveEntity], object, ModelMetad
         # A rule already blocks this; the secret is not shown to any model, not even local ones.
         skipped = "skipped: credential found"
         return rules, None, ModelMetadata(detector=f"rules ({skipped})", classifier=skipped)
-    entities = merge_findings(rules, detect_entities(text))
+    entities = merge_findings(rules, require_entities(text))
     semantic = classify_risk(text)
     ner = hf_detection.status()
     detector = (
@@ -97,6 +98,9 @@ def inspect_and_process(
             response = _error(str(exc), started)
         else:
             response = _process(ingestion.text, ingestion.pages, user_intent, started)
+    except DetectorUnavailable:
+        # Rules cannot see names, so without the detector the text is not known to be safe.
+        response = _error(DETECTOR_DOWN_MESSAGE, started)
     except Exception:
         # Any other failure blocks; its text may quote content (pydantic does), so it is dropped.
         response = _error("Sitr could not inspect this input.", started)
