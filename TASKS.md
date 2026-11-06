@@ -9,7 +9,7 @@
 
 ## Current status
 
-Updated 2026-11-06 after PR #11.
+Updated 2026-11-06 after PR #14.
 
 | Phase | State |
 |---|---|
@@ -17,11 +17,11 @@ Updated 2026-11-06 after PR #11.
 | 2 - Mock pipeline and dataset | Done, merged in PRs #1-#5 |
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
-| 5 - Policy, routing, integration | Built on `feature/policy-routing`, in review (P1-P5) |
-| 6-7 - Product and deployment | Not started (U1-U4); can start now, and the Space can be deployed once Phase 5 merges |
+| 5 - Policy, routing, integration | Done, merged in PR #14 |
+| 6-7 - Product and deployment | Not started (U1-U4); **everything can start now**, including the Space deployment (U3) |
 | 8-9 - Review and submission | Not started (R1-R3) |
 
-What works on `main` now: Phases 1-4. Phase 5 is on `feature/policy-routing`, waiting for review: with it the app runs the real pipeline end to end (PDF uploads, rules, both models, full policy, hosted Qwen on allow and redact, local Qwen on private). Until it merges, the app on `main` still uses mock detection and cannot read PDFs.
+What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. 160 tests pass (CI: 148, with 12 model tests skipped), including T7. Measured results are in `README.md`.
 
 ## Team
 
@@ -69,7 +69,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 | I2 | Empty, corrupted, encrypted, oversized (10 MB), too-long (50 pages), image and unsupported files fail with content-free messages. Ingestion creates no temp files; deleting uploads is P5 | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 | I3 | Detectors: Qatar phone, synthetic QID, passport-like ID, IBAN, account numbers, salaries and amounts (Arabic and English) | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 | I4 | Secret detectors: API keys (sk-, hf_, gh*_, xox*-, assigned keys), bearer tokens, JWTs, passwords (quoted, unquoted, prose), database URLs, private-key blocks, cloud keys (high: internal IPs and hosts) | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
-| I5 | Placeholder keys in documentation (`sk-XXXX`) are not reported. T7 in `test_policy.py` stays xfail until P1 makes the orchestrator call `detect_deterministic` | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I5 | Placeholder keys in documentation (`sk-XXXX`) are not reported. T7 in `test_policy.py` passes since P1 (#14) | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 | I6 | Demo files in `examples/`: `synthetic_cv.pdf`, `synthetic_contract.pdf` (2 pages), `vulnerable_code.py`, `safe_prompt.txt`; rebuild PDFs with `examples/make_examples.py` (needs Chrome) | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 | I7 | Demo phone numbers use `+974 0000 01xx` (not assigned to subscribers) in `examples/` and `app.py`. The published dataset moved to `+974 0000` in H4; only `tests/test_policy.py` still uses `+974 5555 01xx` | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 
@@ -86,11 +86,11 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| P1 | Orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk`; models are skipped when a rule finds a credential; metadata says which models ran or fell back; app warms all models at start | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
-| P2 | `policy_engine.merge_findings`: rules first, overlapping model findings dropped; T7 passes | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
-| P3 | All Phase 5 overrides: credentials, private keys and restricted operational information block; HR/financial data, a model-only credential or the classifier (confidence 0.6 or more) route private; models can never block or lower a decision | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
-| P4 | Hosted Qwen via HF Inference Providers (`featherless-ai`) for allow and redact; local Qwen inside Sitr for private, so originals never leave; timeouts and a notice on failure | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
-| P5 | `inspect_and_process(..., delete_file=True)` removes the upload on success and failure; the app uses it | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P1 | Orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk`; models are skipped when a rule finds a credential; metadata says which models ran or fell back; app warms all models at start | Rashid | Abdulaziz | done | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P2 | `policy_engine.merge_findings`: rules first, overlapping model findings dropped; T7 passes | Rashid | Abdulaziz | done | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P3 | All Phase 5 overrides: credentials, private keys and restricted operational information block; HR/financial data, a model-only credential or the classifier (confidence 0.6 or more) route private; models can never block or lower a decision | Rashid | Abdulaziz | done | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P4 | Hosted Qwen via HF Inference Providers (`featherless-ai`) for allow and redact; local Qwen inside Sitr for private, so originals never leave; timeouts and a notice on failure | Rashid | Abdulaziz | done | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P5 | `inspect_and_process(..., delete_file=True)` removes the upload on success and failure; the app uses it | Rashid | Abdulaziz | done | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
 
 ## Phase 6 and 7 - Product and deployment (Abdulaziz)
 
@@ -119,6 +119,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - PR #14 merged into `main` (160 tests pass after merge, CI green), P1-P5 marked done, lane branches synced, docs updated to match.
 - 2026-11-06 - Abdulaziz - Phase 5 (P1-P5) built on `feature/policy-routing`: real pipeline end to end. 160 tests pass (CI: 148 pass, 12 model tests skip); T7 passes. Test split through the full pipeline: action accuracy 0.95, entities 0.968 / 0.938. Live check: four examples and two PDF uploads in the running app give the right badge, uploads are deleted, the audit log holds no values. [#14](https://github.com/arwaili/sitr-ai-gate/pull/14)
 - 2026-11-06 - Abdulaziz - Added Phase 4 testing steps to Blockers; deleted the merged `chore/phase-1-setup` branch.
 - 2026-11-06 - Abdulaziz - PR #11 merged into `main` (132 tests pass after merge, CI green), H1-H4 marked done, lane branches synced to `main`, docs updated to match.
