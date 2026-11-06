@@ -175,8 +175,11 @@ footer {{ display: none !important; }}
 #sitr-toggles button {{ min-width: 0 !important; background: transparent !important;
   border: 1px solid var(--border-color-primary) !important; box-shadow: none !important; }}
 #sitr-toggles button:hover {{ border-color: var(--sitr-maroon) !important; }}
-#sitr-toggles > button {{ flex: 1 1 0 !important; }}
-#sitr-theme {{ font-size: 1.1rem; }}
+#sitr-toggles > button {{ flex: 1 1 0 !important; height: 38px !important; min-height: 0 !important;
+  padding: 0 8px !important; margin: 0 !important; line-height: 1 !important;
+  display: inline-flex !important; align-items: center !important;
+  justify-content: center !important; border-radius: 10px !important; }}
+#sitr-theme {{ font-size: 1.05rem !important; }}
 
 .sitr-kpis {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
   margin: 10px 0 18px; }}
@@ -194,8 +197,11 @@ footer {{ display: none !important; }}
   display: inline-flex; align-items: center; justify-content: center; }}
 #sitr-composer .upload-button {{ border: 1px solid var(--border-color-primary) !important; }}
 #sitr-composer .upload-button svg {{ display: none; }}
-#sitr-composer .upload-button::before {{ content: "+"; font-size: 1.5rem; font-weight: 300;
-  line-height: 1; }}
+/* The + is drawn as two bars, so it sits at the exact center of its circle in every font. */
+#sitr-composer .upload-button {{ padding: 0 !important; }}
+#sitr-composer .upload-button::before {{ content: ""; width: 14px; height: 14px;
+  background: linear-gradient(currentColor, currentColor) center / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 2px 100% no-repeat; }}
 #sitr-composer .submit-button {{ background: var(--sitr-block) !important; color: #fff !important;
   padding: 8px !important; }}
 #sitr-tools {{ background: transparent !important; border: 0 !important; gap: 8px;
@@ -344,6 +350,14 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-why {{ margin: 0 !important; color: var(--body-text-color); }}
 .sitr-ready {{ border: 1px solid var(--border-color-primary); border-radius: 12px;
   overflow: hidden; background: var(--block-background-fill); }}
+/* The safe version stands out from the page: a light maroon tint, scoped by id so it outranks
+   Gradio's chat styles on Spaces. */
+:root {{ --sitr-ready-bg: #FAF5F6; --sitr-ready-head: #F3E9EC; --sitr-ready-line: #E2D3D8; }}
+.dark {{ --sitr-ready-bg: #1C1C1F; --sitr-ready-head: #232326; --sitr-ready-line: #34343A; }}
+#sitr-chat .sitr-ready {{ background: var(--sitr-ready-bg) !important;
+  border: 1px solid var(--sitr-ready-line) !important; }}
+#sitr-chat .sitr-ready-head {{ background: var(--sitr-ready-head) !important;
+  border-bottom: 1px solid var(--sitr-ready-line) !important; }}
 .sitr-ready-head {{ display: flex; align-items: center; justify-content: space-between;
   gap: 10px; padding: 6px 8px 6px 12px; font-size: .8rem; color: var(--sitr-muted);
   border-bottom: 1px solid var(--border-color-primary); }}
@@ -371,7 +385,7 @@ html[dir="rtl"] .sitr-ready-head {{ padding: 6px 12px 6px 8px; }}
 #sitr-composer .input-row {{ align-items: center !important; gap: 8px !important; }}
 #sitr-composer .upload-button, #sitr-composer .submit-button {{ flex: 0 0 34px !important;
   margin: 0 !important; align-self: center !important; }}
-#sitr-composer .upload-button::before {{ display: block; transform: translateY(-1px); }}
+#sitr-composer .upload-button::before {{ display: block; }}
 #sitr-composer .textarea-wrapper {{ display: flex !important; align-items: center !important;
   flex: 1 1 auto !important; }}
 #sitr-composer textarea {{ padding: 6px 2px !important; line-height: 1.5 !important;
