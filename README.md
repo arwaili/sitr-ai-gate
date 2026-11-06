@@ -15,7 +15,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
    ```bash
    python3.11 -m venv .venv
    source .venv/bin/activate
-   pip install -r requirements.txt
+   pip install -r requirements-dev.txt
    ```
    The first run that uses the models downloads about 3.4 GB from Hugging Face. Set `SITR_HF_MODELS=0` to work without them; the rules still run.
 3. Check that everything passes:

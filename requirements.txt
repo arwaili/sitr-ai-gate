@@ -1,9 +1,11 @@
+# Runtime only, for running the app locally. The Space installs space/requirements.txt. Test and
+# lint tools live in requirements-dev.txt. The index below serves CPU-only torch wheels (torch-X.Y.Z+cpu), which beat
+# the PyPI wheels on version order, so the Space does not download the CUDA build it cannot use.
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 gradio>=5.0,<7
 huggingface-hub>=0.27,<2
 pydantic>=2.9,<3
 pymupdf>=1.24,<2
 transformers>=4.48,<6
 torch>=2.4,<3
-pytest>=8.3,<10
-ruff>=0.8,<1
-

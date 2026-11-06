@@ -1,0 +1,5 @@
+# Local development and CI: everything the Space runs, plus the quality gates.
+-r requirements.txt
+
+pytest>=8.3,<10
+ruff>=0.8,<1
