@@ -1,6 +1,7 @@
 import json
 import logging
 import shutil
+import time
 from pathlib import Path
 
 import pytest
@@ -263,20 +264,65 @@ def test_credentials_are_never_shown_to_the_models(monkeypatch) -> None:
     def forbidden(_text):
         raise AssertionError("a model saw a credential")
 
-    monkeypatch.setattr(orchestrator, "detect_entities", forbidden)
+    monkeypatch.setattr(orchestrator, "require_entities", forbidden)
     monkeypatch.setattr(orchestrator, "classify_risk", forbidden)
     result = inspect_and_process(text=LEAKY_CODE)
     assert result["action_taken"] == "block"
     assert "skipped" in result["analysis"]["model_metadata"]["detector"]
 
 
-def test_models_unavailable_still_decides_with_rules(monkeypatch) -> None:
-    monkeypatch.setenv("SITR_HF_MODELS", "1")
+NAME_ONLY = "Write a short thank-you email to Ahmed Al-Fake."
+
+
+def _detector_crashes(monkeypatch) -> None:
     monkeypatch.setattr("src.hf_detection._predict", lambda _t: 1 / 0)
+
+
+def _detector_hangs(monkeypatch) -> None:
+    monkeypatch.setattr("src.hf_detection.TIMEOUT_SECONDS", 0.05)
+    monkeypatch.setattr("src.hf_detection._predict", lambda _t: time.sleep(0.3) or [])
+
+
+@pytest.mark.parametrize("break_detector", [_detector_crashes, _detector_hangs])
+def test_detector_down_fails_closed(monkeypatch, model_calls, break_detector) -> None:
+    # Regression (R1): rules cannot see names, so without the detector a name went out as "allow".
+    monkeypatch.setenv("SITR_HF_MODELS", "1")
+    break_detector(monkeypatch)
+    result = inspect_and_process(text=NAME_ONLY)
+    time.sleep(0.3)  # let a hung call finish before other tests use the worker
+    assert (result["status"], result["action_taken"]) == ("error", "block")
+    assert result["model_response"] is None
+    assert "Nothing was sent" in result["user_message"]
+    assert "Ahmed" not in result["user_message"]
+    assert model_calls == []
+
+
+def test_detector_down_on_redact_path_fails_closed(monkeypatch, model_calls) -> None:
+    # A rule finding on the same text must not let an unseen name through on the redact route.
+    monkeypatch.setenv("SITR_HF_MODELS", "1")
+    _detector_crashes(monkeypatch)
+    result = inspect_and_process(text=CV)
+    assert result["action_taken"] == "block"
+    assert model_calls == []
+
+
+def test_detector_recovers_after_a_failure(monkeypatch, model_calls) -> None:
+    monkeypatch.setenv("SITR_HF_MODELS", "1")
+    _detector_crashes(monkeypatch)
+    assert inspect_and_process(text=CV)["status"] == "error"
+    monkeypatch.setattr("src.hf_detection._predict", lambda _t: [])
     monkeypatch.setattr("src.risk_classifier._predict", lambda _t: 1 / 0)
     result = inspect_and_process(text=CV)
     assert result["action_taken"] == "redact"
-    assert "rules only" in result["analysis"]["model_metadata"]["detector"]
+    assert "rules +" in result["analysis"]["model_metadata"]["detector"]
+
+
+def test_classifier_unavailable_still_decides(monkeypatch) -> None:
+    monkeypatch.setenv("SITR_HF_MODELS", "1")
+    monkeypatch.setattr("src.hf_detection._predict", lambda _t: [])
+    monkeypatch.setattr("src.risk_classifier._predict", lambda _t: 1 / 0)
+    result = inspect_and_process(text=CV)
+    assert result["action_taken"] == "redact"
     assert "fallback" in result["analysis"]["model_metadata"]["classifier"]
 
 

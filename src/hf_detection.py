@@ -189,23 +189,42 @@ def _predict(text: str) -> list[SensitiveEntity]:
     return entities
 
 
-def detect_entities(text: str) -> list[SensitiveEntity]:
-    """Return contextual entities, with offsets into the exact input string."""
+class DetectorUnavailable(Exception):
+    """The detector could not run. Carries no input content."""
+
+
+def require_entities(text: str) -> list[SensitiveEntity]:
+    """Return contextual entities, or raise DetectorUnavailable if the model could not run.
+
+    Rules cannot see names, so callers that send text onward must use this one: an empty list
+    here means the model looked and found nothing, not that it failed.
+    """
     if os.environ.get("SITR_HF_MODELS", "1") == "0":
         _state.update(state="disabled", detail="SITR_HF_MODELS=0")
         return []
     if not text.strip():
         return []
     try:
-        return _executor.submit(_predict, text).result(timeout=TIMEOUT_SECONDS)
+        entities = _executor.submit(_predict, text).result(timeout=TIMEOUT_SECONDS)
     except FutureTimeout:
         # The call keeps running in the background and the next call reuses the loaded model.
         _state.update(state="unavailable", detail=f"timed out after {TIMEOUT_SECONDS:.0f} s")
     except Exception as exc:
         # Log the error type only; messages can quote the input.
         _state.update(state="unavailable", detail=type(exc).__name__)
-    logger.warning("PII model unavailable (%s); using rules only.", _state["detail"])
-    return []
+    else:
+        _state.update(state="ready", detail="")
+        return entities
+    logger.warning("PII model unavailable (%s).", _state["detail"])
+    raise DetectorUnavailable
+
+
+def detect_entities(text: str) -> list[SensitiveEntity]:
+    """Return contextual entities with offsets into the exact input; `[]` if the model failed."""
+    try:
+        return require_entities(text)
+    except DetectorUnavailable:
+        return []
 
 
 def warm_up() -> None:

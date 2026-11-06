@@ -174,6 +174,24 @@ def test_detector_timeout_falls_back(monkeypatch) -> None:
     time.sleep(0.5)  # let the slow call finish before other tests use the worker
 
 
+def test_require_entities_raises_without_leaking_input(monkeypatch) -> None:
+    def broken(_text):
+        raise RuntimeError("synthetic failure mentioning Sara Haddad")
+
+    monkeypatch.setattr(hf_detection, "_predict", broken)
+    with pytest.raises(hf_detection.DetectorUnavailable) as caught:
+        hf_detection.require_entities("Sara Haddad")
+    assert "Sara" not in str(caught.value)
+
+
+def test_status_returns_to_ready_after_a_failure(monkeypatch) -> None:
+    monkeypatch.setattr(hf_detection, "_predict", lambda _text: 1 / 0)
+    assert detect_entities("Sara Haddad") == []
+    monkeypatch.setattr(hf_detection, "_predict", lambda _text: [])
+    assert detect_entities("Sara Haddad") == []
+    assert hf_detection.status()["state"] == "ready"
+
+
 # Risk classifier: fallback (no model needed)
 
 
