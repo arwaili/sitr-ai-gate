@@ -9,19 +9,19 @@
 
 ## Current status
 
-Updated 2026-11-06 after PR #9.
+Updated 2026-11-06 after PR #11.
 
 | Phase | State |
 |---|---|
 | 1 - Setup | Done (S1-S8; S8 team HF org skipped by decision) |
 | 2 - Mock pipeline and dataset | Done, merged in PRs #1-#5 |
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
-| 4 - Hugging Face intelligence | Built on `feature/hf-intelligence`, in review (H1-H4) |
-| 5 - Policy, routing, integration | Not started (P1-P5); P1 needs Phase 3 (done) and Phase 4 |
+| 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
+| 5 - Policy, routing, integration | Not started (P1-P5); **P1 can start now**, Phases 3 and 4 are merged |
 | 6-7 - Product and deployment | Not started (U1-U4); UI work can start now, deploy after P1 |
 | 8-9 - Review and submission | Not started (R1-R3) |
 
-What works on `main` now: 117 tests pass plus T7 (expected failure until P1). The real Phase 3 modules (`ingest`, `detect_deterministic`) work and are tested, but the app does not call them yet: the orchestrator still uses its own mock patterns and a text-only file reader, so the four pasted demo texts work in the app while uploaded PDFs return a safe error until P1. Phase 4 (`detect_entities`, `classify_risk` with the real models) is on `feature/hf-intelligence`, waiting for review.
+What works on `main` now: 132 tests pass plus T7 (expected failure until P1); in CI, without torch, the 7 real-model tests skip. Phase 3 (`ingest`, `detect_deterministic`) and Phase 4 (`detect_entities`, `classify_risk` with the real models) work and are tested, but the app does not call them yet: the orchestrator still uses its own mock patterns and a text-only file reader, so the four pasted demo texts work in the app while uploaded PDFs return a safe error until P1. Measured results on the held-out test split are in `README.md`.
 
 ## Team
 
@@ -71,23 +71,23 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 | I4 | Secret detectors: API keys (sk-, hf_, gh*_, xox*-, assigned keys), bearer tokens, JWTs, passwords (quoted, unquoted, prose), database URLs, private-key blocks, cloud keys (high: internal IPs and hosts) | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 | I5 | Placeholder keys in documentation (`sk-XXXX`) are not reported. T7 in `test_policy.py` stays xfail until P1 makes the orchestrator call `detect_deterministic` | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 | I6 | Demo files in `examples/`: `synthetic_cv.pdf`, `synthetic_contract.pdf` (2 pages), `vulnerable_code.py`, `safe_prompt.txt`; rebuild PDFs with `examples/make_examples.py` (needs Chrome) | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
-| I7 | Demo phone numbers use `+974 0000 01xx` (not assigned to subscribers) in `examples/` and `app.py`. The published dataset and `test_policy.py` still use `+974 5555 01xx`, see H4 | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
+| I7 | Demo phone numbers use `+974 0000 01xx` (not assigned to subscribers) in `examples/` and `app.py`. The published dataset moved to `+974 0000` in H4; only `tests/test_policy.py` still uses `+974 5555 01xx` | Saad | Abdulaziz | done | [#8](https://github.com/arwaili/sitr-ai-gate/pull/8) |
 
 ## Phase 4 - Hugging Face intelligence (Mohammed)
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| H1 | `OpenMed/privacy-filter-multilingual-v2` loads lazily on CPU (bfloat16), cached, 30 s timeout, rules-only fallback; 18 OpenMed labels mapped to Sitr types; split words grown to whole words; threshold tuned on dev | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
-| H2 | `Horizon-Labs/multilingual-zeroshot-small` scores one English description per risk level (works for Arabic); keyword fallback on failure or timeout | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
-| H3 | `data/evaluate.py` runs locally on CPU (no GPU needed); results in `data/eval_results_test.json` and `README.md` | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
-| H4 | Dataset card rewritten (filter checks, phone range); Qwen sentences scanned with OpenMed (no real names); phones moved to `+974 0000` locally. Republished to the Hub (commit `97553b09`) | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H1 | `OpenMed/privacy-filter-multilingual-v2` loads lazily on CPU (bfloat16), cached, 30 s timeout, rules-only fallback; 18 OpenMed labels mapped to Sitr types; split words grown to whole words; threshold tuned on dev | Mohammed | Abdulaziz | done | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H2 | `Horizon-Labs/multilingual-zeroshot-small` scores one English description per risk level (works for Arabic); keyword fallback on failure or timeout | Mohammed | Abdulaziz | done | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H3 | `data/evaluate.py` runs locally on CPU (no GPU needed); results in `data/eval_results_test.json` and `README.md` | Mohammed | Abdulaziz | done | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H4 | Dataset card rewritten (filter checks, phone range); Qwen sentences scanned with OpenMed (no real names); phones moved to `+974 0000` locally. Republished to the Hub (commit `97553b09`) | Mohammed | Abdulaziz | done | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
 
 ## Phase 5 - Policy, routing and integration (Rashid)
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| P1 | Checkpoint C: orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk` instead of its mock detection | Rashid | | open | |
-| P2 | Merge and deduplicate findings from rules and models; rules stay authoritative | Rashid | | open | |
+| P1 | Checkpoint C: orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk` instead of its mock detection; call `warm_up()` for both models at app start and show `status()` in the UI | Rashid | | open | |
+| P2 | Merge and deduplicate findings from rules and models; rules stay authoritative. Reference: `combine()` in `data/evaluate.py` | Rashid | | open | |
 | P3 | Full policy overrides from `PROJECT_OVERVIEW.md` Phase 5 | Rashid | | open | |
 | P4 | Real `call_model` with Qwen through Hugging Face Inference Providers, with a timeout and a safe fallback | Rashid | | open | |
 | P5 | Remove uploaded temp files on success and failure | Rashid | | open | |
@@ -119,6 +119,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - PR #11 merged into `main` (132 tests pass after merge, CI green), H1-H4 marked done, lane branches synced to `main`, docs updated to match.
 - 2026-11-06 - Abdulaziz - Phase 4 (H1-H4) built on `feature/hf-intelligence`. Held-out test split (60 rows), rules plus models: entity precision 0.967, recall 0.927; names 0.897/0.897; action accuracy 0.95 (all misses are public prompts with a false Arabic name); risk model alone 0.85. Median latency: PII model 234 ms, risk model 146 ms. 132 tests pass locally; CI skips the 7 real-model tests. Dataset republished with `+974 0000` phones. [#11](https://github.com/arwaili/sitr-ai-gate/pull/11)
 - 2026-11-06 - Abdulaziz - PR #8 merged into `main` (117 tests pass after merge), I1-I7 marked done in [#9](https://github.com/arwaili/sitr-ai-gate/pull/9), lane branches synced to `main`, docs brought up to date.
 - 2026-11-06 - Abdulaziz - Phase 3 (I1-I7) built on `feature/ingestion`: real PDF ingestion, 27 deterministic patterns, demo files. 117 tests pass plus T7 (xfail until P1). On the 240-row dev split, structured entities (names excluded) score precision 1.000, recall 0.962; the four demo files give allow, redact, private, block through the policy engine. Worst-case inputs run in about 1 s per 2 MB. [#8](https://github.com/arwaili/sitr-ai-gate/pull/8)
