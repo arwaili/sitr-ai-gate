@@ -8,6 +8,7 @@
 2. **`redaction` is filled in on every non-error response.** `FinalResponse` has no field for the extracted text, and the UI needs it to highlight findings in uploaded files. `redaction.original_text` is the inspected text, and `redaction.safe_text` has every finding replaced, whatever the action. On allow it equals the original. Only the router decides which of the two text versions reaches a model.
 3. **Placeholders** are `[ENTITY_TYPE_N]`, numbered per type in order of first appearance. A repeated value reuses its placeholder, and overlapping findings merge into one span.
 4. **A failed detector fails closed.** Rules cannot see names, so if the PII model times out or fails, `inspect_and_process` returns the error response in decision 1 and nothing reaches a model. A secret found by the rules still blocks as usual, because the model is skipped. `SITR_HF_MODELS=0` is a deliberate switch, not a failure, and stays rules-only: never set it where text can reach hosted Qwen. A failed classifier still falls back to keywords.
+5. **The intended task is inspected too.** `user_intent` reaches the model as written on every route, so `inspect_and_process` checks it with the rules and the PII model first. A task longer than 200 characters, or one with any finding, returns the error response in decision 1 with reason code `SENSITIVE_INTENT` instead of `PROCESSING_ERROR`, and nothing reaches a model. The UI should offer a short task field and keep details in the prompt.
 
 ## Lane interfaces
 

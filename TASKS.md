@@ -105,7 +105,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad | in progress | |
+| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad, Mohammed | in progress | |
 | R2 | 90-second demo script, 3-minute pitch, submission description | Abdulaziz | | open | |
 | R3 | Backup screenshots and video | anyone | | open | |
 
@@ -120,6 +120,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Mohammed - R1 finding fixed (Lane 3 review): the intended task (`user_intent`) went to hosted Qwen as written on the allow and redact routes and was never inspected, so a key, email or phone typed there would leave unredacted once U2 adds the task field. `inspect_and_process` now checks the task with the rules and the PII model, and a task longer than 200 characters or with any finding blocks with reason `SENSITIVE_INTENT`; nothing reaches a model. Blocked inputs skip the check, so credentials are still never shown to a model. 190 tests pass locally, 12 model tests skip.
 - 2026-11-06 - Saad - R1 findings fixed: secrets written as login phrases (English and Arabic), spaced out, broken up with zero-width characters, or base64-encoded were allowed or sent to the private route. They now block. Dataset (240 rows): no new false blocks, all 60 block rows still caught. Private route checked on a Mac: about 4 s per answer after 17 s to load.
 - 2026-11-06 - Saad - R1 finding fixed: when the PII detector timed out or failed, requests continued on rules only, so a name-only prompt showed ALLOWED and would go to hosted Qwen unredacted. Requests now block (`PROCESSING_ERROR`) and nothing reaches a model; the detector status also returns to ready after a failure. 166 tests pass locally. Reproduce on old code with `SITR_MODEL_TIMEOUT=0.01 python app.py`.
 - 2026-11-06 - Abdulaziz - PR #14 merged into `main` (160 tests pass after merge, CI green), P1-P5 marked done, lane branches synced, docs updated to match.

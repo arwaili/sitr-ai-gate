@@ -16,13 +16,19 @@ from src.risk_classifier import classify_risk
 
 _ERROR_METADATA = ModelMetadata(detector="not run", classifier="not run")
 DETECTOR_DOWN_MESSAGE = "The privacy detector is not ready, so this input was blocked. Try again."
+INTENT_MESSAGE = (
+    "The intended task contains personal or secret data, so this input was blocked. "
+    "Keep the task short and put any details in the prompt."
+)
+# The task travels to the model as written, so it must be short and contain nothing sensitive.
+MAX_INTENT_CHARS = 200
 
 
 def _elapsed_ms(started: float) -> int:
     return int((time.perf_counter() - started) * 1000)
 
 
-def _error(message: str, started: float) -> FinalResponse:
+def _error(message: str, started: float, reason: str = "PROCESSING_ERROR") -> FinalResponse:
     # The contract requires an action and risk, and unknown content must fail closed.
     return FinalResponse(
         status="error",
@@ -32,7 +38,7 @@ def _error(message: str, started: float) -> FinalResponse:
             risk_level="critical",
             risk_score=100,
             recommended_action="block",
-            reason_codes=["PROCESSING_ERROR"],
+            reason_codes=[reason],
             explanation=message,
             model_metadata=_ERROR_METADATA,
         ),
@@ -62,10 +68,23 @@ def _detect(text: str, pages) -> tuple[list[SensitiveEntity], object, ModelMetad
     return entities, semantic, ModelMetadata(detector=detector, classifier=classifier)
 
 
+def _intent_is_safe(user_intent: str) -> bool:
+    """The task is sent unredacted on every route, so it may hold nothing the gate would catch."""
+    if len(user_intent) > MAX_INTENT_CHARS:
+        return False
+    if detect_deterministic(user_intent):
+        # A rule finding is enough; a secret here is never shown to the PII model.
+        return False
+    return not require_entities(user_intent)
+
+
 def _process(text: str, pages, user_intent: str, started: float) -> FinalResponse:
     entities, semantic, metadata = _detect(text, pages)
     analysis = decide(str(uuid.uuid4()), text, entities, metadata, semantic)
     action = analysis.recommended_action
+    # A blocked input reaches no model, so its task is not inspected (or shown to the PII model).
+    if action != "block" and not _intent_is_safe(user_intent):
+        return _error(INTENT_MESSAGE, started, reason="SENSITIVE_INTENT")
     redaction = redact(text, entities)
     return FinalResponse(
         status="blocked" if action == "block" else "completed",
