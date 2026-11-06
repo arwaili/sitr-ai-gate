@@ -24,7 +24,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
    pytest
    ```
 4. Open the folder in Claude Code. It reads `CLAUDE.md` automatically. Tell it your name and ask it what to work on.
-5. Run the app with `python app.py` and open http://localhost:7860. It runs the mock pipeline end to end: the four demo scenarios give allow, redact, private and block.
+5. Run the app with `python app.py` and open http://localhost:7860. Pasted text runs end to end and the four demo scenarios give allow, redact, private and block. Detection in the app is still the mock until task P1 connects the real Phase 3 detectors, so uploaded PDFs return a safe error for now. See **Current status** in `TASKS.md`.
 
 ## Where things are
 
@@ -36,6 +36,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
 | `CONTRACT_NOTES.md` | How the frozen contracts are used: function signatures, routes, error behavior |
 | `INSTRUCTIONS.md` | Lanes, file ownership, and integration rules |
 | `src/contracts.py` | Frozen shared data models |
+| `examples/` | Synthetic demo files (CV and contract PDFs, vulnerable code, safe prompt); `make_examples.py` rebuilds the PDFs |
 
 ## Hackathon MVP
 

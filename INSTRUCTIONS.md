@@ -41,7 +41,7 @@ Owns:
 - `examples/`
 - `tests/test_ingestion.py`
 
-Delivers text/PDF/image/code extraction plus regex and secret detection with exact source offsets.
+Delivers text/PDF/image/code extraction plus regex and secret detection with exact source offsets. Status: done in PR #8 (no OCR; images are rejected with a clear message).
 
 ### Lane 2 - Hugging Face intelligence
 
@@ -118,7 +118,7 @@ All four must pass on the deployed Hugging Face Space before additional features
 
 ## GitHub setup
 
-Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
+Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5) and Phase 3 (#8) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
 
 Still to do (tracked in `TASKS.md`):
 

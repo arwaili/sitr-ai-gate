@@ -12,7 +12,7 @@
 
 | Lane | Function | Returns |
 |---|---|---|
-| 1 | `src.ingestion.ingest(text=None, file_path=None)` | `IngestionResult`, or raises `ValueError` with a safe message |
+| 1 | `src.ingestion.ingest(text=None, file_path=None)` | `IngestionResult`, or raises `ValueError` with a safe message. Accepts text, code and text files, and digital PDFs (`input_type="pdf"`, one `PageText` per page, pages joined with `src.ingestion.PAGE_SEPARATOR`). Limits: 10 MB, 50 pages; images need OCR and are rejected |
 | 1 | `src.deterministic.detect_deterministic(text, pages=None)` | `list[SensitiveEntity]` sorted by `start`; pass `IngestionResult.pages` to fill in `page`. Nested findings are dropped; documentation placeholders (`sk-XXXX`, `<your-api-key>`) are not reported |
 | 2 | `src.hf_detection.detect_entities(text)` | `list[SensitiveEntity]` |
 | 2 | `src.risk_classifier.classify_risk(text)` | `RiskPrediction(risk_level, confidence, explanation)` |

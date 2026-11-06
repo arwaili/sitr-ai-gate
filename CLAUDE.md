@@ -37,7 +37,7 @@ The public demo must run on Hugging Face Spaces and use synthetic data only. Use
 
 Update the documents as you work, not only at the end:
 
-- **`TASKS.md`:** change the task's status when you start it, when the PR opens (`in review`, with the PR link), and when it merges (`done`). Add a line to the **Log** for every finished piece of work, and add anything that blocks you under **Blockers**.
+- **`TASKS.md`:** change the task's status when you start it, when the PR opens (`in review`, with the PR link), and when it merges (`done`). Add a line to the **Log** for every finished piece of work, and add anything that blocks you under **Blockers**. When a phase starts or finishes, or when what works in the app changes, update the **Current status** table and paragraph at the top.
 - **`CONTRACT_NOTES.md`:** update it whenever a function signature, route, placeholder rule, or error behavior changes.
 - **`README.md`:** update it when setup steps, models, or links change.
 - Put the documentation update in the same commit or PR as the change it describes.
