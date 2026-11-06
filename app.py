@@ -96,6 +96,12 @@ _LATTICE = (
     "%3Crect x='12' y='12' width='20' height='20' transform='rotate(45 22 22)'/%3E"
     "%3C/g%3E%3C/svg%3E"
 )
+# A circular arrow (start over), used as a mask so it takes the text color.
+_RESET_ICON = (
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' "
+    "fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E"
+    "%3Cpath d='M3 12a9 9 0 1 0 3-6.7'/%3E%3Cpath d='M3 4v5h5'/%3E%3C/svg%3E"
+)
 CSS = f"""
 :root {{
   --sitr-maroon: #8A1538; --sitr-side: #FAF7F8;
@@ -122,10 +128,17 @@ footer {{ display: none !important; }}
 .sitr-talk p[dir="auto"] {{ margin: 0; white-space: pre-line; }}
 /* The chat's reset button (top right) is the way to start over, so it is easy to see. */
 #sitr-chat .top-panel {{ top: 12px !important; right: 16px !important; padding: 0 !important; }}
+#sitr-chat .top-panel, #sitr-chat .top-panel button {{ background: transparent !important;
+  border: 0 !important; box-shadow: none !important; }}
 #sitr-chat .top-panel button {{ width: 34px !important; height: 34px !important;
-  border: 1px solid var(--sitr-ready-line) !important; border-radius: 10px !important;
-  background: var(--sitr-ready-bg) !important; color: var(--sitr-maroon) !important; }}
-#sitr-chat .top-panel button:hover {{ border-color: var(--sitr-maroon) !important; }}
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--body-text-color) !important; }}
+/* A circular "start over" arrow instead of Gradio's trash can: it resets, nothing is lost. */
+#sitr-chat .top-panel button svg {{ display: none; }}
+#sitr-chat .top-panel button::before {{ content: ""; width: 20px; height: 20px;
+  background: currentColor; -webkit-mask: url("{_RESET_ICON}") center / contain no-repeat;
+  mask: url("{_RESET_ICON}") center / contain no-repeat; }}
+#sitr-chat .top-panel button:hover {{ opacity: .75; }}
 /* Copy buttons appear when the pointer is over their message; touch screens always show them. */
 @media (hover: hover) {{
   #sitr-chat .message-buttons-left, #sitr-chat .message-buttons-right, #sitr-chat .sitr-copy {{
