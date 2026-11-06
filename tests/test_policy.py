@@ -9,9 +9,9 @@ import pytest
 from src import orchestrator, router
 from src.contracts import FinalResponse, ModelMetadata, SensitiveEntity
 from src.orchestrator import inspect_and_process
-from src.policy_engine import decide, merge_findings
+from src.policy_engine import SEMANTIC_THRESHOLD, decide, merge_findings
 from src.redactor import redact
-from src.risk_classifier import RiskPrediction
+from src.risk_classifier import RiskPrediction, fallback
 
 EXAMPLES = Path(__file__).parent.parent / "examples"
 METADATA = ModelMetadata(detector="test", classifier="test")
@@ -340,6 +340,57 @@ def test_disguised_secrets_never_reach_a_model(model_calls, text: str) -> None:
     result = inspect_and_process(text=text)
     assert (result["status"], result["action_taken"]) == ("blocked", "block")
     assert model_calls == []
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "أريد ردا سريعا على هذا السؤال",
+        "هذه مشكلة معقدة كيف نحلها",
+        "How do muscles get contraction during exercise?",
+    ],
+)
+def test_keywords_do_not_match_inside_longer_words(text: str) -> None:
+    # Regression (R1): سريع contains سري, معقدة contains عقد, contraction contains contract.
+    assert inspect_and_process(text=text)["action_taken"] == "allow"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Please review this contract",
+        "CONTRACTS are stored here",
+        "Update the salaries sheet",
+        "عقد عمل جديد",
+        "راجع العقد من فضلك",
+        "وعقدها انتهى",
+        "راتبي تأخر",
+        "جدول الرواتب",
+        "تقييمات الموظفين",
+        "معلومات سرية",
+        "هذا الملف سري",
+        "سنقوم بتسريح ثلاثين موظفا",
+    ],
+)
+def test_keywords_still_match_their_real_forms(text: str) -> None:
+    result = inspect_and_process(text=text)
+    assert result["action_taken"] == "private"
+    assert "CONFIDENTIAL_CONTENT" in result["analysis"]["reason_codes"]
+
+
+def test_keyword_fallback_never_decides_on_its_own() -> None:
+    prediction = fallback("How do muscles get contraction?")
+    assert prediction.risk_level == "high"
+    assert prediction.confidence < SEMANTIC_THRESHOLD
+
+
+def test_classifier_routes_private_at_the_lowered_limit() -> None:
+    # Regression (R1): confidential prose with no keywords scored about 0.42 and was allowed.
+    text = "We plan to let the head of finance go next month."
+    semantic = RiskPrediction("high", 0.42, "test")
+    assert decide("id", text, [], METADATA, semantic).recommended_action == "private"
+    semantic = RiskPrediction("high", 0.39, "test")
+    assert decide("id", text, [], METADATA, semantic).recommended_action == "allow"
 
 
 def test_validation_style_errors_do_not_leak_content(monkeypatch) -> None:

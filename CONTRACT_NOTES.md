@@ -19,8 +19,8 @@
 | 2 | `src.hf_detection.require_entities(text)` | same as `detect_entities`, but raises `DetectorUnavailable` (no input content) if the model could not run. The orchestrator uses this one |
 | 2 | `src.hf_detection.status()`, `src.risk_classifier.status()` | `{model, state, detail}`; state is `not loaded`, `ready`, `unavailable` or `disabled` (`SITR_HF_MODELS=0`) |
 | 2 | `src.hf_detection.warm_up()`, `src.risk_classifier.warm_up()` | load the model in the background at app start |
-| 2 | `src.risk_classifier.classify_risk(text)` | `RiskPrediction(risk_level, confidence, explanation)`. Never raises: on failure a keyword fallback answers and its explanation starts with `Fallback` |
-| 3 | `src.policy_engine.decide(document_id, text, entities, metadata, semantic=None)` | `AnalysisResult`; `semantic` is an optional `RiskPrediction` that can raise the action to private, never block or lower it |
+| 2 | `src.risk_classifier.classify_risk(text)` | `RiskPrediction(risk_level, confidence, explanation)`. Never raises: on failure a keyword fallback answers and its explanation starts with `Fallback`; its confidence stays below the policy limit, so it never decides on its own |
+| 3 | `src.policy_engine.decide(document_id, text, entities, metadata, semantic=None)` | `AnalysisResult`; `semantic` is an optional `RiskPrediction` that can raise the action to private at confidence 0.4 or above, never block or lower it. Confidential keywords match whole words, with Arabic prefixes and pronoun endings |
 | 3 | `src.policy_engine.merge_findings(rules, model)` | rules plus the model findings that overlap no rule finding |
 | 3 | `src.redactor.redact(text, entities)` | `RedactionResult` |
 | 3 | `src.router.route(action, redaction, user_intent)` | model response, or `None` on block |

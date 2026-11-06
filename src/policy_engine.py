@@ -10,11 +10,19 @@ Overrides, strictest first (PROJECT_OVERVIEW.md, Phase 5):
 Models can raise a decision to private at most; only rules can block or lower it.
 """
 
+import re
+
 from src.contracts import Action, AnalysisResult, ModelMetadata, SensitiveEntity
 
-_CONFIDENTIAL_TERMS = (
-    "contract", "salary", "payroll", "evaluation", "appraisal", "confidential", "termination",
-    "عقد", "راتب", "رواتب", "تقييم", "سري", "إنهاء الخدمة",
+# Whole words only, so "contraction", سريع (quick) and معقدة (complex) do not match. Arabic words
+# may carry attached prefixes and pronoun endings, as in العقد and راتبي.
+_ARABIC_LETTER = "\u0600-\u06ff"
+_CONFIDENTIAL_PATTERN = re.compile(
+    r"(?i)\b(?:contracts?|salary|salaries|payroll|evaluations?|appraisals?|confidential"
+    r"|terminations?)\b"
+    rf"|(?<![{_ARABIC_LETTER}])(?:[وفبكل]?(?:ال|لل)?)"
+    r"(?:عقد|عقود|راتب|رواتب|تقييم|تقييمات|سري|سرية|سريا|تسريح|إنهاء الخدمة|انهاء الخدمة)"
+    rf"(?:ي|ك|ه|ها|نا|هم|هن|كم)?(?![{_ARABIC_LETTER}])"
 )
 _RESTRICTED_TERMS = (
     "top secret", "classification: restricted", "restricted information", "internal use only",
@@ -30,8 +38,10 @@ _CREDENTIAL_CODES = {
     "DATABASE_URL": "DATABASE_CREDENTIAL",
     "PRIVATE_KEY": "PRIVATE_KEY",
 }
-# The classifier may route to private only when it is this sure; tuned on the dev split.
-SEMANTIC_THRESHOLD = 0.6
+# The classifier may route to private only when it is this sure. On the dev split, limits from
+# 0.35 to 0.6 gave the same accuracy, and the lower limit catches confidential prose with no
+# keywords.
+SEMANTIC_THRESHOLD = 0.4
 
 _DECISIONS = {
     "block": ("critical", 95, "Restricted content was found, so nothing was sent to any model."),
@@ -84,7 +94,7 @@ def _assess(text: str, entities: list[SensitiveEntity], semantic) -> tuple[Actio
     if any(e.severity == "critical" for e in entities):
         # Only the model saw it: suspicious, but not proof, so keep it off external routes.
         private.append("MODEL_SUSPECTED_CREDENTIAL")
-    if any(term in lowered for term in _CONFIDENTIAL_TERMS):
+    if _CONFIDENTIAL_PATTERN.search(text):
         private.append("CONFIDENTIAL_CONTENT")
     if (
         semantic is not None
