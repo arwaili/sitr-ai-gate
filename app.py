@@ -1,5 +1,6 @@
 """Sitr Gradio interface. All security decisions come from inspect_and_process."""
 
+import logging
 from html import escape
 
 import gradio as gr
@@ -17,6 +18,9 @@ EXAMPLES = {
     "Code with a synthetic API key": 'API_KEY = "sk-synthetic-000000000000"\n'
     'requests.get(URL, headers={"Authorization": API_KEY})',
 }
+
+# Uploads are stored by Gradio on drop, so one that is never inspected is purged on this schedule.
+CACHE_PURGE_SECONDS = (600, 600)
 
 BADGES = {
     "allow": ("#166534", "ALLOWED · مسموح"),
@@ -67,14 +71,24 @@ def render(result: dict) -> tuple[str, str, list, str, str, str]:
     return badge, why, original, safe_text, model_response, models
 
 
-def analyze(text: str, file_path: str | None) -> tuple[str, str, list, str, str, str]:
-    # Uploads are Gradio temp copies; Sitr deletes them once inspected, even on failure.
-    return render(
-        inspect_and_process(text=text or None, file_path=file_path, delete_file=bool(file_path))
+def analyze(text: str, file_path: str | None) -> tuple[str, str, list, str, str, str, None]:
+    # Uploads are Gradio temp copies; Sitr deletes them once inspected, even on failure, and
+    # the last value clears the file box so it never points at a deleted file.
+    result = inspect_and_process(
+        text=text or None, file_path=file_path, delete_file=bool(file_path)
     )
+    return (*render(result), None)
 
 
-with gr.Blocks(title="Sitr AI Gate") as demo:
+def enable_audit_log() -> None:
+    """Write Sitr's metadata-only audit events to the console. Safe to call twice."""
+    logger = logging.getLogger("sitr")
+    logger.setLevel(logging.INFO)
+    if not logger.handlers:
+        logger.addHandler(logging.StreamHandler())
+
+
+with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
     gr.Markdown(
         "# Sitr AI Gate · سِتر\n"
         "Inspects employee prompts and files before they reach an AI model, then allows, "
@@ -104,10 +118,14 @@ with gr.Blocks(title="Sitr AI Gate") as demo:
     submit.click(
         analyze,
         [text_input, file_input],
-        [badge_output, why_output, original_output, safe_output, response_output, models_output],
+        [
+            badge_output, why_output, original_output, safe_output, response_output, models_output,
+            file_input,
+        ],
     )
 
 if __name__ == "__main__":
+    enable_audit_log()
     for module in (hf_detection, risk_classifier, router):
         module.warm_up()
     demo.launch()

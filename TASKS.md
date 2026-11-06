@@ -19,9 +19,9 @@ Updated 2026-11-06 after PR #14.
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
 | 5 - Policy, routing, integration | Done, merged in PR #14 |
 | 6-7 - Product and deployment | Not started (U1-U4); **everything can start now**, including the Space deployment (U3) |
-| 8-9 - Review and submission | R1 in progress (Saad); R2-R3 not started |
+| 8-9 - Review and submission | R1 in review (Saad, PR #18); R2-R3 not started |
 
-What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 213 tests pass locally, including T7. Measured results are in `README.md`.
+What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 216 tests pass locally, including T7. Measured results are in `README.md`.
 
 ## Team
 
@@ -105,7 +105,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad | in progress | [#16](https://github.com/arwaili/sitr-ai-gate/pull/16), [#17](https://github.com/arwaili/sitr-ai-gate/pull/17) |
+| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad | in review | [#16](https://github.com/arwaili/sitr-ai-gate/pull/16), [#17](https://github.com/arwaili/sitr-ai-gate/pull/17), [#18](https://github.com/arwaili/sitr-ai-gate/pull/18) |
 | R2 | 90-second demo script, 3-minute pitch, submission description | Abdulaziz | | open | |
 | R3 | Backup screenshots and video | anyone | | open | |
 
@@ -120,6 +120,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Saad - R1 uploads and logs check: inspected uploads were deleted and audit events held no values. Fixed: nothing enabled the audit log, so the app wrote no events; uploads never inspected stayed in the Gradio cache; a second click on Inspect failed on the deleted file. Saad's R1 review is complete once PR #18 merges; Mohammed's [#19](https://github.com/arwaili/sitr-ai-gate/pull/19) is separate. [#18](https://github.com/arwaili/sitr-ai-gate/pull/18)
 - 2026-11-06 - Saad - R1 classifier check: the fallback changed no decisions when the classifier was down. Fixed two gaps it showed: confidential keywords matched inside longer words (`سريع`, `معقدة`, `contraction`), and confidential prose with no keywords stayed below the classifier limit, now lowered from 0.6 to 0.4. The fallback stays below that limit. Dev split unchanged at 0.983 action accuracy; 25 harmless prompts stay allowed. `data/eval_results_test.json` and README numbers were not rerun.
 - 2026-11-06 - Saad - R1 findings fixed: secrets written as login phrases (English and Arabic), spaced out, broken up with zero-width characters, or base64-encoded were allowed or sent to the private route. They now block. Dataset (240 rows): no new false blocks, all 60 block rows still caught. Private route checked on a Mac: about 4 s per answer after 17 s to load.
 - 2026-11-06 - Saad - R1 finding fixed: when the PII detector timed out or failed, requests continued on rules only, so a name-only prompt showed ALLOWED and would go to hosted Qwen unredacted. Requests now block (`PROCESSING_ERROR`) and nothing reaches a model; the detector status also returns to ready after a failure. 166 tests pass locally. Reproduce on old code with `SITR_MODEL_TIMEOUT=0.01 python app.py`.

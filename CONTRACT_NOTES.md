@@ -8,6 +8,7 @@
 2. **`redaction` is filled in on every non-error response.** `FinalResponse` has no field for the extracted text, and the UI needs it to highlight findings in uploaded files. `redaction.original_text` is the inspected text, and `redaction.safe_text` has every finding replaced, whatever the action. On allow it equals the original. Only the router decides which of the two text versions reaches a model.
 3. **Placeholders** are `[ENTITY_TYPE_N]`, numbered per type in order of first appearance. A repeated value reuses its placeholder, and overlapping findings merge into one span.
 4. **A failed detector fails closed.** Rules cannot see names, so if the PII model times out or fails, `inspect_and_process` returns the error response in decision 1 and nothing reaches a model. A secret found by the rules still blocks as usual, because the model is skipped. `SITR_HF_MODELS=0` is a deliberate switch, not a failure, and stays rules-only: never set it where text can reach hosted Qwen. A failed classifier still falls back to keywords.
+5. **Uploads and audit events.** The app deletes an upload after inspection and clears the file box. Gradio stores a file as soon as it is dropped, so an upload that is never inspected is purged after about 10 minutes. `python app.py` writes audit events to the console; they hold metadata only.
 
 ## Lane interfaces
 
