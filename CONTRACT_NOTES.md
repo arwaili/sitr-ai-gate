@@ -18,11 +18,12 @@
 | 2 | `src.hf_detection.status()`, `src.risk_classifier.status()` | `{model, state, detail}`; state is `not loaded`, `ready`, `unavailable` or `disabled` (`SITR_HF_MODELS=0`) |
 | 2 | `src.hf_detection.warm_up()`, `src.risk_classifier.warm_up()` | load the model in the background at app start |
 | 2 | `src.risk_classifier.classify_risk(text)` | `RiskPrediction(risk_level, confidence, explanation)`. Never raises: on failure a keyword fallback answers and its explanation starts with `Fallback` |
-| 3 | `src.policy_engine.decide(document_id, text, entities, metadata)` | `AnalysisResult` |
+| 3 | `src.policy_engine.decide(document_id, text, entities, metadata, semantic=None)` | `AnalysisResult`; `semantic` is an optional `RiskPrediction` that can raise the action to private, never block or lower it |
+| 3 | `src.policy_engine.merge_findings(rules, model)` | rules plus the model findings that overlap no rule finding |
 | 3 | `src.redactor.redact(text, entities)` | `RedactionResult` |
 | 3 | `src.router.route(action, redaction, user_intent)` | model response, or `None` on block |
-| 3 | `src.router.call_model(route, prompt, user_intent)` | the replaceable model adapter |
-| 3 | `src.orchestrator.inspect_and_process(text=None, file_path=None, user_intent="summarize")` | `FinalResponse` as a dict |
+| 3 | `src.router.call_model(route, prompt, user_intent)` | the replaceable model adapter; never raises. `SITR_LLM=mock` returns canned text (tests set it) |
+| 3 | `src.orchestrator.inspect_and_process(text=None, file_path=None, user_intent="summarize", delete_file=False)` | `FinalResponse` as a dict |
 
 Entity offsets are Python string indices into the exact inspected text. Every occurrence is a separate entity.
 
@@ -30,9 +31,9 @@ Entity offsets are Python string indices into the exact inspected text. Every oc
 
 | Action | Route name | Text sent |
 |---|---|---|
-| allow | `approved_external` | original |
-| redact | `sanitized_external` | `safe_text` only |
-| private | `private_simulation` | original, kept on the private route, which is a demonstration and not an isolated environment |
+| allow | `approved_external` | original, to hosted Qwen through HF Inference Providers |
+| redact | `sanitized_external` | `safe_text` only, to hosted Qwen |
+| private | `private_simulation` | original, answered by Qwen running inside the Sitr process (never an external service); a demonstration, not an isolated environment |
 | block | none | nothing |
 
 ## Dataset

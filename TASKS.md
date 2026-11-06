@@ -17,11 +17,11 @@ Updated 2026-11-06 after PR #11.
 | 2 - Mock pipeline and dataset | Done, merged in PRs #1-#5 |
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
-| 5 - Policy, routing, integration | Not started (P1-P5); **P1 can start now**, Phases 3 and 4 are merged |
-| 6-7 - Product and deployment | Not started (U1-U4); UI work can start now, deploy after P1 |
+| 5 - Policy, routing, integration | Built on `feature/policy-routing`, in review (P1-P5) |
+| 6-7 - Product and deployment | Not started (U1-U4); can start now, and the Space can be deployed once Phase 5 merges |
 | 8-9 - Review and submission | Not started (R1-R3) |
 
-What works on `main` now: 132 tests pass plus T7 (expected failure until P1); in CI, without torch, the 7 real-model tests skip. Phase 3 (`ingest`, `detect_deterministic`) and Phase 4 (`detect_entities`, `classify_risk` with the real models) work and are tested, but the app does not call them yet: the orchestrator still uses its own mock patterns and a text-only file reader, so the four pasted demo texts work in the app while uploaded PDFs return a safe error until P1. Measured results on the held-out test split are in `README.md`.
+What works on `main` now: Phases 1-4. Phase 5 is on `feature/policy-routing`, waiting for review: with it the app runs the real pipeline end to end (PDF uploads, rules, both models, full policy, hosted Qwen on allow and redact, local Qwen on private). Until it merges, the app on `main` still uses mock detection and cannot read PDFs.
 
 ## Team
 
@@ -86,11 +86,11 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| P1 | Checkpoint C: orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk` instead of its mock detection; call `warm_up()` for both models at app start and show `status()` in the UI | Rashid | | open | |
-| P2 | Merge and deduplicate findings from rules and models; rules stay authoritative. Reference: `combine()` in `data/evaluate.py` | Rashid | | open | |
-| P3 | Full policy overrides from `PROJECT_OVERVIEW.md` Phase 5 | Rashid | | open | |
-| P4 | Real `call_model` with Qwen through Hugging Face Inference Providers, with a timeout and a safe fallback | Rashid | | open | |
-| P5 | Remove uploaded temp files on success and failure | Rashid | | open | |
+| P1 | Orchestrator calls `ingest`, `detect_deterministic`, `detect_entities` and `classify_risk`; models are skipped when a rule finds a credential; metadata says which models ran or fell back; app warms all models at start | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P2 | `policy_engine.merge_findings`: rules first, overlapping model findings dropped; T7 passes | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P3 | All Phase 5 overrides: credentials, private keys and restricted operational information block; HR/financial data, a model-only credential or the classifier (confidence 0.6 or more) route private; models can never block or lower a decision | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P4 | Hosted Qwen via HF Inference Providers (`featherless-ai`) for allow and redact; local Qwen inside Sitr for private, so originals never leave; timeouts and a notice on failure | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
+| P5 | `inspect_and_process(..., delete_file=True)` removes the upload on success and failure; the app uses it | Rashid | Abdulaziz | in review | [#14](https://github.com/arwaili/sitr-ai-gate/pull/14) |
 
 ## Phase 6 and 7 - Product and deployment (Abdulaziz)
 
@@ -113,12 +113,13 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 - `main` is not protected: the repository is private on a free plan. Follow the PR rules anyway.
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
-- Until P1, the app's orchestrator uses mock detection and does not call the Phase 3 rules or the Phase 4 models, and it cannot read PDFs. To test Phase 3, call `src.ingestion.ingest` and `src.deterministic.detect_deterministic` directly. To test Phase 4, run `python data/evaluate.py --split dev` (rules plus both models plus the policy engine), or call `src.hf_detection.detect_entities` and `src.risk_classifier.classify_risk`.
+- The Space needs an `HF_TOKEN` secret for hosted Qwen, and about 6.5 GB of RAM for the three models (CPU Basic has 16 GB).
 
 ## Log
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - Phase 5 (P1-P5) built on `feature/policy-routing`: real pipeline end to end. 160 tests pass (CI: 148 pass, 12 model tests skip); T7 passes. Test split through the full pipeline: action accuracy 0.95, entities 0.968 / 0.938. Live check: four examples and two PDF uploads in the running app give the right badge, uploads are deleted, the audit log holds no values. [#14](https://github.com/arwaili/sitr-ai-gate/pull/14)
 - 2026-11-06 - Abdulaziz - Added Phase 4 testing steps to Blockers; deleted the merged `chore/phase-1-setup` branch.
 - 2026-11-06 - Abdulaziz - PR #11 merged into `main` (132 tests pass after merge, CI green), H1-H4 marked done, lane branches synced to `main`, docs updated to match.
 - 2026-11-06 - Abdulaziz - Phase 4 (H1-H4) built on `feature/hf-intelligence`. Held-out test split (60 rows), rules plus models: entity precision 0.967, recall 0.927; names 0.897/0.897; action accuracy 0.95 (all misses are public prompts with a false Arabic name); risk model alone 0.85. Median latency: PII model 234 ms, risk model 146 ms. 132 tests pass locally; CI skips the 7 real-model tests. Dataset republished with `+974 0000` phones. [#11](https://github.com/arwaili/sitr-ai-gate/pull/11)
