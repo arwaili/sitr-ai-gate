@@ -73,7 +73,7 @@ Owns:
 - `src/orchestrator.py`
 - `tests/test_policy.py`
 
-Delivers deterministic allow/redact/private/block decisions and the single public `inspect_and_process` entry point.
+Delivers deterministic allow/redact/private/block decisions and the single public `inspect_and_process` entry point. Status: built on `feature/policy-routing`, in review.
 
 ### Lane 4 - Product and deployment
 

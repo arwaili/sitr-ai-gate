@@ -45,6 +45,14 @@ LABEL_MAP = {
     "PASSWORD": ("PASSWORD", "critical"),
 }
 
+# Words the model has read as names that never are: Qatari places and confidentiality terms.
+# A PERSON finding made only of these words is dropped.
+NOT_NAMES = {
+    "doha", "qatar", "lusail", "wakrah", "al", "khor", "corniche", "pearl", "katara",
+    "الدوحة", "دوحة", "قطر", "لوسيل", "الوكرة", "الخور", "الكورنيش", "كتارا",
+    "سري", "سرية", "السنوي", "الموظف", "الموظفة",
+}
+
 logger = logging.getLogger("sitr.hf_detection")
 _executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="sitr-ner")
 _lock = threading.Lock()
@@ -148,6 +156,8 @@ def decode(text: str, offsets, labels, scores) -> list[SensitiveEntity]:
 
 def _plausible(entity: SensitiveEntity) -> bool:
     """Cheap shape checks that drop model fragments such as a port number tagged as an email."""
+    if entity.entity_type == "PERSON":
+        return not all(word.casefold() in NOT_NAMES for word in entity.value.split())
     if entity.entity_type == "EMAIL":
         return "@" in entity.value
     if entity.entity_type in ("PHONE", "ACCOUNT_NUMBER", "CREDIT_CARD"):

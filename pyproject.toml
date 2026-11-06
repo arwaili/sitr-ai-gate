@@ -2,6 +2,7 @@
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-q"
+markers = ["real_models: runs the real Hugging Face models"]
 
 [tool.ruff]
 target-version = "py311"

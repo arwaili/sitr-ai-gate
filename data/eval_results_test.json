@@ -27,8 +27,8 @@
    "support": 3
   },
   "PERSON": {
-   "precision": 0.897,
-   "recall": 0.897,
+   "precision": 0.9,
+   "recall": 0.931,
    "support": 29
   },
   "PHONE": {
@@ -47,8 +47,8 @@
    "support": 13
   },
   "all": {
-   "precision": 0.967,
-   "recall": 0.927,
+   "precision": 0.968,
+   "recall": 0.938,
    "support": 96
   }
  },
@@ -78,12 +78,12 @@
    "p95": 0
   },
   "pii_model": {
-   "median": 234,
-   "p95": 274
+   "median": 238,
+   "p95": 281
   },
   "risk_model": {
-   "median": 146,
-   "p95": 165
+   "median": 159,
+   "p95": 184
   }
  },
  "models": [

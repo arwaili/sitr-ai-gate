@@ -4,6 +4,7 @@ from html import escape
 
 import gradio as gr
 
+from src import hf_detection, risk_classifier, router
 from src.orchestrator import inspect_and_process
 
 # Every value below is synthetic.
@@ -67,7 +68,10 @@ def render(result: dict) -> tuple[str, str, list, str, str, str]:
 
 
 def analyze(text: str, file_path: str | None) -> tuple[str, str, list, str, str, str]:
-    return render(inspect_and_process(text=text or None, file_path=file_path))
+    # Uploads are Gradio temp copies; Sitr deletes them once inspected, even on failure.
+    return render(
+        inspect_and_process(text=text or None, file_path=file_path, delete_file=bool(file_path))
+    )
 
 
 with gr.Blocks(title="Sitr AI Gate") as demo:
@@ -76,7 +80,8 @@ with gr.Blocks(title="Sitr AI Gate") as demo:
         "Inspects employee prompts and files before they reach an AI model, then allows, "
         "redacts, routes privately, or blocks them.\n\n"
         "**Security decision-support prototype. Do not upload real confidential information.**\n\n"
-        "*Preview build: detection and model responses are mocked.*"
+        "*The private route runs Qwen inside this app; it is a demonstration, not an isolated "
+        "environment.*"
     )
     with gr.Row():
         with gr.Column():
@@ -103,4 +108,6 @@ with gr.Blocks(title="Sitr AI Gate") as demo:
     )
 
 if __name__ == "__main__":
+    for module in (hf_detection, risk_classifier, router):
+        module.warm_up()
     demo.launch()

@@ -3,8 +3,8 @@
     python data/evaluate.py                 # held-out test split from the Hub (final numbers)
     python data/evaluate.py --split dev     # dev split, for tuning
 
-Entities come from Lane 1 rules plus Lane 2's model; model findings that overlap a rule finding
-are dropped, because rules are authoritative. Actions come from the current policy engine.
+Entities come from Lane 1 rules plus Lane 2's model, merged by the policy engine (rules win),
+and actions come from the policy engine with the semantic classifier, as in the app.
 Writes data/eval_results_<split>.json.
 """
 
@@ -23,17 +23,11 @@ from src import hf_detection, risk_classifier  # noqa: E402
 from src.contracts import ModelMetadata  # noqa: E402
 from src.deterministic import detect_deterministic  # noqa: E402
 from src.hf_detection import detect_entities  # noqa: E402
-from src.policy_engine import decide  # noqa: E402
+from src.policy_engine import decide, merge_findings  # noqa: E402
 from src.risk_classifier import classify_risk  # noqa: E402
 
 REPO_ID = "arwaili/sitr-synthetic-dlp"
 METADATA = ModelMetadata(detector=hf_detection.MODEL_ID, classifier=risk_classifier.MODEL_ID)
-
-
-def combine(rules: list, model: list) -> list:
-    """Rules first; a model finding is kept only where no rule finding overlaps it."""
-    kept = [m for m in model if not any(r.start < m.end and m.start < r.end for r in rules)]
-    return sorted(rules + kept, key=lambda e: (e.start, -e.end))
 
 
 def _rate(hits: int, total: int) -> float:
@@ -65,7 +59,8 @@ def evaluate(rows: list[dict]) -> dict:
         prediction = classify_risk(text)
         timings["risk_model"].append(time.perf_counter() - started)
 
-        found = {(e.start, e.end): e.entity_type for e in combine(rules, model)}
+        entities = merge_findings(rules, model)
+        found = {(e.start, e.end): e.entity_type for e in entities}
         gold = {(e["start"], e["end"]): e["entity_type"] for e in row["entities"]}
         for span, kind in gold.items():
             spans[(kind, "tp" if found.get(span) == kind else "fn")] += 1
@@ -73,7 +68,7 @@ def evaluate(rows: list[dict]) -> dict:
             if gold.get(span) != kind:
                 spans[(kind, "fp")] += 1
 
-        decided = decide(row["id"], text, combine(rules, model), METADATA).recommended_action
+        decided = decide(row["id"], text, entities, METADATA, prediction).recommended_action
         for group in ("all", row["language"], row["expected_action"]):
             risk[(group, prediction.risk_level == row["expected_risk"])] += 1
             action[(group, decided == row["expected_action"])] += 1

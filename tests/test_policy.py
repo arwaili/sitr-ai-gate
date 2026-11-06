@@ -1,12 +1,26 @@
 import json
 import logging
+import shutil
+from pathlib import Path
 
 import pytest
 
-from src import router
-from src.contracts import FinalResponse, SensitiveEntity
+from src import orchestrator, router
+from src.contracts import FinalResponse, ModelMetadata, SensitiveEntity
 from src.orchestrator import inspect_and_process
+from src.policy_engine import decide, merge_findings
 from src.redactor import redact
+from src.risk_classifier import RiskPrediction
+
+EXAMPLES = Path(__file__).parent.parent / "examples"
+METADATA = ModelMetadata(detector="test", classifier="test")
+
+
+@pytest.fixture(autouse=True)
+def _rules_only(monkeypatch, request) -> None:
+    # Policy tests are deterministic: models off unless a test is marked to use them.
+    if "real_models" not in request.keywords:
+        monkeypatch.setenv("SITR_HF_MODELS", "0")
 
 CV = "Curriculum vitae: Mariam, test.applicant@example.com, +974 5555 0100"
 CONTRACT = "عقد عمل: الراتب 15000 ريال، الرقم الشخصي 28400000000"
@@ -31,7 +45,6 @@ def test_shared_matrix(scenario: str, text: str, risk: str, action: str) -> None
     assert result["action_taken"] == action, scenario
 
 
-@pytest.mark.xfail(reason="T7 needs the real secret scanner, the mock flags any key-shaped text")
 def test_t7_documentation_key_is_not_critical() -> None:
     result = inspect_and_process(text="Keys look like sk-XXXXXXXXXXXX in the documentation.")
     assert result["analysis"]["risk_level"] != "critical"
@@ -156,3 +169,211 @@ def test_entity_offsets_select_exact_values() -> None:
     assert result["analysis"]["entities"]
     for entity in result["analysis"]["entities"]:
         assert CONTRACT[entity["start"] : entity["end"]] == entity["value"]
+
+
+# Phase 5: files through the whole pipeline, cleanup, overrides, routing
+
+
+@pytest.mark.parametrize(
+    ("name", "action"),
+    [
+        ("safe_prompt.txt", "allow"),
+        ("synthetic_cv.pdf", "redact"),
+        ("synthetic_contract.pdf", "private"),
+        ("vulnerable_code.py", "block"),
+    ],
+)
+def test_demo_files_reach_their_decision(name: str, action: str) -> None:
+    result = inspect_and_process(file_path=str(EXAMPLES / name))
+    assert result["action_taken"] == action
+    assert result["status"] == ("blocked" if action == "block" else "completed")
+
+
+def test_uploaded_file_is_deleted_after_success(tmp_path) -> None:
+    upload = Path(shutil.copy(EXAMPLES / "synthetic_cv.pdf", tmp_path / "upload.pdf"))
+    assert inspect_and_process(file_path=str(upload), delete_file=True)["action_taken"] == "redact"
+    assert not upload.exists()
+
+
+def test_uploaded_file_is_deleted_after_failure(tmp_path) -> None:
+    upload = tmp_path / "broken.pdf"
+    upload.write_bytes(b"\xff\xfe broken")
+    assert inspect_and_process(file_path=str(upload), delete_file=True)["status"] == "error"
+    assert not upload.exists()
+
+
+def test_files_are_kept_unless_deletion_is_asked_for() -> None:
+    inspect_and_process(file_path=str(EXAMPLES / "safe_prompt.txt"))
+    assert (EXAMPLES / "safe_prompt.txt").exists()
+
+
+@pytest.mark.parametrize(
+    ("text", "code"),
+    [
+        ("-----BEGIN RSA " + "PRIVATE KEY-----\nc3ludGhldGlj\n-----END RSA " + "PRIVATE KEY-----",
+         "PRIVATE_KEY"),
+        ("db = 'postgresql://app:synthetic1@db.example.internal:5432/hr'", "DATABASE_CREDENTIAL"),
+        ('password = "Synthetic-Pass-01"', "PASSWORD"),
+        ("The build server is at 10.20.30.40", "RESTRICTED_OPERATIONAL"),
+        ("Classification: Restricted. Network plan for the data centre.", "RESTRICTED_OPERATIONAL"),
+    ],
+)
+def test_mandatory_block_overrides(text: str, code: str) -> None:
+    result = inspect_and_process(text=text)
+    assert result["action_taken"] == "block"
+    assert code in result["analysis"]["reason_codes"]
+    assert result["model_response"] is None
+
+
+def _model_entity(text: str, value: str, entity_type: str, severity: str) -> SensitiveEntity:
+    start = text.index(value)
+    return SensitiveEntity(entity_type=entity_type, value=value, start=start,
+                           end=start + len(value), confidence=0.9, source="hf_ner",
+                           severity=severity)
+
+
+def test_model_suspected_credential_goes_private_not_block() -> None:
+    text = "the code word is Synthetic-Word-77"
+    entity = _model_entity(text, "Synthetic-Word-77", "PASSWORD", "critical")
+    analysis = decide("x", text, [entity], METADATA)
+    assert analysis.recommended_action == "private"
+    assert "MODEL_SUSPECTED_CREDENTIAL" in analysis.reason_codes
+
+
+def test_classifier_can_raise_to_private_but_not_lower() -> None:
+    high = RiskPrediction("high", 0.9, "test")
+    low = RiskPrediction("low", 0.99, "test")
+    assert decide("x", "Feedback for the team", [], METADATA, high).recommended_action == "private"
+    unsure = RiskPrediction("high", 0.3, "test")
+    assert decide("x", "Feedback for the team", [], METADATA, unsure).recommended_action == "allow"
+    leaky = inspect_and_process(text=LEAKY_CODE)["analysis"]["entities"]
+    entities = [SensitiveEntity(**e) for e in leaky]
+    assert decide("x", LEAKY_CODE, entities, METADATA, low).recommended_action == "block"
+
+
+def test_merge_keeps_rules_and_drops_overlapping_model_findings() -> None:
+    text = "mail a@example.com, call Sara"
+    rule = _entity("EMAIL", text, "a@example.com")
+    overlap = _model_entity(text, "a@example.com", "EMAIL", "medium")
+    name = _model_entity(text, "Sara", "PERSON", "medium")
+    assert merge_findings([rule], [overlap, name]) == [rule, name]
+
+
+def test_credentials_are_never_shown_to_the_models(monkeypatch) -> None:
+    def forbidden(_text):
+        raise AssertionError("a model saw a credential")
+
+    monkeypatch.setattr(orchestrator, "detect_entities", forbidden)
+    monkeypatch.setattr(orchestrator, "classify_risk", forbidden)
+    result = inspect_and_process(text=LEAKY_CODE)
+    assert result["action_taken"] == "block"
+    assert "skipped" in result["analysis"]["model_metadata"]["detector"]
+
+
+def test_models_unavailable_still_decides_with_rules(monkeypatch) -> None:
+    monkeypatch.setenv("SITR_HF_MODELS", "1")
+    monkeypatch.setattr("src.hf_detection._predict", lambda _t: 1 / 0)
+    monkeypatch.setattr("src.risk_classifier._predict", lambda _t: 1 / 0)
+    result = inspect_and_process(text=CV)
+    assert result["action_taken"] == "redact"
+    assert "rules only" in result["analysis"]["model_metadata"]["detector"]
+    assert "fallback" in result["analysis"]["model_metadata"]["classifier"]
+
+
+def test_validation_style_errors_do_not_leak_content(monkeypatch) -> None:
+    def explode(*_args):
+        raise ValueError(f"bad value {LEAKY_CODE}")
+
+    monkeypatch.setattr("src.orchestrator.decide", explode)
+    result = inspect_and_process(text=CV)
+    assert result["status"] == "error"
+    assert "sk-synthetic" not in result["user_message"]
+
+
+# Live routing logic, with the network and the local model replaced
+
+
+@pytest.fixture
+def live_routes(monkeypatch) -> dict[str, list[str]]:
+    monkeypatch.setenv("SITR_LLM", "live")
+    calls: dict[str, list[str]] = {"external": [], "local": []}
+    monkeypatch.setattr(router, "_external", lambda p, i: calls["external"].append(p) or "ext")
+    monkeypatch.setattr(router, "_generate_locally", lambda p, i: calls["local"].append(p) or "loc")
+    return calls
+
+
+def test_private_route_never_uses_the_external_service(live_routes) -> None:
+    result = inspect_and_process(text=CONTRACT)
+    assert result["action_taken"] == "private"
+    assert live_routes == {"external": [], "local": [CONTRACT]}
+    assert result["model_response"].startswith(router.PRIVATE_LABEL)
+
+
+def test_redact_route_sends_only_the_sanitized_text(live_routes) -> None:
+    result = inspect_and_process(text=CV)
+    assert live_routes["external"] == [result["redaction"]["safe_text"]]
+    assert live_routes["local"] == []
+
+
+def test_blocked_input_reaches_no_route(live_routes) -> None:
+    inspect_and_process(text=LEAKY_CODE)
+    assert live_routes == {"external": [], "local": []}
+
+
+def test_model_failure_returns_a_notice_and_keeps_the_decision(monkeypatch) -> None:
+    monkeypatch.setenv("SITR_LLM", "live")
+
+    def down(_prompt, _intent):
+        raise ConnectionError("synthetic outage")
+
+    monkeypatch.setattr(router, "_external", down)
+    result = inspect_and_process(text="Write a public marketing slogan for a Doha cafe.")
+    assert result["action_taken"] == "allow"
+    assert "could not answer (ConnectionError)" in result["model_response"]
+
+
+# Real models, when installed (skipped in CI)
+
+
+def _cached(model_id: str) -> bool:
+    try:
+        import torch  # noqa: F401
+        from huggingface_hub import try_to_load_from_cache
+    except ImportError:
+        return False
+    return isinstance(try_to_load_from_cache(model_id, "config.json"), str)
+
+
+real_models = pytest.mark.skipif(
+    not (_cached("OpenMed/privacy-filter-multilingual-v2")
+         and _cached("Horizon-Labs/multilingual-zeroshot-small")),
+    reason="models not installed",
+)
+
+
+@pytest.mark.real_models
+@real_models
+@pytest.mark.parametrize(
+    ("name", "action"),
+    [
+        ("safe_prompt.txt", "allow"),
+        ("synthetic_cv.pdf", "redact"),
+        ("synthetic_contract.pdf", "private"),
+        ("vulnerable_code.py", "block"),
+    ],
+)
+def test_demo_files_with_real_models(name: str, action: str) -> None:
+    result = inspect_and_process(file_path=str(EXAMPLES / name))
+    assert result["action_taken"] == action
+    if action != "block":
+        assert "OpenMed" in result["analysis"]["model_metadata"]["detector"]
+        assert "Horizon-Labs" in result["analysis"]["model_metadata"]["classifier"]
+
+
+@pytest.mark.real_models
+@real_models
+def test_t7_and_doha_with_real_models() -> None:
+    doc = inspect_and_process(text="Keys look like sk-XXXXXXXXXXXX in the documentation.")
+    assert doc["analysis"]["risk_level"] != "critical"
+    cafe = inspect_and_process(text="Write a public marketing slogan for a Doha cafe.")
+    assert cafe["action_taken"] == "allow"
