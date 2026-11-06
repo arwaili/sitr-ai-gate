@@ -16,12 +16,12 @@ Updated 2026-11-06 after PR #9.
 | 1 - Setup | Done (S1-S8; S8 team HF org skipped by decision) |
 | 2 - Mock pipeline and dataset | Done, merged in PRs #1-#5 |
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
-| 4 - Hugging Face intelligence | Not started (H1-H4), can start now |
+| 4 - Hugging Face intelligence | Built on `feature/hf-intelligence`, in review (H1-H4) |
 | 5 - Policy, routing, integration | Not started (P1-P5); P1 needs Phase 3 (done) and Phase 4 |
 | 6-7 - Product and deployment | Not started (U1-U4); UI work can start now, deploy after P1 |
 | 8-9 - Review and submission | Not started (R1-R3) |
 
-What works on `main` now: 117 tests pass plus T7 (expected failure until P1). The real Phase 3 modules (`ingest`, `detect_deterministic`) work and are tested, but the app does not call them yet: the orchestrator still uses its own mock patterns and a text-only file reader, so the four pasted demo texts work in the app while uploaded PDFs return a safe error until P1.
+What works on `main` now: 117 tests pass plus T7 (expected failure until P1). The real Phase 3 modules (`ingest`, `detect_deterministic`) work and are tested, but the app does not call them yet: the orchestrator still uses its own mock patterns and a text-only file reader, so the four pasted demo texts work in the app while uploaded PDFs return a safe error until P1. Phase 4 (`detect_entities`, `classify_risk` with the real models) is on `feature/hf-intelligence`, waiting for review.
 
 ## Team
 
@@ -77,10 +77,10 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| H1 | Load `OpenMed/privacy-filter-multilingual-v2` lazily on CPU, cached; map its labels to Sitr types; exact offsets | Mohammed | | open | |
-| H2 | Semantic risk with `Horizon-Labs/multilingual-zeroshot-small`; deterministic fallback when the model fails | Mohammed | | open | |
-| H3 | Evaluation script on the dataset `test` split (an HF Job if it needs a GPU): precision, recall, action accuracy, per-language results, latency | Mohammed | | open | |
-| H4 | Update the dataset card wording to describe the new filter checks; check Qwen sentences for real names; switch generated phones to `+974 0000 01xx` (I7) | Mohammed | | open | |
+| H1 | `OpenMed/privacy-filter-multilingual-v2` loads lazily on CPU (bfloat16), cached, 30 s timeout, rules-only fallback; 18 OpenMed labels mapped to Sitr types; split words grown to whole words; threshold tuned on dev | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H2 | `Horizon-Labs/multilingual-zeroshot-small` scores one English description per risk level (works for Arabic); keyword fallback on failure or timeout | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H3 | `data/evaluate.py` runs locally on CPU (no GPU needed); results in `data/eval_results_test.json` and `README.md` | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H4 | Dataset card rewritten (filter checks, phone range); Qwen sentences scanned with OpenMed (no real names); phones moved to `+974 0000` locally. Republished to the Hub (commit `97553b09`) | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
 
 ## Phase 5 - Policy, routing and integration (Rashid)
 
@@ -113,12 +113,13 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 - `main` is not protected: the repository is private on a free plan. Follow the PR rules anyway.
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
-- Until P1, the app's orchestrator uses mock detection and cannot read PDFs. Use `src.ingestion.ingest` and `src.deterministic.detect_deterministic` directly to test Phase 3.
+- Until P1, the app's orchestrator uses mock detection and does not call the Phase 3 rules or the Phase 4 models, and it cannot read PDFs. Use `src.ingestion.ingest` and `src.deterministic.detect_deterministic` directly to test Phase 3.
 
 ## Log
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - Phase 4 (H1-H4) built on `feature/hf-intelligence`. Held-out test split (60 rows), rules plus models: entity precision 0.967, recall 0.927; names 0.897/0.897; action accuracy 0.95 (all misses are public prompts with a false Arabic name); risk model alone 0.85. Median latency: PII model 234 ms, risk model 146 ms. 132 tests pass locally; CI skips the 7 real-model tests. Dataset republished with `+974 0000` phones. [#11](https://github.com/arwaili/sitr-ai-gate/pull/11)
 - 2026-11-06 - Abdulaziz - PR #8 merged into `main` (117 tests pass after merge), I1-I7 marked done in [#9](https://github.com/arwaili/sitr-ai-gate/pull/9), lane branches synced to `main`, docs brought up to date.
 - 2026-11-06 - Abdulaziz - Phase 3 (I1-I7) built on `feature/ingestion`: real PDF ingestion, 27 deterministic patterns, demo files. 117 tests pass plus T7 (xfail until P1). On the 240-row dev split, structured entities (names excluded) score precision 1.000, recall 0.962; the four demo files give allow, redact, private, block through the policy engine. Worst-case inputs run in about 1 s per 2 MB. [#8](https://github.com/arwaili/sitr-ai-gate/pull/8)
 - 2026-11-06 - Abdulaziz - PRs #1, #2, #5, #3, #4 merged in order. Merged `main`: 62 tests pass plus 1 expected failure (T7); Ruff, compile, offline four-scenario check (allow, redact, private, block) and secret scan all pass; contracts unchanged since `887963c`. Clean-venv install confirmed (S7). Collaborators invited (S6). Team HF org skipped (S8): dataset, jobs and the Space stay on `arwaili`.

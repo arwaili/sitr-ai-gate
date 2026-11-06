@@ -10,6 +10,8 @@ examples. It never writes sensitive values, and every sentence passes a safety f
 
 Local, templates only:
     python data/generate_dataset.py
+Move the published dataset to +974 0000 phones (writes the dev split; add --push to publish):
+    python data/generate_dataset.py --migrate-phones <namespace>/sitr-synthetic-dlp
 As a Hugging Face Job that publishes to the Hub:
     hf jobs uv run --flavor t4-small --secrets HF_TOKEN data/generate_dataset.py \
         --qwen --push <namespace>/sitr-synthetic-dlp
@@ -213,7 +215,8 @@ def fake_values(rng: random.Random) -> dict[str, str]:
         "PERSON_EN": f"{rng.choice(FIRST_EN)} {rng.choice(LAST_EN)}",
         "PERSON_AR": f"{rng.choice(FIRST_AR)} {rng.choice(LAST_AR)}",
         "EMAIL": f"{rng.choice(['applicant', 'staff', 'hr.contact', 'employee'])}{n}@example.com",
-        "PHONE": f"+974 5555 01{n:02d}",
+        # +974 0000 is not assigned to subscribers in Qatar, so no real person has these numbers.
+        "PHONE": f"+974 0000 01{n:02d}",
         "QATAR_ID": f"2840000{rng.randrange(10_000):04d}",
         "IBAN": f"QA00SYNT{rng.randrange(10**21):021d}",
         "SALARY_EN": f"{rng.randrange(8, 60) * 1000:,} QAR",
@@ -358,14 +361,18 @@ security gateway that decides whether employee input to an AI model is allowed, 
 routed privately, or blocked. Built for the Qai x Hugging Face Hackathon in Qatar.
 
 **Every name, email, phone number, ID, IBAN, salary, and credential is fictional.** Emails use
-`example.com`, IBANs use the invalid check digits `QA00`, and keys start with `sk-synthetic-`.
+`example.com`, phone numbers use `+974 0000`, which is not assigned to subscribers in Qatar,
+IBANs use the invalid check digits `QA00`, and keys start with `sk-synthetic-`.
 
 ## How it was made
 
 Sensitive values and labels come from templates, so entity offsets and expected actions are
 exact. `{MODEL_ID}` wrote the benign carrier sentences used by low-risk prompts ({qwen} examples)
-inside a Hugging Face Job. Each sentence passed a filter that rejects digits, contacts,
-credentials, and confidential business terms.
+inside a Hugging Face Job. Each sentence passed a filter: 15 to 200 characters, ending in
+sentence punctuation, one script only (Arabic or Latin, so no CJK or Cyrillic drift), no
+stray quotes or hashtags, and no digits, contacts, credentials, or confidential business terms.
+Every Qwen sentence was then scanned for names with `OpenMed/privacy-filter-multilingual-v2`;
+it flagged only common words (no real names).
 
 ## Fields
 
@@ -383,13 +390,14 @@ Use `dev` for development and `test` only for final measured results.
 ## Limitations
 
 Template-based examples are less varied than real documents, so results on this dataset
-overstate real-world accuracy. Qwen sentences were instructed not to mention people, but names
-in them are not checked automatically. Sitr is a decision-support prototype, not a compliance
+overstate real-world accuracy. Sitr is a decision-support prototype, not a compliance
 guarantee.
 """
 
 
-def push(repo_id: str, examples: list[dict]) -> None:
+def push(
+    repo_id: str, examples: list[dict], message: str = "Generate Sitr synthetic dataset"
+) -> None:
     from huggingface_hub import CommitOperationAdd, HfApi
 
     api = HfApi()
@@ -405,9 +413,39 @@ def push(repo_id: str, examples: list[dict]) -> None:
     ]
     operations.append(CommitOperationAdd("README.md", dataset_card(examples).encode()))
     api.create_commit(
-        repo_id, operations, commit_message="Generate Sitr synthetic dataset", repo_type="dataset"
+        repo_id, operations, commit_message=message, repo_type="dataset"
     )
     print(f"Published https://huggingface.co/datasets/{repo_id}")
+
+
+def migrate_phones(examples: list[dict]) -> list[dict]:
+    """Move published rows from +974 5555 to +974 0000. Same length, so offsets stay exact."""
+    migrated = json.loads(
+        json.dumps(examples, ensure_ascii=False).replace("+974 5555 ", "+974 0000 ")
+    )
+    for example in migrated:
+        for entity in example["entities"]:
+            assert example["text"][entity["start"] : entity["end"]] == entity["value"]
+    return migrated
+
+
+def load_published(repo_id: str) -> list[dict]:
+    from huggingface_hub import hf_hub_download
+
+    return [
+        json.loads(line)
+        for split in ("dev", "test")
+        for line in Path(
+            hf_hub_download(repo_id, f"data/{split}.jsonl", repo_type="dataset")
+        ).read_text(encoding="utf-8").splitlines()
+    ]
+
+
+def write_dev(examples: list[dict], output: str) -> None:
+    dev = [e for e in examples if e["split"] == "dev"]
+    Path(output).parent.mkdir(parents=True, exist_ok=True)
+    Path(output).write_text(json.dumps(dev, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"Wrote {len(dev)} dev examples to {output}; {len(examples) - len(dev)} held out.")
 
 
 def main() -> None:
@@ -417,16 +455,21 @@ def main() -> None:
     parser.add_argument("--qwen", action="store_true", help="Generate carriers with Qwen.")
     parser.add_argument("--push", metavar="REPO_ID", help="Publish to this Hub dataset repo.")
     parser.add_argument("--output", default="data/synthetic_examples.json")
+    parser.add_argument(
+        "--migrate-phones", metavar="REPO_ID",
+        help="Rewrite the published dataset to +974 0000 phones and refresh its card.",
+    )
     args = parser.parse_args()
 
+    if args.migrate_phones:
+        examples = migrate_phones(load_published(args.migrate_phones))
+        write_dev(examples, args.output)
+        if args.push:
+            push(args.push, examples, "Use +974 0000 phone numbers and refresh the card")
+        return
     carriers = generate_carriers(40, args.seed) if args.qwen else None
     examples = build_examples(args.per_class, args.seed, carriers)
-    dev = [e for e in examples if e["split"] == "dev"]
-    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    Path(args.output).write_text(
-        json.dumps(dev, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
-    )
-    print(f"Wrote {len(dev)} dev examples to {args.output}; {len(examples) - len(dev)} held out.")
+    write_dev(examples, args.output)
     if args.push:
         push(args.push, examples)
 

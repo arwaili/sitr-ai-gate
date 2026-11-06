@@ -56,7 +56,7 @@ Owns:
 - `data/` (the dataset generator and `synthetic_examples.json`)
 - `tests/test_detection.py`
 
-Delivers Arabic-English contextual PII detection, semantic risk classification, model caching, fallbacks, and measured evaluation.
+Delivers Arabic-English contextual PII detection, semantic risk classification, model caching, fallbacks, and measured evaluation. Status: built on `feature/hf-intelligence`, in review.
 
 ### Lane 3 - Policy and routing
 
