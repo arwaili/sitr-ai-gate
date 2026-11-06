@@ -5,7 +5,7 @@
 - **Deadline:** Saturday, November 7, 2026, 2:00 PM Qatar time. Internal deadline: **12:30 PM**.
 - **Repository:** https://github.com/arwaili/sitr-ai-gate
 - **Dataset:** https://huggingface.co/datasets/arwaili/sitr-synthetic-dlp
-- **Space:** not deployed yet
+- **Space:** https://huggingface.co/spaces/arwaili/sitr-ai-gate (private; switch to public for judging with `python space/deploy_space.py --public`)
 
 ## Current status
 
@@ -18,7 +18,7 @@ Updated 2026-11-06 after PR #14.
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
 | 5 - Policy, routing, integration | Done, merged in PR #14 |
-| 6-7 - Product and deployment | U1-U3 in review in PR #21; **the Space deploy is blocked** (see Blockers), so U4 waits |
+| 6-7 - Product and deployment | U1-U3 in review in PR #21; the Space is live (private); U4 measured over the API, the phone check is left |
 | 8-9 - Review and submission | R1 in progress (Saad); R2-R3 not started |
 
 What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 196 tests pass locally, including T7. Measured results are in `README.md`.
@@ -98,8 +98,8 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 |---|---|---|---|---|---|
 | U1 | Dashboard tab: inspected, allowed, redacted, private, blocked and error counts plus entity categories; in memory, metadata only, shared by all visitors | Abdulaziz | Abdulaziz | in review | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
 | U2 | Mixed Arabic-English text follows each paragraph's first letter; highlighted view switches to right-to-left for Arabic input; fixed task list (no free text reaches a model); route used, entity counts, collapsible technical details without values; About tab; model readiness in the header | Abdulaziz | Abdulaziz | in review | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
-| U3 | `space/`: Space README with metadata, CPU-only requirements (torch wheel 210 MB, resolution checked for Linux), `deploy_space.py`; the app warms all models at start. The package is ready; the deploy is blocked because Hugging Face requires PRO to host Gradio Spaces | Abdulaziz | Abdulaziz | blocked | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
-| U4 | Test the Space from a clean browser and another device; measure cold and warm latency | anyone | | open | |
+| U3 | `space/`: Space README with metadata, CPU-only requirements (torch wheel 210 MB, resolution checked for Linux), `deploy_space.py`; the app warms all models at start. Deployed (private) on cpu-basic; `HF_TOKEN` secret set; models load at start | Abdulaziz | Abdulaziz | in review | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
+| U4 | Live Space over its API: 11 requests (examples, repeats, three uploads) give the right badge with no leaked value. Time per request: block 1.5-2 s, redact 5-8 s, allow 4-23 s (hosted provider), private 18-33 s (local Qwen on 2 vCPU). Left: open it on a phone while signed in | anyone | Abdulaziz | in progress | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
 
 ## Phase 8 and 9 - Security review and submission (everyone)
 
@@ -111,7 +111,6 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 ## Blockers
 
-- **U3, Space deploy:** Hugging Face returned 402: hosting Gradio Spaces, even on free CPU Basic, now needs a PRO subscription, and `arwaili` is not PRO. Options: subscribe `arwaili` to PRO, deploy under a teammate's PRO account or a hackathon organization with a plan or credits (`python space/deploy_space.py --repo <owner>/sitr-ai-gate`), or ask the organizers. Then add the `HF_TOKEN` secret.
 - `main` is not protected: the repository is private on a free plan. Follow the PR rules anyway.
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
 - Requests are blocked until the PII model has loaded, so open the Space and run one inspection before any demo.
@@ -121,6 +120,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - Space deployed after `arwaili` moved to PRO: https://huggingface.co/spaces/arwaili/sitr-ai-gate (private). First build failed because the Space installs `gradio[oauth,mcp]`, which pins pydantic to 2.12.x; the pin was loosened (tests pass on 2.12.5). U4 over the API: all 11 requests correct, no leaks; timings in U4.
 - 2026-11-06 - Abdulaziz - U1-U3 built on `feature/product`: dashboard, task field, RTL, details panel, Space package. Also includes PR #18's app fixes (audit log, purge of uninspected uploads, file box cleared). 201 tests pass (CI: 189, 12 model tests skip). Live check in the browser: four examples, three uploads and a translate task give the right badge, no value leaks, dashboard counts match. [#21](https://github.com/arwaili/sitr-ai-gate/pull/21). Space deploy tried and refused (needs HF PRO); nothing was created.
 - 2026-11-06 - Saad - R1 findings fixed: secrets written as login phrases (English and Arabic), spaced out, broken up with zero-width characters, or base64-encoded were allowed or sent to the private route. They now block. Dataset (240 rows): no new false blocks, all 60 block rows still caught. Private route checked on a Mac: about 4 s per answer after 17 s to load.
 - 2026-11-06 - Saad - R1 finding fixed: when the PII detector timed out or failed, requests continued on rules only, so a name-only prompt showed ALLOWED and would go to hosted Qwen unredacted. Requests now block (`PROCESSING_ERROR`) and nothing reaches a model; the detector status also returns to ready after a failure. 166 tests pass locally. Reproduce on old code with `SITR_MODEL_TIMEOUT=0.01 python app.py`.
