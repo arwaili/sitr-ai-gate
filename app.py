@@ -10,7 +10,7 @@ from src.orchestrator import inspect_and_process
 EXAMPLES = {
     "Safe public prompt": "Write a public marketing slogan for a Doha cafe.",
     "Synthetic CV": "Curriculum vitae: Mariam Al-Example\n"
-    "Email: test.applicant@example.com\nPhone: +974 5555 0100",
+    "Email: test.applicant@example.com\nPhone: +974 0000 0100",
     "Synthetic Arabic-English contract": "عقد عمل / Employment contract\n"
     "الموظف: مريم المثال\nالراتب: 15000 ريال\nالرقم الشخصي: 28400000000",
     "Code with a synthetic API key": 'API_KEY = "sk-synthetic-000000000000"\n'
