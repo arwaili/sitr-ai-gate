@@ -26,8 +26,9 @@
 | 3 | `src.policy_engine.merge_findings(rules, model)` | rules plus the model findings that overlap no rule finding |
 | 3 | `src.redactor.redact(text, entities)` | `RedactionResult` |
 | 3 | `src.router.route(action, redaction, user_intent)` | model response, or `None` on block |
+| 3 | `src.export.redacted_pdf(source, redaction)`, `src.export.redacted_text_file(redaction)` | safe copies for the user; the PDF is scrubbed (page text, metadata, outline, links, comments, attachments), read back, and `None` if any value remains |
 | 3 | `src.router.call_model(route, prompt, user_intent)` | the replaceable model adapter; never raises. `SITR_LLM=mock` returns canned text (tests set it) |
-| 3 | `src.orchestrator.inspect_and_process(text=None, file_path=None, user_intent="summarize", delete_file=False)` | `FinalResponse` as a dict |
+| 3 | `src.orchestrator.inspect_and_process(text=None, file_path=None, user_intent="summarize", delete_file=False, route_to_model=True)` | `FinalResponse` as a dict |
 
 Entity offsets are Python string indices into the exact inspected text. Every occurrence is a separate entity.
 

@@ -45,12 +45,15 @@ LABEL_MAP = {
     "PASSWORD": ("PASSWORD", "critical"),
 }
 
-# Words the model has read as names that never are: Qatari places and confidentiality terms.
+# Words the model has read as names that never are: Qatari places, confidentiality terms and
+# AI product names.
 # A PERSON finding made only of these words is dropped.
 NOT_NAMES = {
     "doha", "qatar", "lusail", "wakrah", "al", "khor", "corniche", "pearl", "katara",
     "الدوحة", "دوحة", "قطر", "لوسيل", "الوكرة", "الخور", "الكورنيش", "كتارا",
     "سري", "سرية", "السنوي", "الموظف", "الموظفة",
+    # AI products the app is asked about all the time.
+    "chatgpt", "claude", "gemini", "copilot", "deepseek", "كلود",
 }
 
 logger = logging.getLogger("sitr.hf_detection")

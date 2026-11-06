@@ -561,3 +561,12 @@ def test_task_is_not_checked_when_no_model_is_called(monkeypatch) -> None:
     result = inspect_and_process(text="Write a public slogan.", route_to_model=False)
     assert result["action_taken"] == "allow" and result["model_response"] is None
     assert inspect_and_process(text="Write a public slogan.")["status"] == "error"
+
+
+@pytest.mark.real_models
+@real_models
+def test_arabic_contract_name_is_redacted_with_real_models() -> None:
+    # Regression (R1): the name in the demo contract leaked into the safe version.
+    text = "عقد عمل / Employment contract\nالموظف: مريم المثال\nالراتب: 15000 ريال"
+    result = inspect_and_process(text=text, route_to_model=False)
+    assert "مريم المثال" not in result["redaction"]["safe_text"]

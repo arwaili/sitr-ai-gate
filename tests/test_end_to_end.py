@@ -58,6 +58,7 @@ def test_redacted_answer_offers_only_the_safe_version_without_the_question() -> 
     assert "[EMAIL_1]" in ready and "test.applicant@example.com" not in ready
     assert "Can I send" not in ready
     assert Path(items[-1]["files"][0]).read_text(encoding="utf-8").startswith("Curriculum")
+    assert Path(items[-1]["files"][0]).name == "sitr-redacted.txt"
 
 
 def test_blocked_answer_says_no_and_hides_the_secret() -> None:
@@ -85,7 +86,8 @@ def test_file_question_checks_the_file_and_offers_redacted_copies(tmp_path) -> N
     assert "Checking it" in pending[0][1]["content"]
     assert "Attached: cv.pdf" in final[0][0]["content"]
     assert "Send this version to Claude instead." in final[0][1]["content"]
-    assert [Path(f).name for f in final[2][-1]["files"]] == ["cv-redacted.pdf", "cv-redacted.txt"]
+    names = [Path(f).name for f in final[2][-1]["files"]]
+    assert names == ["sitr-redacted.pdf", "sitr-redacted.txt"]
     assert {"path": final[2][-1]["files"][0]} in [m["content"] for m in final[0]]
     assert not upload.exists()  # the upload is deleted after the check
 
@@ -211,3 +213,14 @@ def test_audit_events_are_written_when_enabled(monkeypatch, capfd) -> None:
     err = capfd.readouterr().err
     assert '"action": "redact"' in err
     assert "test.applicant" not in err
+
+
+def test_only_the_content_under_a_question_is_checked(monkeypatch) -> None:
+    # Regression (R1): checking the question with the content made the model read "Claude" as
+    # a name and miss the real name in the contract, which then leaked into the safe version.
+    seen = []
+    real = app.inspect_and_process
+    monkeypatch.setattr(app, "inspect_and_process",
+                        lambda text=None, **kw: seen.append(text) or real(text=text, **kw))
+    _ask("Can I upload this to Claude?\n\nEmail: test.applicant@example.com")
+    assert seen == ["Email: test.applicant@example.com"]
