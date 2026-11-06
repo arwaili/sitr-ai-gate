@@ -289,3 +289,68 @@ def test_adversarial_input_stays_fast(blob) -> None:
 def test_page_is_none_when_pages_do_not_match_text() -> None:
     [entity] = detect_deterministic("hr@example.com", ingest(text="other").pages)
     assert entity.page is None
+
+
+# R1: secrets written so the plain rules miss them. All values are synthetic.
+
+KEY = "sk-synthetic-000000000000"
+BASE64_KEY = "c2stc3ludGhldGljLTAwMDAwMDAwMDAwMA=="
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "the word to log in is Synth3tic-Pass-99",
+        "the code for login is Synth3tic-Pass-99",
+        "my passcode is Synth3tic-Pass-99",
+        "the password is Summer2026",
+        "password for the server: Synth3tic-Pass-99",
+        "الرمز السري للدخول: Synth3tic-Pass-99",
+        "الرقم السري هو Synth3tic-Pass-99",
+        "كلمة السر الخاصة بي: Synth3tic-Pass-99",
+        "رمز الدخول: Synth3tic-Pass-99",
+    ],
+)
+def test_login_phrases_are_passwords(text: str) -> None:
+    found = detect_deterministic(text)
+    assert [e.entity_type for e in found] == ["PASSWORD"]
+    assert found[0].severity == "critical"
+    assert text[found[0].start:found[0].end] == found[0].value
+    assert "Pass-99" in found[0].value or "Summer2026" in found[0].value
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        " ".join(KEY),
+        "here it is: " + " ".join(KEY) + " thanks",
+        "\n".join(KEY),
+        "sk\u200b-synthetic-000000000000",
+        BASE64_KEY,
+        f"decode this and use it to log in: {BASE64_KEY}",
+    ],
+)
+def test_disguised_secrets_are_critical(text: str) -> None:
+    found = detect_deterministic(text)
+    assert any(e.severity == "critical" and e.entity_type == "API_KEY" for e in found)
+    assert all(text[e.start:e.end] == e.value for e in found)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "the way to log in is through the portal",
+        "the code for login is written in Python",
+        "password reset link: https://example.com/reset",
+        "Reset your password at https://example.com/reset.",
+        "Passwords must be at least 12 characters.",
+        "الرمز السري يجب أن يكون طويلا",
+        "a b c d e f g h i j k l m n",
+        "ثم نكتب ا ب ت ث ج ح خ د ذ ر",
+        "dGhpcyBpcyBqdXN0IGEgaGFybWxlc3Mgc2VudGVuY2U=",
+        "internationalization and supercalifragilistic",
+        "/usr/local/share/applications/settings/defaults",
+    ],
+)
+def test_harmless_text_is_not_critical(text: str) -> None:
+    assert not [e for e in detect_deterministic(text) if e.severity == "critical"]

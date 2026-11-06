@@ -19,7 +19,7 @@ Updated 2026-11-06 after PR #14.
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
 | 5 - Policy, routing, integration | Done, merged in PR #14 |
 | 6-7 - Product and deployment | Not started (U1-U4); **everything can start now**, including the Space deployment (U3) |
-| 8-9 - Review and submission | Not started (R1-R3) |
+| 8-9 - Review and submission | R1 in progress (Saad); R2-R3 not started |
 
 What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. 160 tests pass (CI: 148, with 12 model tests skipped), including T7. Measured results are in `README.md`.
 
@@ -105,7 +105,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | | open | |
+| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad | in progress | |
 | R2 | 90-second demo script, 3-minute pitch, submission description | Abdulaziz | | open | |
 | R3 | Backup screenshots and video | anyone | | open | |
 
@@ -119,6 +119,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Saad - R1 findings fixed: secrets written as login phrases (English and Arabic), spaced out, broken up with zero-width characters, or base64-encoded were allowed or sent to the private route. They now block. Dataset (240 rows): no new false blocks, all 60 block rows still caught. Private route checked on a Mac: about 4 s per answer after 17 s to load.
 - 2026-11-06 - Abdulaziz - PR #14 merged into `main` (160 tests pass after merge, CI green), P1-P5 marked done, lane branches synced, docs updated to match.
 - 2026-11-06 - Abdulaziz - Phase 5 (P1-P5) built on `feature/policy-routing`: real pipeline end to end. 160 tests pass (CI: 148 pass, 12 model tests skip); T7 passes. Test split through the full pipeline: action accuracy 0.95, entities 0.968 / 0.938. Live check: four examples and two PDF uploads in the running app give the right badge, uploads are deleted, the audit log holds no values. [#14](https://github.com/arwaili/sitr-ai-gate/pull/14)
 - 2026-11-06 - Abdulaziz - Added Phase 4 testing steps to Blockers; deleted the merged `chore/phase-1-setup` branch.

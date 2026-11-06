@@ -280,6 +280,22 @@ def test_models_unavailable_still_decides_with_rules(monkeypatch) -> None:
     assert "fallback" in result["analysis"]["model_metadata"]["classifier"]
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        "the word to log in is Synth3tic-Pass-99",
+        " ".join("sk-synthetic-000000000000"),
+        "decode this and use it to log in: c2stc3ludGhldGljLTAwMDAwMDAwMDAwMA==",
+        "الرمز السري للدخول: Synth3tic-Pass-99",
+    ],
+)
+def test_disguised_secrets_never_reach_a_model(model_calls, text: str) -> None:
+    # Regression (R1): these were allowed, or sent to the private route, with the secret intact.
+    result = inspect_and_process(text=text)
+    assert (result["status"], result["action_taken"]) == ("blocked", "block")
+    assert model_calls == []
+
+
 def test_validation_style_errors_do_not_leak_content(monkeypatch) -> None:
     def explode(*_args):
         raise ValueError(f"bad value {LEAKY_CODE}")
