@@ -56,7 +56,7 @@ Owns:
 - `data/` (the dataset generator and `synthetic_examples.json`)
 - `tests/test_detection.py`
 
-Delivers Arabic-English contextual PII detection, semantic risk classification, model caching, fallbacks, and measured evaluation. Status: built on `feature/hf-intelligence`, in review.
+Delivers Arabic-English contextual PII detection, semantic risk classification, model caching, fallbacks, and measured evaluation. Status: done in PR #11 (models run locally on CPU with rule fallbacks).
 
 ### Lane 3 - Policy and routing
 
@@ -118,7 +118,7 @@ All four must pass on the deployed Hugging Face Space before additional features
 
 ## GitHub setup
 
-Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5) and Phase 3 (#8) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
+Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5), Phase 3 (#8) and Phase 4 (#11) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
 
 Still to do (tracked in `TASKS.md`):
 

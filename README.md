@@ -17,6 +17,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
+   The first run that uses the models downloads about 3.4 GB from Hugging Face. Set `SITR_HF_MODELS=0` to work without them; the rules still run.
 3. Check that everything passes:
    ```bash
    python -m compileall -q src tests
@@ -24,7 +25,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
    pytest
    ```
 4. Open the folder in Claude Code. It reads `CLAUDE.md` automatically. Tell it your name and ask it what to work on.
-5. Run the app with `python app.py` and open http://localhost:7860. Pasted text runs end to end and the four demo scenarios give allow, redact, private and block. Detection in the app is still the mock until task P1 connects the real Phase 3 detectors, so uploaded PDFs return a safe error for now. See **Current status** in `TASKS.md`.
+5. Run the app with `python app.py` and open http://localhost:7860. Pasted text runs end to end and the four demo scenarios give allow, redact, private and block. Detection in the app is still the mock until task P1 connects the real Phase 3 rules and Phase 4 models, so uploaded PDFs return a safe error for now. See **Current status** in `TASKS.md`.
 
 ## Where things are
 
