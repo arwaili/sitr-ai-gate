@@ -7,6 +7,22 @@
 - **Dataset:** https://huggingface.co/datasets/arwaili/sitr-synthetic-dlp
 - **Space:** not deployed yet
 
+## Current status
+
+Updated 2026-11-06 after PR #9.
+
+| Phase | State |
+|---|---|
+| 1 - Setup | Done (S1-S8; S8 team HF org skipped by decision) |
+| 2 - Mock pipeline and dataset | Done, merged in PRs #1-#5 |
+| 3 - Ingestion and deterministic security | Done, merged in PR #8 |
+| 4 - Hugging Face intelligence | Not started (H1-H4), can start now |
+| 5 - Policy, routing, integration | Not started (P1-P5); P1 needs Phase 3 (done) and Phase 4 |
+| 6-7 - Product and deployment | Not started (U1-U4); UI work can start now, deploy after P1 |
+| 8-9 - Review and submission | Not started (R1-R3) |
+
+What works on `main` now: 117 tests pass plus T7 (expected failure until P1). The real Phase 3 modules (`ingest`, `detect_deterministic`) work and are tested, but the app does not call them yet: the orchestrator still uses its own mock patterns and a text-only file reader, so the four pasted demo texts work in the app while uploaded PDFs return a safe error until P1.
+
 ## Team
 
 | Person | Default lane | Branch | Owns |
@@ -97,13 +113,14 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 - `main` is not protected: the repository is private on a free plan. Follow the PR rules anyway.
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
+- Until P1, the app's orchestrator uses mock detection and cannot read PDFs. Use `src.ingestion.ingest` and `src.deterministic.detect_deterministic` directly to test Phase 3.
 
 ## Log
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - PR #8 merged into `main` (117 tests pass after merge), I1-I7 marked done in [#9](https://github.com/arwaili/sitr-ai-gate/pull/9), lane branches synced to `main`, docs brought up to date.
 - 2026-11-06 - Abdulaziz - Phase 3 (I1-I7) built on `feature/ingestion`: real PDF ingestion, 27 deterministic patterns, demo files. 117 tests pass plus T7 (xfail until P1). On the 240-row dev split, structured entities (names excluded) score precision 1.000, recall 0.962; the four demo files give allow, redact, private, block through the policy engine. Worst-case inputs run in about 1 s per 2 MB. [#8](https://github.com/arwaili/sitr-ai-gate/pull/8)
-
 - 2026-11-06 - Abdulaziz - PRs #1, #2, #5, #3, #4 merged in order. Merged `main`: 62 tests pass plus 1 expected failure (T7); Ruff, compile, offline four-scenario check (allow, redact, private, block) and secret scan all pass; contracts unchanged since `887963c`. Clean-venv install confirmed (S7). Collaborators invited (S6). Team HF org skipped (S8): dataset, jobs and the Space stay on `arwaili`.
 - 2026-11-06 - Abdulaziz - Task board and team workflow added to `TASKS.md` and `CLAUDE.md`. [#1](https://github.com/arwaili/sitr-ai-gate/pull/1)
 - 2026-11-06 - Abdulaziz - Dataset `arwaili/sitr-synthetic-dlp` generated with Qwen in an HF Job and published (300 examples). [#5](https://github.com/arwaili/sitr-ai-gate/pull/5)
