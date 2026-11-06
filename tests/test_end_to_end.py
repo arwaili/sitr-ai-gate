@@ -96,8 +96,8 @@ def test_dashboard_counts_decisions_and_types_only() -> None:
     _chat(EXAMPLES["Synthetic CV"])
     _chat(EXAMPLES["Code with a synthetic API key"], task="answer the request")
     board = app.dashboard()
-    assert "<b>2</b> inspected" in board
-    assert "Redacted<b>1</b>" in board and "Blocked<b>1</b>" in board
+    assert "<b>2</b><span>Messages checked</span>" in board
+    assert "<b>1</b><span>Redacted</span>" in board and "<b>1</b><span>Blocked</span>" in board
     assert "EMAIL" in board and "sk-synthetic" not in board and "example.com" not in board
 
 
@@ -140,8 +140,8 @@ def test_language_switch_redraws_the_whole_conversation() -> None:
     *_, (_, _, items, _) = _chat(EXAMPLES["Synthetic CV"])
     outputs = app.switch_language("en", items)
     assert outputs[0] == "ar"
-    assert "منقّح" in str(outputs[6].value[1]["content"])  # Gradio stores content as parts
-    assert len(outputs) == 13  # one value per component the switch updates
+    assert "منقّح" in str(outputs[8].value[1]["content"])  # Gradio stores content as parts
+    assert len(outputs) == 17  # one value per component the switch updates
     assert app.switch_language("ar", items)[0] == "en"
 
 
