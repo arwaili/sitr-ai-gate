@@ -172,8 +172,8 @@ def test_language_switch_redraws_the_whole_conversation() -> None:
     *_, (_, _, items, _) = _ask(app.chat_examples()[1]["text"])
     outputs = app.switch_language("en", items)
     assert outputs[0] == "ar"
-    assert "ليس كما هو" in str(outputs[8].value[1]["content"])  # Gradio stores content as parts
-    assert len(outputs) == 16  # one value per component the switch updates
+    assert "ليس كما هو" in str(outputs[7].value[1]["content"])  # Gradio stores content as parts
+    assert len(outputs) == 15  # one value per component the switch updates
     assert app.switch_language("ar", items)[0] == "en"
 
 
@@ -292,3 +292,16 @@ def test_chat_failure_falls_back_to_the_verdict(monkeypatch) -> None:
     monkeypatch.setattr(app.router, "chat", lambda *_: None)
     *_, (chat, _, _, _) = _ask("hello")
     assert 'class="sitr-chip allow"' in chat[1]["content"]
+
+
+def test_clicking_chat_again_starts_a_new_conversation() -> None:
+    *_, (_, _, items, _) = _ask("hello")
+    chat, kept, page, *_ = app.open_chat("dashboard", items)
+    assert kept == items and page == "chat" and len(chat) == 2  # coming back keeps the chat
+    chat, kept, page, *_ = app.open_chat("chat", items)
+    assert kept == [] and chat == [] and page == "chat"
+
+
+def test_there_is_no_new_chat_button() -> None:
+    from ui_text import TEXT
+    assert "new_chat" not in TEXT["en"] and "new_chat" not in TEXT["ar"]

@@ -120,6 +120,12 @@ footer {{ display: none !important; }}
 @media (max-width: 768px) {{ #sitr-main {{ padding-right: 14px !important; }} }}
 .sitr-copy {{ white-space: nowrap; }}
 .sitr-talk p[dir="auto"] {{ margin: 0; white-space: pre-line; }}
+/* The chat's reset button (top right) is the way to start over, so it is easy to see. */
+#sitr-chat .top-panel {{ top: 12px !important; right: 16px !important; padding: 0 !important; }}
+#sitr-chat .top-panel button {{ width: 34px !important; height: 34px !important;
+  border: 1px solid var(--sitr-ready-line) !important; border-radius: 10px !important;
+  background: var(--sitr-ready-bg) !important; color: var(--sitr-maroon) !important; }}
+#sitr-chat .top-panel button:hover {{ border-color: var(--sitr-maroon) !important; }}
 /* Copy buttons appear when the pointer is over their message; touch screens always show them. */
 @media (hover: hover) {{
   #sitr-chat .message-buttons-left, #sitr-chat .message-buttons-right, #sitr-chat .sitr-copy {{
@@ -156,7 +162,6 @@ footer {{ display: none !important; }}
 #sitr-sidebar .sitr-brand .en {{ font-weight: 700; font-size: 1.02rem; }}
 #sitr-sidebar .sitr-brand .tag {{ flex-basis: 100%; font-size: .8rem;
   color: var(--sitr-muted) !important; }}
-#sitr-new {{ justify-content: flex-start !important; }}
 .sitr-nav {{ gap: 2px !important; margin-top: 10px; }}
 .sitr-nav button {{ justify-content: flex-start !important; text-align: start;
   border: 0 !important; box-shadow: none !important; background: transparent !important;
@@ -726,6 +731,12 @@ def page_title(page: str, lang: str = "en") -> str:
     return f'<h2 class="sitr-page-title" dir="{_dir(lang)}">{TEXT[lang][key]}</h2>'
 
 
+def open_chat(current: str, items: list[dict], lang: str = "en") -> tuple:
+    """Go to the chat; if it is already open, start a new conversation."""
+    items = [] if current == "chat" else items
+    return (messages(items, lang), items, *show_page("chat", lang))
+
+
 def show_page(page: str, lang: str = "en") -> tuple:
     """Show one page and mark its sidebar entry."""
     return (
@@ -803,7 +814,6 @@ def switch_language(lang: str, items: list[dict]) -> tuple:
         gr.Button(value=t["switch"]),
         brand(new),
         status(new),
-        gr.Button(value=f"+  {t['new_chat']}"),
         gr.Button(value=t["tab_inspect"]),
         gr.Button(value=t["tab_dashboard"]),
         gr.Button(value=t["tab_how"]),
@@ -850,7 +860,6 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
     conversation = gr.State([])
     with gr.Sidebar(elem_id="sitr-sidebar", width=268, open=True):
         brand_output = gr.HTML(brand())
-        new_chat_button = gr.Button(f"+  {EN['new_chat']}", variant="secondary", elem_id="sitr-new")
         with gr.Column(elem_classes="sitr-nav"):
             nav_buttons = [
                 gr.Button(EN["tab_inspect"], variant="primary"),
@@ -889,23 +898,23 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
             how_output = gr.Markdown(EN["how"])
 
     pages = [chat_page, dashboard_page, how_page]
-    for page, button in zip(PAGES, nav_buttons, strict=True):
+    page_outputs = [page_state, *pages, *nav_buttons, dashboard_output]
+    # Clicking Chat while already on it starts a new conversation.
+    nav_buttons[0].click(
+        open_chat, [page_state, conversation, lang_state], [chat, conversation, *page_outputs],
+    ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
+    for page, button in zip(PAGES[1:], nav_buttons[1:], strict=True):
         button.click(
-            lambda lang, page=page: show_page(page, lang), lang_state,
-            [page_state, *pages, *nav_buttons, dashboard_output],
+            lambda lang, page=page: show_page(page, lang), lang_state, page_outputs,
         ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
     outputs = [chat, composer, conversation, dashboard_output]
     composer.submit(send, [composer, conversation, lang_state], outputs)
     chat.example_select(send_example, [conversation, lang_state], outputs)
-    # The trash icon and "New chat" both start a new conversation.
+    # The reset button at the top right of the chat starts a new conversation.
     chat.clear(lambda: [], None, conversation)
-    new_chat_button.click(
-        lambda lang: ([], [], *show_page("chat", lang)), lang_state,
-        [chat, conversation, page_state, *pages, *nav_buttons, dashboard_output],
-    ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
     lang_button.click(
         switch_language, [lang_state, conversation],
-        [lang_state, lang_button, brand_output, status_output, new_chat_button, *nav_buttons,
+        [lang_state, lang_button, brand_output, status_output, *nav_buttons,
          chat, composer, dashboard_title, dashboard_intro, dashboard_output,
          refresh_button, how_title, how_output],
     ).then(None, lang_button, js=SET_DIRECTION_JS)
