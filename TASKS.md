@@ -43,7 +43,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 | S5 | Merge Lane 4 Gradio shell (it contains S4, so merge it last) | Abdulaziz | | done | [#4](https://github.com/arwaili/sitr-ai-gate/pull/4) |
 | S6 | Add all four people as GitHub collaborators (invited: `malaliQA`, `astro0707-c`, `ralkubai`; each must accept the invite) | Abdulaziz | | done | |
 | S7 | Confirm `pip install -r requirements.txt` works in a clean Python 3.11 venv (passes: torch 2.15, transformers 5.22, gradio 6.31 import; PyMuPDF warns that `fitz` is deprecated, use `import pymupdf`) | anyone | Abdulaziz | done | |
-| S8 | Create the team Hugging Face org on the website, add members, move the dataset to it; credits cannot be moved by an agent, see Blockers | Abdulaziz | | blocked | |
+| S8 | Team Hugging Face org and credits: skipped by decision; everything stays on `arwaili` | Abdulaziz | | done | |
 
 ## Phase 3 - Ingestion and deterministic security (Saad)
 
@@ -95,7 +95,6 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 ## Blockers
 
-- **S8:** the team Hugging Face org must be created by Abdulaziz at https://huggingface.co/organizations/new (it cannot be created through the API). Then invite members (their HF usernames are not known yet) and move the dataset with `hf repo move` or `huggingface_hub.move_repo`. Hugging Face credits belong to the account that received them; ask the hackathon organisers to apply them to the org. Until then, jobs bill to `arwaili` (about $0.03 so far).
 - `main` is not protected: the repository is private on a free plan. Follow the PR rules anyway.
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
 
@@ -103,7 +102,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
-- 2026-11-06 - Abdulaziz - PRs #1, #2, #5, #3, #4 merged in order. Merged `main`: 62 tests pass plus 1 expected failure (T7); Ruff, compile, offline four-scenario check (allow, redact, private, block) and secret scan all pass; contracts unchanged since `887963c`. Clean-venv install confirmed (S7). Collaborators invited (S6).
+- 2026-11-06 - Abdulaziz - PRs #1, #2, #5, #3, #4 merged in order. Merged `main`: 62 tests pass plus 1 expected failure (T7); Ruff, compile, offline four-scenario check (allow, redact, private, block) and secret scan all pass; contracts unchanged since `887963c`. Clean-venv install confirmed (S7). Collaborators invited (S6). Team HF org skipped (S8): dataset, jobs and the Space stay on `arwaili`.
 - 2026-11-06 - Abdulaziz - Task board and team workflow added to `TASKS.md` and `CLAUDE.md`. [#1](https://github.com/arwaili/sitr-ai-gate/pull/1)
 - 2026-11-06 - Abdulaziz - Dataset `arwaili/sitr-synthetic-dlp` generated with Qwen in an HF Job and published (300 examples). [#5](https://github.com/arwaili/sitr-ai-gate/pull/5)
 - 2026-11-05 - Abdulaziz - Contracts locked at `887963c`; mocks for all four lanes and the Gradio shell built. PRs [#1](https://github.com/arwaili/sitr-ai-gate/pull/1) to [#5](https://github.com/arwaili/sitr-ai-gate/pull/5)
