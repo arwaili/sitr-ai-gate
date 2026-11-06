@@ -21,9 +21,9 @@ TEXT = {
             "redact": ("Needs changes", "Not as it is. Send this version to {dest} instead.",
                        "It has {things}. I replaced them with placeholders such as [EMAIL_1], so "
                        "this version is safe to share."),
-            "private": ("Keep private", "No, keep this one inside the company.",
-                        "It's confidential work{with_things}. Use your organization's approved "
-                        "internal AI tool for it."),
+            "private": ("Keep private", "Better not. Keep this one private.",
+                        "It has sensitive details{with_things}. Keep it to yourself, or use a "
+                        "private AI tool you trust."),
             "block": ("Don't send", "No, don't send this to {dest}.",
                       "It contains {things}, and secrets should never go into an AI assistant. "
                       "If the secret was shared anywhere, have it changed."),
@@ -45,15 +45,15 @@ TEXT = {
             "INTERNAL_HOST": "internal server addresses",
         },
         "ready_text": "Ready to paste",
-        "ready_text_limited": "If your policy allows outside tools, share only this version",
+        "ready_text_limited": "If you still want to ask, share only this version",
         "ready_secret": "If you need help with it, send this version, with the secret removed",
         "original_ok": "You can upload the original file as it is.",
         "see_found": "See what I found",
         "copy": "Copy",
         "copied": "Copied",
         "files_ready": "Redacted file, ready to send:",
-        "pdf_not_safe": "A redacted PDF could not be made safely for this file, so use the text "
-        "version above.",
+        "pdf_not_safe": "A redacted PDF could not be made safely for this file, so here is a "
+        "redacted text version instead.",
         "models_title": "Models",
         "theme": "Switch light or dark",
         "kpi_inspected": "Messages checked",
@@ -145,9 +145,9 @@ TEXT = {
             "redact": ("يحتاج تعديلًا", "ليس كما هو. أرسل هذه النسخة إلى {dest} بدلًا منه.",
                        "فيه {things}. استبدلتها بعناصر بديلة مثل [EMAIL_1]، فهذه النسخة آمنة "
                        "للمشاركة."),
-            "private": ("أبقِه خاصًا", "لا، أبقِ هذا داخل المؤسسة.",
-                        "هذا عمل سري{with_things}. استخدم أداة الذكاء الاصطناعي الداخلية المعتمدة "
-                        "في مؤسستك."),
+            "private": ("أبقِه خاصًا", "الأفضل لا. أبقِ هذا خاصًا.",
+                        "فيه معلومات حساسة{with_things}. احتفظ بها لنفسك، أو استخدم أداة ذكاء "
+                        "اصطناعي خاصة تثق بها."),
             "block": ("لا ترسله", "لا، لا ترسل هذا إلى {dest}.",
                       "فيه {things}، ولا يجوز إدخال الأسرار في أي مساعد ذكاء اصطناعي. وإن شاركت "
                       "السر في أي مكان، فاطلب تغييره."),
@@ -169,14 +169,14 @@ TEXT = {
             "INTERNAL_HOST": "عناوين خوادم داخلية",
         },
         "ready_text": "جاهز للصق",
-        "ready_text_limited": "إن سمحت سياستك بالأدوات الخارجية، فشارك هذه النسخة فقط",
+        "ready_text_limited": "إن أردت السؤال رغم ذلك، فشارك هذه النسخة فقط",
         "ready_secret": "إن احتجت مساعدة فيه، فأرسل هذه النسخة بعد حذف السر",
         "original_ok": "يمكنك رفع الملف الأصلي كما هو.",
         "see_found": "اعرض ما وجدته",
         "copy": "نسخ",
         "copied": "نُسخ",
         "files_ready": "ملف منقّح جاهز للإرسال:",
-        "pdf_not_safe": "تعذر إنشاء ملف PDF منقّح بأمان لهذا الملف، فاستخدم النسخة النصية أعلاه.",
+        "pdf_not_safe": "تعذر إنشاء ملف PDF منقّح بأمان لهذا الملف، فهذه نسخة نصية منقّحة بدلًا منه.",
         "models_title": "النماذج",
         "theme": "تبديل الوضع الفاتح أو الداكن",
         "kpi_inspected": "رسائل فُحصت",

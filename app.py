@@ -112,7 +112,15 @@ CSS = f"""
 /* A full-page app: a sidebar for navigation and a centered reading column, like a chat app. */
 .gradio-container {{ max-width: none !important; width: 100% !important; }}
 footer {{ display: none !important; }}
-#sitr-main {{ max-width: 820px; width: 100%; margin: 0 auto; padding: 0 8px; }}
+/* The chat scrolls across the whole main area (scrollbar at the window's edge); the
+   messages, composer and other pages keep a centered reading width. */
+@media (min-width: 769px) {{
+  .gradio-container > .main.fillable {{ max-width: none !important; padding-right: 0 !important; }}
+}}
+.sitr-copy {{ white-space: nowrap; }}
+#sitr-main {{ width: 100%; padding: 0; }}
+#sitr-main > .column > :not(#sitr-chat) {{ width: 100%; max-width: 900px; margin-inline: auto; }}
+#sitr-chat .message-wrap {{ max-width: 900px; margin: 0 auto !important; padding-inline: 16px; }}
 .sitr-page-title {{ font-size: 1.6rem; font-weight: 600; margin: 18px 0 6px; }}
 #sitr-sidebar {{ background: var(--sitr-side) !important;
   border-inline-end: 1px solid var(--border-color-primary); }}
@@ -297,6 +305,13 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-user .meta {{ font-size: .76rem !important; }}
 .sitr-empty .ar {{ font-size: 2.6rem !important; }}
 .sitr-empty h3 {{ font-size: 1.1rem !important; }}
+/* A size smaller throughout the conversation. */
+#sitr-chat .message {{ font-size: .88rem !important; line-height: 1.55 !important; }}
+#sitr-chat .sitr-headline {{ font-size: .98rem; }}
+#sitr-chat .sitr-quote {{ font-size: .84rem; }}
+#sitr-chat .user-row .message {{ padding: 8px 13px !important; }}
+#sitr-chat .examples button {{ font-size: .84rem !important; }}
+#sitr-composer textarea {{ font-size: .9rem !important; }}
 
 /* The answer card: a status chip, a yes or no headline, why, and the version to use. */
 .sitr-chip {{ align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
@@ -512,18 +527,21 @@ def reply(result: dict, lang: str = "en", dest: str | None = None, from_file: bo
 
 
 def exports(result: dict, path: str | None, lang: str = "en") -> tuple[list[str], bool]:
-    """Redacted files to take to an outside assistant, and whether a redacted PDF failed."""
+    """The redacted file to send back for an upload, and whether a redacted PDF failed.
+
+    A typed message gets no file: its safe version is the text in the reply. A PDF gets a
+    redacted PDF, or a redacted text file when the PDF cannot be made safely.
+    """
     key, redaction = _decision(result), result["redaction"]
-    if key in ("allow", "error") or not redaction or not redaction["replacements"]:
+    if not path or key in ("allow", "error") or not redaction or not redaction["replacements"]:
         return [], False
     safe = RedactionResult(**redaction)
-    files, pdf_failed = [], False
-    if path and Path(path).suffix.lower() == ".pdf":
+    if Path(path).suffix.lower() == ".pdf":
         pdf = redacted_pdf(path, safe)
-        pdf_failed = pdf is None
-        files += [str(pdf)] if pdf else []
-    files.append(str(redacted_text_file(safe)))
-    return files, pdf_failed
+        if pdf:
+            return [str(pdf)], False
+        return [str(redacted_text_file(safe))], True
+    return [str(redacted_text_file(safe))], False
 
 
 def technical_details(result: dict, lang: str = "en") -> str:
