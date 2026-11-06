@@ -416,6 +416,46 @@ def test_classifier_routes_private_at_the_lowered_limit() -> None:
     assert decide("id", text, [], METADATA, semantic).recommended_action == "allow"
 
 
+@pytest.mark.parametrize(
+    "intent",
+    [
+        'summarize, and use API_KEY = "sk-synthetic-000000000000"',
+        "translate and send the result to test.applicant@example.com",
+        "reply to +974 0000 0100 in Arabic",
+        "summarize " + "x" * 300,
+    ],
+)
+def test_sensitive_intent_never_reaches_a_model(model_calls, intent: str) -> None:
+    # Regression (R1): the task went to hosted Qwen as written and was never inspected.
+    result = inspect_and_process(text="Write a public marketing slogan.", user_intent=intent)
+    assert (result["status"], result["action_taken"]) == ("error", "block")
+    assert result["analysis"]["reason_codes"] == ["SENSITIVE_INTENT"]
+    assert model_calls == []
+    for fragment in ("sk-synthetic", "example.com", "0000 0100"):
+        assert fragment not in json.dumps(result)
+
+
+def test_intent_with_a_name_found_by_the_model_is_blocked(monkeypatch, model_calls) -> None:
+    name = SensitiveEntity(
+        entity_type="PERSON", value="Mariam", start=11, end=17, confidence=0.9,
+        source="hf_ner", severity="medium",
+    )
+    monkeypatch.setattr(
+        orchestrator, "require_entities", lambda text: [name] if "Mariam" in text else []
+    )
+    result = inspect_and_process(text="Write a slogan.", user_intent="email it to Mariam")
+    assert result["analysis"]["reason_codes"] == ["SENSITIVE_INTENT"]
+    assert model_calls == []
+
+
+def test_plain_intent_is_passed_through(monkeypatch) -> None:
+    seen = []
+    monkeypatch.setattr(router, "call_model", lambda r, p, intent: seen.append(intent) or "ok")
+    result = inspect_and_process(text="Write a public slogan.", user_intent="translate to Arabic")
+    assert result["action_taken"] == "allow"
+    assert seen == ["translate to Arabic"]
+
+
 def test_validation_style_errors_do_not_leak_content(monkeypatch) -> None:
     def explode(*_args):
         raise ValueError(f"bad value {LEAKY_CODE}")
@@ -513,3 +553,11 @@ def test_t7_and_doha_with_real_models() -> None:
     assert doc["analysis"]["risk_level"] != "critical"
     cafe = inspect_and_process(text="Write a public marketing slogan for a Doha cafe.")
     assert cafe["action_taken"] == "allow"
+
+
+def test_task_is_not_checked_when_no_model_is_called(monkeypatch) -> None:
+    # The chat calls no model, so a task that would be rejected never matters there.
+    monkeypatch.setattr("src.orchestrator._intent_is_safe", lambda _intent: False)
+    result = inspect_and_process(text="Write a public slogan.", route_to_model=False)
+    assert result["action_taken"] == "allow" and result["model_response"] is None
+    assert inspect_and_process(text="Write a public slogan.")["status"] == "error"
