@@ -87,6 +87,7 @@ Owns:
 - `requirements.txt`
 - `README.md`
 - `assets/`
+- `space/`
 - `tests/test_end_to_end.py`
 - Hugging Face Space deployment
 - Demo, backup recording, pitch, and submission
