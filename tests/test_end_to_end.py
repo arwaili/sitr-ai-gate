@@ -1,3 +1,4 @@
+import logging
 import re
 import shutil
 from pathlib import Path
@@ -191,3 +192,22 @@ def test_every_example_is_a_question_in_both_languages() -> None:
         for example in app.chat_examples(lang):
             question, content = app.split_question(example["text"])
             assert question == example["display_text"] and content
+
+
+def test_uploads_never_inspected_are_purged() -> None:
+    # Regression (R1, Saad): Gradio stores a file on drop, so an abandoned upload stayed on disk.
+    assert app.demo.delete_cache is not None
+
+
+def test_audit_events_are_written_when_enabled(monkeypatch, capfd) -> None:
+    # Regression (R1, Saad): nothing enabled INFO, so the app wrote no audit events at all.
+    logger = logging.getLogger("sitr")
+    monkeypatch.setattr(logger, "handlers", [])
+    monkeypatch.setattr(logger, "level", logging.NOTSET)
+    app.enable_audit_log()
+    app.enable_audit_log()
+    assert len(logger.handlers) == 1
+    inspect_and_process(text="Curriculum vitae: test.applicant@example.com")
+    err = capfd.readouterr().err
+    assert '"action": "redact"' in err
+    assert "test.applicant" not in err

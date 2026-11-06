@@ -10,11 +10,23 @@ Overrides, strictest first (PROJECT_OVERVIEW.md, Phase 5):
 Models can raise a decision to private at most; only rules can block or lower it.
 """
 
+import re
+
 from src.contracts import Action, AnalysisResult, ModelMetadata, SensitiveEntity
 
-_CONFIDENTIAL_TERMS = (
-    "contract", "salary", "payroll", "evaluation", "appraisal", "confidential", "termination",
-    "عقد", "راتب", "رواتب", "تقييم", "سري", "إنهاء الخدمة",
+# Whole words only, so "contraction", سريع (quick) and معقدة (complex) do not match. Arabic words
+# may carry attached prefixes and pronoun endings, as in العقد, وبالعقد and راتبي. Code names count
+# as word breaks, as in payroll_2026 and salary2026, and Arabic punctuation is not a letter.
+# src/risk_classifier.py keeps a looser list for its fallback: change the two together.
+_ARABIC_LETTER = "\u0620-\u063f\u0641-\u064a\u066e-\u06d3\u06d5"
+_ARABIC_MARKS = re.compile("[\u064b-\u065f\u0640\u0670]")
+_CAMEL_CASE_BREAK = re.compile(r"(?<=[a-z])(?=[A-Z])")
+_CONFIDENTIAL_PATTERN = re.compile(
+    r"(?i)(?<![a-z])(?:contracts?|salary|salaries|payroll|evaluations?|appraisals?|confidential"
+    r"|terminations?)(?![a-z])"
+    rf"|(?<![{_ARABIC_LETTER}])(?:[وف]?[بكل]?(?:ال|لل)?)"
+    r"(?:عقد|عقود|راتب|رواتب|تقييم|تقييمات|سري|سرية|سريا|تسريح|إنهاء الخدمة|انهاء الخدمة)"
+    rf"(?:ي|ك|ه|ها|نا|هم|هن|كم)?(?![{_ARABIC_LETTER}])"
 )
 _RESTRICTED_TERMS = (
     "top secret", "classification: restricted", "restricted information", "internal use only",
@@ -30,8 +42,16 @@ _CREDENTIAL_CODES = {
     "DATABASE_URL": "DATABASE_CREDENTIAL",
     "PRIVATE_KEY": "PRIVATE_KEY",
 }
-# The classifier may route to private only when it is this sure; tuned on the dev split.
-SEMANTIC_THRESHOLD = 0.6
+# The classifier may route to private only when it is this sure. On the dev split, limits from
+# 0.35 to 0.6 gave the same accuracy, and the lower limit catches confidential prose with no
+# keywords.
+SEMANTIC_THRESHOLD = 0.4
+
+def _has_confidential_term(text: str) -> bool:
+    # Only a yes or no comes back, so changing the text here cannot move any entity offset.
+    plain = _CAMEL_CASE_BREAK.sub(" ", _ARABIC_MARKS.sub("", text))
+    return bool(_CONFIDENTIAL_PATTERN.search(plain))
+
 
 _DECISIONS = {
     "block": ("critical", 95, "Restricted content was found, so nothing was sent to any model."),
@@ -84,7 +104,7 @@ def _assess(text: str, entities: list[SensitiveEntity], semantic) -> tuple[Actio
     if any(e.severity == "critical" for e in entities):
         # Only the model saw it: suspicious, but not proof, so keep it off external routes.
         private.append("MODEL_SUSPECTED_CREDENTIAL")
-    if any(term in lowered for term in _CONFIDENTIAL_TERMS):
+    if _has_confidential_term(text):
         private.append("CONFIDENTIAL_CONTENT")
     if (
         semantic is not None
