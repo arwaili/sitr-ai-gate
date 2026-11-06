@@ -9,7 +9,7 @@
 
 ## Current status
 
-Updated 2026-11-06 after PR #21.
+Updated 2026-11-06 after PR #23.
 
 | Phase | State |
 |---|---|
@@ -18,10 +18,10 @@ Updated 2026-11-06 after PR #21.
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
 | 5 - Policy, routing, integration | Done, merged in PR #14 |
-| 6-7 - Product and deployment | U1-U3 done, merged in PR #21; the Space is live and public; U4 measured, the phone check is left |
+| 6-7 - Product and deployment | Done: U1-U3 merged in PRs #21 and #23 (customer chat UI, English/Arabic switch); the Space is live and public and runs `main`; U4 measured and checked on a phone |
 | 8-9 - Review and submission | R1 in progress (Saad); R2-R3 not started |
 
-What works on `main` now: Phases 1-5 and U1-U3, live at https://huggingface.co/spaces/arwaili/sitr-ai-gate. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 196 tests pass locally, including T7. Measured results are in `README.md`.
+What works on `main` now, and on the public Space (https://huggingface.co/spaces/arwaili/sitr-ai-gate): Phases 1-7. The app is a chat: type a message and press Enter, or press + to attach a PDF, code or text file. Each reply shows, in order, Sitr's decision, what it found, exactly what the AI model received (placeholders only on redact, nothing on block), and the answer. A header button switches the whole app between English and Arabic (right-to-left). Allow and redact are answered by hosted Qwen, private by Qwen inside the app, and block reaches no model. Uploads are deleted after inspection. If the PII detector is down, messages are blocked. 212 tests pass locally (CI: 200, with 12 model tests skipped). Measured results are in `README.md`.
 
 ## Team
 
@@ -97,9 +97,9 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
 | U1 | Dashboard tab: inspected, allowed, redacted, private, blocked and error counts plus entity categories; in memory, metadata only, shared by all visitors | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
-| U2 | Mixed Arabic-English text follows each paragraph's first letter; highlighted view switches to right-to-left for Arabic input; fixed task list (no free text reaches a model); route used, entity counts, collapsible technical details without values; About tab; model readiness in the header | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
+| U2 | Customer chat UI: one scrolling column, ChatGPT-style composer (Enter sends, + attaches a file), replies in a fixed order (decision seal, findings highlighted, what the model received, answer, technical details), suggestion cards, pending message, new-chat button; English/Arabic switch with a right-to-left page; fixed task list so no free text reaches a model; header keeps one size on every tab | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21), [#23](https://github.com/arwaili/sitr-ai-gate/pull/23) |
 | U3 | `space/`: Space README with metadata, CPU-only requirements (torch wheel 210 MB, resolution checked for Linux), `deploy_space.py`; the app warms all models at start. Deployed on cpu-basic, now public; `HF_TOKEN` secret set; models load at start | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
-| U4 | Live Space over its API: 11 requests (examples, repeats, three uploads) give the right badge with no leaked value. Time per request: block 1.5-2 s, redact 5-8 s, allow 4-23 s (hosted provider), private 18-33 s (local Qwen on 2 vCPU). Left: open it on a phone | anyone | Abdulaziz | in progress | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
+| U4 | Live Space over its API: 11 requests (examples, repeats, three uploads) give the right badge with no leaked value. Time per request: block 1.5-2 s, redact 5-8 s, allow 4-23 s (hosted provider), private 18-33 s (local Qwen on 2 vCPU). The chat UI was rechecked on the live Space; Abdulaziz confirmed it works on a phone | anyone | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
 
 ## Phase 8 and 9 - Security review and submission (everyone)
 
@@ -114,12 +114,14 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 - `main` is not protected: the repository is private on a free plan. Follow the PR rules anyway.
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
 - Requests are blocked until the PII model has loaded, so open the Space and run one inspection before any demo.
-- The Space needs an `HF_TOKEN` secret for hosted Qwen, and about 6.5 GB of RAM for the three models (CPU Basic has 16 GB).
+- The Space has its `HF_TOKEN` secret and runs on CPU Basic (16 GB RAM; the three models use about 6.5 GB). Redeploy with `python space/deploy_space.py --public` after each merge that changes `app.py`, `ui_text.py`, `src/` or `examples/`.
+- Open PRs to update against `main`: [#18](https://github.com/arwaili/sitr-ai-gate/pull/18) conflicts in `app.py` (keep `main`'s version, which already has its audit-log, cache-purge and file-clearing fixes); [#20](https://github.com/arwaili/sitr-ai-gate/pull/20) duplicates the merged Space package (`space/`), so only its `.env.example` and `requirements-dev.txt` parts are still needed; [#19](https://github.com/arwaili/sitr-ai-gate/pull/19) is waiting for Rashid's review.
 
 ## Log
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - PR #23 merged into `main` (212 tests pass after merge, CI green) and deployed: all 19 Space files match `main`. Live check on the public Space: the CV suggestion was redacted and the model received placeholders only. U4 done (phone confirmed). Lane branches synced. [#23](https://github.com/arwaili/sitr-ai-gate/pull/23)
 - 2026-11-06 - Abdulaziz - Customer version of the UI on `task/u2-redesign`: the Inspect tab is now a chat (one column, scrolls like a phone conversation). A ChatGPT-style composer sends on Enter and attaches a file with +. Each reply runs in order: Sitr's decision, what Sitr found (highlighted), exactly what the AI model received, the answer, then collapsed technical details. Suggestion cards when the chat is empty; a pending message while Sitr checks; the trash icon starts a new chat; the header keeps one size on every tab; Gradio's footer is hidden. 212 tests pass (CI: 200). Checked in both languages, light and dark, desktop and phone.
 - 2026-11-06 - Abdulaziz - U2 redesign on `task/u2-redesign`: an English/العربية switch shows one language at a time (the page turns right-to-left in Arabic, and every label, reason, risk, route, dashboard line and the How it works tab are translated); the decision is a large colored seal; one-click examples; grouped input and result panels; Qatar maroon theme with Readex Pro and Reem Kufi; on a phone the decision scrolls into view; blocked inputs show that nothing was sent. 210 tests pass (CI: 198, 12 model tests skip). Checked in the browser in both languages, light and dark, desktop and phone.
 - 2026-11-06 - Abdulaziz - PR #21 merged into `main` (201 tests pass after merge, CI green), U1-U3 marked done, lane branches synced.

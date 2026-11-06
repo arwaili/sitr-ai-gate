@@ -120,7 +120,7 @@ All four must pass on the deployed Hugging Face Space before additional features
 
 ## GitHub setup
 
-Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5), Phase 3 (#8), Phase 4 (#11), Phase 5 (#14) and Phases 6-7 (#21) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
+Done: the repository is pushed, the four lane branches exist from contract commit `887963c`, CI runs on every PR, the Phase 1-2 PRs (#1-#5), Phase 3 (#8), Phase 4 (#11), Phase 5 (#14) and Phases 6-7 (#21, #23) are merged into `main`, and `malaliQA`, `astro0707-c` and `ralkubai` are invited as collaborators with write access. The four lane branches were fast-forwarded to the merged `main`.
 
 Still to do (tracked in `TASKS.md`):
 
