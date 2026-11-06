@@ -1,5 +1,6 @@
 import json
 import re
+import time
 from collections import Counter
 from pathlib import Path
 
@@ -11,8 +12,10 @@ from data.generate_dataset import (
     build_examples,
     dataset_card,
     is_safe_carrier,
+    migrate_phones,
 )
-from src.hf_detection import detect_entities
+from src import hf_detection, risk_classifier
+from src.hf_detection import decode, detect_entities
 from src.risk_classifier import classify_risk
 
 EXAMPLES = build_examples()
@@ -104,24 +107,152 @@ def test_dataset_card_lists_every_split() -> None:
     assert "path: data/dev.jsonl" in card
 
 
-@pytest.mark.parametrize("name", ["Mariam Al-Example", "مريم المثال"])
-def test_names_are_detected_with_exact_offsets(name: str) -> None:
-    text = f"Applicant / المتقدم: {name}."
-    [entity] = detect_entities(text)
-    assert entity.entity_type == "PERSON"
-    assert text[entity.start : entity.end] == name
+def test_dataset_phones_cannot_belong_to_real_people() -> None:
+    phones = [e["value"] for x in EXAMPLES for e in x["entities"] if e["entity_type"] == "PHONE"]
+    assert phones and all(p.startswith("+974 0000 ") for p in phones)
 
 
-def test_mixed_language_without_names_returns_nothing() -> None:
-    assert detect_entities("Public notice إعلان عام") == []
+def test_phone_migration_keeps_offsets_exact() -> None:
+    old = [{"text": "Call +974 5555 0107 now", "entities": [
+        {"entity_type": "PHONE", "value": "+974 5555 0107", "start": 5, "end": 19}]}]
+    [row] = migrate_phones(old)
+    assert row["text"] == "Call +974 0000 0107 now"
+    assert row["entities"][0]["value"] == "+974 0000 0107"
+
+
+def test_committed_dev_split_uses_safe_phones() -> None:
+    assert "+974 5555" not in Path("data/synthetic_examples.json").read_text(encoding="utf-8")
+
+
+# PII detector: decoding and fallback (no model needed)
+
+
+def test_decode_joins_names_and_grows_partial_words() -> None:
+    text = "Name: Lina Aziz, لينا"
+    offsets = [(0, 5), (5, 10), (10, 15), (15, 16), (16, 18), (18, 21)]
+    labels = ["O", "B-FIRSTNAME", "S-LASTNAME", "O", "O", "S-FIRSTNAME"]
+    entities = decode(text, offsets, labels, [0.1, 0.9, 0.8, 0.1, 0.1, 0.9])
+    assert [e.value for e in entities] == ["Lina Aziz", "لينا"]
+    assert {e.entity_type for e in entities} == {"PERSON"}
+    assert all(text[e.start : e.end] == e.value for e in entities)
+    assert entities[0].source == "hf_ner" and entities[0].confidence == 0.8
+
+
+def test_decode_drops_low_confidence_and_implausible_spans() -> None:
+    text = "port 5432 and Sara"
+    labels = ["O", "S-EMAIL", "O", "S-FIRSTNAME"]
+    offsets = [(0, 4), (4, 9), (9, 13), (13, 18)]
+    assert decode(text, offsets, labels, [0.1, 0.99, 0.1, 0.4]) == []
+
+
+def test_decode_ignores_unmapped_labels() -> None:
+    assert decode("Doha", [(0, 4)], ["S-CITY"], [0.99]) == []
+
+
+def test_detector_can_be_switched_off(monkeypatch) -> None:
+    monkeypatch.setenv("SITR_HF_MODELS", "0")
+    assert detect_entities("Sara Haddad") == []
+    assert hf_detection.status()["state"] == "disabled"
+
+
+def test_detector_failure_falls_back_to_no_findings(monkeypatch) -> None:
+    def broken(_text):
+        raise RuntimeError("synthetic failure mentioning Sara Haddad")
+
+    monkeypatch.setattr(hf_detection, "_predict", broken)
+    assert detect_entities("Sara Haddad") == []
+    assert hf_detection.status() == {
+        "model": hf_detection.MODEL_ID, "state": "unavailable", "detail": "RuntimeError"
+    }
+
+
+def test_detector_timeout_falls_back(monkeypatch) -> None:
+    monkeypatch.setattr(hf_detection, "TIMEOUT_SECONDS", 0.05)
+    monkeypatch.setattr(hf_detection, "_predict", lambda _text: time.sleep(0.5) or [])
+    assert detect_entities("Sara Haddad") == []
+    assert "timed out" in hf_detection.status()["detail"]
+    time.sleep(0.5)  # let the slow call finish before other tests use the worker
+
+
+# Risk classifier: fallback (no model needed)
 
 
 @pytest.mark.parametrize(
     ("text", "level"),
-    [("Employment contract", "high"), ("عقد عمل", "high"), ("A public slogan", "low")],
+    [
+        ("Employment contract", "high"),
+        ("عقد عمل", "high"),
+        ("The database password is below", "critical"),
+        ("A public slogan", "low"),
+    ],
 )
-def test_classifier_returns_a_contract_risk_level(text: str, level: str) -> None:
+def test_fallback_risk_levels(monkeypatch, text: str, level: str) -> None:
+    monkeypatch.setenv("SITR_HF_MODELS", "0")
     prediction = classify_risk(text)
     assert prediction.risk_level == level
     assert 0 <= prediction.confidence <= 1
-    assert prediction.explanation
+    assert prediction.explanation.startswith("Fallback")
+
+
+def test_classifier_failure_uses_fallback(monkeypatch) -> None:
+    def broken(_text):
+        raise RuntimeError("synthetic failure")
+
+    monkeypatch.setattr(risk_classifier, "_predict", broken)
+    assert classify_risk("Employment contract").risk_level == "high"
+    assert risk_classifier.status()["state"] == "unavailable"
+
+
+# Real models: run locally when torch and the cached models are present, skipped in CI
+
+
+def _cached(model_id: str) -> bool:
+    try:
+        import torch  # noqa: F401
+        from huggingface_hub import try_to_load_from_cache
+    except ImportError:
+        return False
+    return isinstance(try_to_load_from_cache(model_id, "config.json"), str)
+
+
+needs_pii_model = pytest.mark.skipif(
+    not _cached(hf_detection.MODEL_ID), reason="PII model not installed"
+)
+needs_risk_model = pytest.mark.skipif(
+    not _cached(risk_classifier.MODEL_ID), reason="risk model not installed"
+)
+
+
+@needs_pii_model
+@pytest.mark.parametrize(
+    ("text", "name"),
+    [
+        ("Applicant / المتقدم: Mariam Al-Example.", "Mariam Al-Example"),
+        ("لخّص هذه السيرة الذاتية. الاسم: لينا الناصر، البريد staff12@example.com", "لينا الناصر"),
+    ],
+)
+def test_model_finds_names_with_exact_offsets(text: str, name: str) -> None:
+    people = [e for e in detect_entities(text) if e.entity_type == "PERSON"]
+    assert [e.value for e in people] == [name]
+    assert all(text[e.start : e.end] == e.value for e in people)
+
+
+@needs_pii_model
+def test_model_finds_nothing_in_public_text() -> None:
+    assert detect_entities("Public notice إعلان عام about the new metro line.") == []
+
+
+@needs_risk_model
+@pytest.mark.parametrize(
+    ("text", "level"),
+    [
+        ("Write a short announcement for our new cafe opening in Doha.", "low"),
+        ("Summarize this CV. Email: staff7@example.com, phone +974 0000 0107.", "medium"),
+        ("Employment contract: monthly salary 25,000 QAR, confidential.", "high"),
+        ('DB_PASSWORD = "Synthetic-Pass-01"\nAPI_KEY = "sk-synthetic-0000"', "critical"),
+    ],
+)
+def test_model_risk_levels_for_the_demo_scenarios(text: str, level: str) -> None:
+    prediction = classify_risk(text)
+    assert prediction.risk_level == level
+    assert not prediction.explanation.startswith("Fallback")
