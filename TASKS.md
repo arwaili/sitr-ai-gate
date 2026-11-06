@@ -113,12 +113,13 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 - `main` is not protected: the repository is private on a free plan. Follow the PR rules anyway.
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
-- Until P1, the app's orchestrator uses mock detection and does not call the Phase 3 rules or the Phase 4 models, and it cannot read PDFs. Use `src.ingestion.ingest` and `src.deterministic.detect_deterministic` directly to test Phase 3.
+- Until P1, the app's orchestrator uses mock detection and does not call the Phase 3 rules or the Phase 4 models, and it cannot read PDFs. To test Phase 3, call `src.ingestion.ingest` and `src.deterministic.detect_deterministic` directly. To test Phase 4, run `python data/evaluate.py --split dev` (rules plus both models plus the policy engine), or call `src.hf_detection.detect_entities` and `src.risk_classifier.classify_risk`.
 
 ## Log
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - Added Phase 4 testing steps to Blockers; deleted the merged `chore/phase-1-setup` branch.
 - 2026-11-06 - Abdulaziz - PR #11 merged into `main` (132 tests pass after merge, CI green), H1-H4 marked done, lane branches synced to `main`, docs updated to match.
 - 2026-11-06 - Abdulaziz - Phase 4 (H1-H4) built on `feature/hf-intelligence`. Held-out test split (60 rows), rules plus models: entity precision 0.967, recall 0.927; names 0.897/0.897; action accuracy 0.95 (all misses are public prompts with a false Arabic name); risk model alone 0.85. Median latency: PII model 234 ms, risk model 146 ms. 132 tests pass locally; CI skips the 7 real-model tests. Dataset republished with `+974 0000` phones. [#11](https://github.com/arwaili/sitr-ai-gate/pull/11)
 - 2026-11-06 - Abdulaziz - PR #8 merged into `main` (117 tests pass after merge), I1-I7 marked done in [#9](https://github.com/arwaili/sitr-ai-gate/pull/9), lane branches synced to `main`, docs brought up to date.
