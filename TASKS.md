@@ -9,7 +9,7 @@
 
 ## Current status
 
-Updated 2026-11-06 after PR #14.
+Updated 2026-11-06 after PR #21.
 
 | Phase | State |
 |---|---|
@@ -18,10 +18,10 @@ Updated 2026-11-06 after PR #14.
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
 | 5 - Policy, routing, integration | Done, merged in PR #14 |
-| 6-7 - Product and deployment | U1-U3 in review in PR #21; the Space is live and public; U4 measured over the API, the phone check is left |
+| 6-7 - Product and deployment | U1-U3 done, merged in PR #21; the Space is live and public; U4 measured, the phone check is left |
 | 8-9 - Review and submission | R1 in progress (Saad); R2-R3 not started |
 
-What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 196 tests pass locally, including T7. Measured results are in `README.md`.
+What works on `main` now: Phases 1-5 and U1-U3, live at https://huggingface.co/spaces/arwaili/sitr-ai-gate. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 196 tests pass locally, including T7. Measured results are in `README.md`.
 
 ## Team
 
@@ -96,9 +96,9 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| U1 | Dashboard tab: inspected, allowed, redacted, private, blocked and error counts plus entity categories; in memory, metadata only, shared by all visitors | Abdulaziz | Abdulaziz | in review | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
-| U2 | Mixed Arabic-English text follows each paragraph's first letter; highlighted view switches to right-to-left for Arabic input; fixed task list (no free text reaches a model); route used, entity counts, collapsible technical details without values; About tab; model readiness in the header | Abdulaziz | Abdulaziz | in review | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
-| U3 | `space/`: Space README with metadata, CPU-only requirements (torch wheel 210 MB, resolution checked for Linux), `deploy_space.py`; the app warms all models at start. Deployed on cpu-basic, now public; `HF_TOKEN` secret set; models load at start | Abdulaziz | Abdulaziz | in review | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
+| U1 | Dashboard tab: inspected, allowed, redacted, private, blocked and error counts plus entity categories; in memory, metadata only, shared by all visitors | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
+| U2 | Mixed Arabic-English text follows each paragraph's first letter; highlighted view switches to right-to-left for Arabic input; fixed task list (no free text reaches a model); route used, entity counts, collapsible technical details without values; About tab; model readiness in the header | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
+| U3 | `space/`: Space README with metadata, CPU-only requirements (torch wheel 210 MB, resolution checked for Linux), `deploy_space.py`; the app warms all models at start. Deployed on cpu-basic, now public; `HF_TOKEN` secret set; models load at start | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
 | U4 | Live Space over its API: 11 requests (examples, repeats, three uploads) give the right badge with no leaked value. Time per request: block 1.5-2 s, redact 5-8 s, allow 4-23 s (hosted provider), private 18-33 s (local Qwen on 2 vCPU). Left: open it on a phone | anyone | Abdulaziz | in progress | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
 
 ## Phase 8 and 9 - Security review and submission (everyone)
@@ -120,6 +120,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Abdulaziz - PR #21 merged into `main` (201 tests pass after merge, CI green), U1-U3 marked done, lane branches synced.
 - 2026-11-06 - Abdulaziz - Space made public; it loads without signing in.
 - 2026-11-06 - Abdulaziz - Space deployed after `arwaili` moved to PRO: https://huggingface.co/spaces/arwaili/sitr-ai-gate (private). First build failed because the Space installs `gradio[oauth,mcp]`, which pins pydantic to 2.12.x; the pin was loosened (tests pass on 2.12.5). U4 over the API: all 11 requests correct, no leaks; timings in U4.
 - 2026-11-06 - Abdulaziz - U1-U3 built on `feature/product`: dashboard, task field, RTL, details panel, Space package. Also includes PR #18's app fixes (audit log, purge of uninspected uploads, file box cleared). 201 tests pass (CI: 189, 12 model tests skip). Live check in the browser: four examples, three uploads and a translate task give the right badge, no value leaks, dashboard counts match. [#21](https://github.com/arwaili/sitr-ai-gate/pull/21). Space deploy tried and refused (needs HF PRO); nothing was created.
