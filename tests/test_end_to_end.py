@@ -7,6 +7,12 @@ gradio = pytest.importorskip("gradio")  # CI installs only the core test depende
 from app import EXAMPLES, highlight, render  # noqa: E402
 
 
+@pytest.fixture(autouse=True)
+def _rules_only(monkeypatch) -> None:
+    # CI has no model libraries, and a detector that cannot run now blocks, so switch models off.
+    monkeypatch.setenv("SITR_HF_MODELS", "0")
+
+
 @pytest.mark.parametrize(
     ("name", "action", "label"),
     [
