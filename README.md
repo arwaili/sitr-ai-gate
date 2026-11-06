@@ -6,7 +6,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
 
 ## Joining the team
 
-1. Ask Abdulaziz to add your GitHub account as a collaborator, then clone the repository:
+1. Accept the collaborator invite in your GitHub email or at https://github.com/arwaili/sitr-ai-gate/invitations, then clone the repository:
    ```bash
    git clone https://github.com/arwaili/sitr-ai-gate.git
    cd sitr-ai-gate
@@ -24,7 +24,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
    pytest
    ```
 4. Open the folder in Claude Code. It reads `CLAUDE.md` automatically. Tell it your name and ask it what to work on.
-5. Run the app with `python app.py` and open http://localhost:7860. Until PR #4 merges, the app exists only on `feature/product`.
+5. Run the app with `python app.py` and open http://localhost:7860. It runs the mock pipeline end to end: the four demo scenarios give allow, redact, private and block.
 
 ## Where things are
 
