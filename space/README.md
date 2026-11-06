@@ -20,15 +20,19 @@ datasets:
 
 # Sitr AI Gate · سِتر
 
-Sitr inspects employee prompts and files before they reach an AI model, then allows, redacts,
-routes privately, or blocks them. Built for the Qai x Hugging Face Hackathon in Qatar.
+Ask Sitr "Can I share this with an AI assistant?" with text or a file. It answers yes or no,
+says what it found, and gives you the safe version: redacted text to copy, a redacted PDF for a
+PDF, or a redacted text file for other files. Behind it, the pipeline allows, redacts, routes
+privately, or blocks. Built for the Qai x Hugging Face Hackathon in Qatar. English and Arabic,
+light and dark.
 
 - Rules find secrets, IDs, IBANs and salaries in Arabic and English.
 - `OpenMed/privacy-filter-multilingual-v2` finds names and personal data.
 - `Horizon-Labs/multilingual-zeroshot-small` reads what the text is about.
-- `Qwen/Qwen2.5-1.5B-Instruct` answers allowed and redacted requests through Hugging Face
-  Inference Providers, and private requests inside this Space.
+- `Qwen/Qwen2.5-1.5B-Instruct` is the pipeline's model: allowed and redacted requests go
+  through Hugging Face Inference Providers, private requests stay inside this Space. The chat
+  itself only checks: your text is read by the detectors inside this Space and is not sent to Qwen or any outside service.
 
 **Use synthetic data only.** This is a security decision-support prototype; the private route is
 a demonstration, not an isolated environment. The models load when the Space starts: wait until
-the header says `ready` before the first request.
+the bottom of the sidebar says `Privacy detector ready` before the first request.

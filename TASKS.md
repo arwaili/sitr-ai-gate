@@ -9,7 +9,7 @@
 
 ## Current status
 
-Updated 2026-11-06 after PR #26.
+Updated 2026-11-07 after PR #27.
 
 | Phase | State |
 |---|---|
@@ -18,12 +18,10 @@ Updated 2026-11-06 after PR #26.
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
 | 5 - Policy, routing, integration | Done, merged in PR #14 |
-| 6-7 - Product and deployment | Done: U1-U3 merged in PRs #21 and #23 (customer chat UI, English/Arabic switch); the Space is live and public and runs `main`; U4 measured and checked on a phone |
+| 6-7 - Product and deployment | Done: U1-U3 merged in PRs #21, #23 and #27 (chat advisor, English/Arabic and light/dark switches, maroon theme); the Space is live and public and runs `main`; U4 measured and checked on a phone |
 | 8-9 - Review and submission | R1 done, merged in PR #26; R2-R3 not started |
 
-What works on `main` now, and on the public Space (https://huggingface.co/spaces/arwaili/sitr-ai-gate): Phases 1-8. The app is a chat advisor: ask "Can I send this to an AI assistant?" with text, or press + to attach a PDF, code or text file. Sitr answers yes or no in plain words, says what it found, and gives the version that is safe to use: the redacted text with a Copy button for a typed message, a redacted PDF for a PDF upload (read back and refused if any value remains), or a redacted text file for other uploads. Developer details are collapsed under "See what I found". A sidebar holds the pages (Chat, Dashboard, How it works), and at its bottom the model status and the English/Arabic and light/dark switches. The chat checks only and calls no model; uploads are deleted after inspection; if the PII detector is down, messages are blocked. 289 tests pass locally. Measured results are in `README.md`.
-| 8-9 - Review and submission | R1 in review (Saad, PR #18); R2-R3 not started |
-What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 238 tests pass locally, including T7. Measured results are in `README.md`.
+What works on `main` now, and on the public Space (https://huggingface.co/spaces/arwaili/sitr-ai-gate): Phases 1-8. The app is a chat advisor: ask "Can I send this to an AI assistant?" with text, or press + to attach a PDF, code or text file. Sitr answers yes or no in plain words, says what it found, and gives the version that is safe to use: the redacted text with a Copy button for a typed message, a redacted PDF for a PDF upload (read back and refused if any value remains), or a redacted text file for other uploads. Developer details are collapsed under "See what I found", and Copy buttons appear on hover. A sidebar with the Sitr header band holds the pages (Chat, Dashboard, How it works), and at its bottom the model status and the English/Arabic and light/dark switches. The chat only checks and does not call Qwen; uploads are deleted after inspection; if the PII detector is down, messages are blocked. 289 tests pass locally. Measured results are in `README.md`.
 
 ## Team
 
@@ -99,7 +97,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
 | U1 | Dashboard tab: inspected, allowed, redacted, private, blocked and error counts plus entity categories; in memory, metadata only, shared by all visitors | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
-| U2 | Customer chat UI: one scrolling column, ChatGPT-style composer (Enter sends, + attaches a file), replies in a fixed order (decision seal, findings highlighted, what the model received, answer, technical details), suggestion cards, pending message, new-chat button; English/Arabic switch with a right-to-left page; fixed task list so no free text reaches a model; header keeps one size on every tab | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21), [#23](https://github.com/arwaili/sitr-ai-gate/pull/23) |
+| U2 | Customer chat advisor: ask "Can I send this to an AI assistant?" with text or a file (+ attaches, Enter sends); the reply says yes or no, what was found, and the safe version (redacted text with Copy, a redacted PDF for PDFs, a redacted text file for other files); details collapsed; sidebar with header band, pages, model status and English/Arabic and light/dark switches; one maroon theme; full-width scrolling chat | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21), [#23](https://github.com/arwaili/sitr-ai-gate/pull/23), [#27](https://github.com/arwaili/sitr-ai-gate/pull/27) |
 | U3 | `space/`: Space README with metadata, CPU-only requirements (torch wheel 210 MB, resolution checked for Linux), `deploy_space.py`; the app warms all models at start. Deployed on cpu-basic, now public; `HF_TOKEN` secret set; models load at start | Abdulaziz | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
 | U4 | Live Space over its API: 11 requests (examples, repeats, three uploads) give the right badge with no leaked value. Time per request: block 1.5-2 s, redact 5-8 s, allow 4-23 s (hosted provider), private 18-33 s (local Qwen on 2 vCPU). The chat UI was rechecked on the live Space; Abdulaziz confirmed it works on a phone | anyone | Abdulaziz | done | [#21](https://github.com/arwaili/sitr-ai-gate/pull/21) |
 
@@ -107,8 +105,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad, Mohammed, Rashid, Abdulaziz | in review | #16, #17 (merged); #18, #19, #20 combined on `task/r1-integrate` with Abdulaziz's export and chat fixes |
-| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad, Mohammed | in progress | [#19](https://github.com/arwaili/sitr-ai-gate/pull/19) |
+| R1 | Adversarial review of another person's lane (bypasses, leaks, failures); add regression tests | everyone | Saad, Mohammed, Rashid, Abdulaziz | done | #16, #17; #18, #19, #20 combined in [#26](https://github.com/arwaili/sitr-ai-gate/pull/26) with Abdulaziz's export and chat fixes |
 | R2 | 90-second demo script, 3-minute pitch, submission description | Abdulaziz | | open | |
 | R3 | Backup screenshots and video | anyone | | open | |
 
@@ -118,13 +115,13 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
 - Requests are blocked until the PII model has loaded, so open the Space and run one inspection before any demo.
 - The Space has its `HF_TOKEN` secret and runs on CPU Basic (16 GB RAM; the three models use about 6.5 GB). Redeploy with `python space/deploy_space.py --public` after each merge that changes `app.py`, `ui_text.py`, `src/` or `examples/`.
-- Open PRs to update against `main`: [#18](https://github.com/arwaili/sitr-ai-gate/pull/18) conflicts in `app.py` (keep `main`'s version, which already has its audit-log, cache-purge and file-clearing fixes); [#20](https://github.com/arwaili/sitr-ai-gate/pull/20) duplicates the merged Space package (`space/`), so only its `.env.example` and `requirements-dev.txt` parts are still needed; [#19](https://github.com/arwaili/sitr-ai-gate/pull/19) is waiting for Rashid's review.
 
 ## Log
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
-- 2026-11-06 - Abdulaziz - On `task/u2-theme`: one maroon (`#8A1538`) theme, white in light mode and near-black/dark grey in dark mode; the ستر wordmark is maroon again. The sidebar has a brand card with the tagline "Check before you share", and model status plus the language and theme buttons sit at its bottom. Interface text no longer names AI products (trademarks); Sitr names one only when the user's own question does. A typed message gets no download (its safe version is the text in the reply); a PDF upload gets only a redacted PDF, with a text file only when the PDF cannot be made safely. "Private" answers are general ("Better not. Keep this one private.") instead of company-only. The chat scrolls across the whole main area with the scrollbar at the right edge, and the type is a size smaller. 289 tests pass.
+- 2026-11-07 - Abdulaziz - Docs brought in line with `main` after #27: status table, U2 and R1 rows, closed-PR blocker removed, README model-status step.
+- 2026-11-06 - Abdulaziz - Merged in [#27](https://github.com/arwaili/sitr-ai-gate/pull/27) and deployed: one maroon (`#8A1538`) theme, white in light mode and near-black/dark grey in dark mode; the ستر wordmark is maroon again. The sidebar opens with a full-width header band (ستر, "Sitr AI Gate", tagline "Check before you share"; the wordmark rule now outranks Gradio's `.prose` color, which won on Spaces), and model status plus the language and theme buttons sit at its bottom. Interface text no longer names AI products (trademarks); Sitr names one only when the user's own question does. A typed message gets no download (its safe version is the text in the reply); a PDF upload gets only a redacted PDF, with a text file only when the PDF cannot be made safely. "Private" answers are general ("Better not. Keep this one private.") instead of company-only. The chat scrolls across the whole main area with the scrollbar at the right edge, and the type is a size smaller; the composer sits lower; Copy buttons appear on hover (always shown on touch screens). 289 tests pass.
 
 - 2026-11-06 - Abdulaziz - R1 finished on `task/r1-integrate`. Merged Saad's #18 (keeping main's app.py, which already had its app fixes, and porting its purge and audit tests) and Mohammed's #19 (the task check now runs only when a model will receive the task). Took Rashid's #20 `.env.example`, requirements split and deployment tests, pointed at `space/`. Own review of the chat and exports found and fixed three leaks: the redacted download kept the uploaded file's name; redacted PDFs kept names and emails in metadata, outline, links, comments and attachments; and checking the question with the content made the model read "Claude" as a name and miss the real name, which leaked into the safe version. Regression tests confirmed failing before and passing after. 285 tests pass (CI: 271); dev 0.983 and test 0.95 action accuracy unchanged.
 - 2026-11-06 - Abdulaziz - On `task/u2-app-shell`: the chat is now a user-facing advisor. You ask "Can I send this CV to ChatGPT?" (with text or a file) and Sitr answers yes or no in plain words, says what it found ("a name, an email address and a phone number"), and gives the version that is safe to use, with Copy and redacted downloads. It names the destination it sees (ChatGPT, Claude, Gemini, Copilot). Developer details (risk score, reason codes, models) are collapsed under "See what I found". The chat no longer calls Qwen (`inspect_and_process(..., route_to_model=False)`), so answers take seconds. Claude-style layout: replies on the page, user messages in right-aligned bubbles, smaller type, aligned composer. 221 tests pass (CI: 209).
