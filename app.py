@@ -12,6 +12,8 @@ from pathlib import Path
 import gradio as gr
 
 from src import hf_detection, risk_classifier, router
+from src.contracts import RedactionResult
+from src.export import redacted_pdf, redacted_text_file
 from src.orchestrator import inspect_and_process
 from ui_text import (
     DECISION_REASONS_AR,
@@ -207,6 +209,20 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-quote mark.high {{ background: var(--sitr-high); }}
 .sitr-quote mark.critical {{ background: var(--sitr-critical); }}
 .sitr-note {{ margin-top: 6px; font-size: .85rem; color: var(--sitr-muted); }}
+.sitr-next {{ position: relative; border-radius: 10px; padding: 14px 16px;
+  background: var(--block-background-fill); border: 1px solid var(--border-color-primary);
+  border-inline-start: 4px solid var(--seal-next, var(--sitr-muted)); }}
+.sitr-next h3 {{ margin: 0 0 4px; font-size: 1.05rem; }}
+.sitr-next p {{ margin: 0 0 10px; }}
+.sitr-next.allow {{ --seal-next: var(--sitr-allow); }}
+.sitr-next.redact {{ --seal-next: var(--sitr-redact); }}
+.sitr-next.private {{ --seal-next: var(--sitr-private); }}
+.sitr-next.block {{ --seal-next: var(--sitr-block); }}
+.sitr-copy {{ position: absolute; top: 12px; inset-inline-end: 12px; padding: 4px 12px;
+  border-radius: 999px; border: 1px solid var(--border-color-primary); cursor: pointer;
+  background: var(--body-background-fill); color: var(--body-text-color); font: inherit;
+  font-size: .82rem; }}
+.sitr-files p {{ margin: 6px 0 0; color: var(--sitr-muted); font-size: .88rem; }}
 .sitr-answer {{ white-space: pre-wrap; }}
 .sitr-reply details summary {{ cursor: pointer; color: var(--sitr-muted); font-size: .85rem; }}
 .sitr-table {{ border-collapse: collapse; margin-top: 8px; font-size: .85rem; }}
@@ -321,18 +337,10 @@ def reply(result: dict, lang: str = "en") -> str:
             f'<div class="sitr-quote" dir="auto">'
             f"{findings_html(redaction['original_text'], analysis['entities'])}</div>"
         )
-    # On block or error nothing left Sitr, so no text is shown as sent.
-    if key in ("block", "error") or not redaction:
-        sent = f'<div class="sitr-note">{t["nothing_sent"]}</div>'
-    else:
-        shown = redaction["safe_text"] if key == "redact" else redaction["original_text"]
-        sent = f'<div class="sitr-quote" dir="auto">{escape(shown)}</div>'
-        if key == "private":
-            sent += f'<div class="sitr-note">{t["private_note"]}</div>'
     sections = [
         seal(result, lang),
+        next_step(result, lang),
         f"<section><h4>{t['found_label']}</h4>{facts}{found}</section>",
-        f"<section><h4>{t['sent_label']}</h4>{sent}</section>",
     ]
     if result["model_response"]:
         # The card already names the route, so the router's private-route tag is not repeated.
@@ -343,6 +351,44 @@ def reply(result: dict, lang: str = "en") -> str:
         )
     sections.append(technical_details(result, lang))
     return f'<div class="sitr-reply" dir="{_dir(lang)}">{"".join(sections)}</div>'
+
+
+def next_step(result: dict, lang: str = "en") -> str:
+    """What to give ChatGPT or Claude: the text as it is, a safer version, or nothing."""
+    t, key, redaction = TEXT[lang], _decision(result), result["redaction"]
+    title, advice = t["next"][key]
+    text = ""
+    if redaction and key != "error":
+        # Allowed text goes as written; everything else only with every finding replaced.
+        text = redaction["original_text"] if key == "allow" else redaction["safe_text"]
+    copy = ""
+    if text:
+        # The button copies the text shown next to it, so nothing else ends up on the clipboard.
+        copy = (
+            f'<button type="button" class="sitr-copy" data-done="{t["copied"]}" '
+            'onclick="navigator.clipboard.writeText(this.parentElement.querySelector'
+            "('.sitr-quote').innerText); this.textContent = this.dataset.done;\">"
+            f'{t["copy"]}</button><div class="sitr-quote" dir="auto">{escape(text)}</div>'
+        )
+    return (
+        f'<section class="sitr-next {key}"><h3>{escape(title)}</h3><p>{escape(advice)}</p>'
+        f"{copy}</section>"
+    )
+
+
+def exports(result: dict, path: str | None, lang: str = "en") -> tuple[list[str], bool]:
+    """Redacted files to take to an outside assistant, and whether a redacted PDF failed."""
+    key, redaction = _decision(result), result["redaction"]
+    if key in ("allow", "error") or not redaction or not redaction["replacements"]:
+        return [], False
+    safe = RedactionResult(**redaction)
+    files, pdf_failed = [], False
+    if path and Path(path).suffix.lower() == ".pdf":
+        pdf = redacted_pdf(path, safe)
+        pdf_failed = pdf is None
+        files += [str(pdf)] if pdf else []
+    files.append(str(redacted_text_file(safe, Path(path).name if path else "message")))
+    return files, pdf_failed
 
 
 def technical_details(result: dict, lang: str = "en") -> str:
@@ -389,6 +435,13 @@ def messages(items: list[dict], lang: str = "en") -> list[dict]:
             if item["result"] is None else reply(item["result"], lang)
         )
         chat.append({"role": "assistant", "content": content})
+        if item.get("files") or item.get("pdf_failed"):
+            note = TEXT[lang]["pdf_not_safe"] if item.get("pdf_failed") else ""
+            chat.append({"role": "assistant", "content": (
+                f'<div class="sitr-files" dir="{_dir(lang)}">{TEXT[lang]["files_ready"]}'
+                f"{f'<p>{note}</p>' if note else ''}</div>"
+            )})
+            chat += [{"role": "assistant", "content": {"path": f}} for f in item["files"]]
     return chat
 
 
@@ -505,10 +558,16 @@ def send(message: dict | None, task: str, items: list[dict], lang: str = "en"):
     pending = [*items, item]
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=False), items, \
         dashboard(lang)
-    # Uploads are Gradio temp copies; Sitr deletes them once inspected, even on failure.
-    item["result"] = inspect_and_process(
-        text=text or None, file_path=path, user_intent=item["task"], delete_file=bool(path)
-    )
+    # Uploads are Gradio temp copies. The upload is kept until its redacted copy is made, then
+    # deleted whatever happens.
+    try:
+        item["result"] = inspect_and_process(
+            text=text or None, file_path=path, user_intent=item["task"]
+        )
+        item["files"], item["pdf_failed"] = exports(item["result"], path, lang)
+    finally:
+        if path:
+            Path(path).unlink(missing_ok=True)
     record(item["result"])
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=True), pending, \
         dashboard(lang)

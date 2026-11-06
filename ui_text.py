@@ -14,6 +14,29 @@ TEXT = {
                    "disabled": "off"},
         "tab_inspect": "Chat",
         "new_chat": "New chat",
+        "next": {
+            "allow": ("Safe to send",
+                      "Nothing sensitive was found. You can paste this into ChatGPT, Claude or "
+                      "any AI assistant as it is."),
+            "redact": ("Send this version instead",
+                       "Personal data is replaced with placeholders. Give the AI assistant this "
+                       "version, or the redacted file below, not the original."),
+            "private": ("Don't send this to ChatGPT or Claude",
+                        "This is confidential work. Use your organization's approved internal AI "
+                        "tool instead. If your policy allows outside tools, send only this "
+                        "version, with the sensitive details removed."),
+            "block": ("Don't send this",
+                      "It contains a secret such as a password or API key, and secrets must never "
+                      "go into an AI assistant. If you need help with it, send this version, "
+                      "where the secret is replaced. If the secret was shared anywhere, ask for "
+                      "it to be changed."),
+            "error": ("Nothing to send", "Sitr could not read this. Try pasting the text instead."),
+        },
+        "copy": "Copy",
+        "copied": "Copied",
+        "files_ready": "Redacted file, ready to send:",
+        "pdf_not_safe": "A redacted PDF could not be made safely for this file, so use the text "
+        "version above.",
         "models_title": "Models",
         "theme": "Switch light or dark",
         "kpi_inspected": "Messages checked",
@@ -96,6 +119,27 @@ TEXT = {
                    "disabled": "متوقف"},
         "tab_inspect": "المحادثة",
         "new_chat": "محادثة جديدة",
+        "next": {
+            "allow": ("آمن للإرسال",
+                      "لم يُعثر على شيء حساس. يمكنك لصقه في ChatGPT أو Claude أو أي مساعد ذكاء "
+                      "اصطناعي كما هو."),
+            "redact": ("أرسل هذه النسخة بدلًا منه",
+                       "استُبدلت البيانات الشخصية بعناصر بديلة. أعطِ المساعد هذه النسخة أو الملف "
+                       "المنقّح أدناه، وليس الأصل."),
+            "private": ("لا ترسل هذا إلى ChatGPT أو Claude",
+                        "هذا عمل سري. استخدم أداة الذكاء الاصطناعي الداخلية المعتمدة في "
+                        "مؤسستك. وإن سمحت سياستك بالأدوات الخارجية، فأرسل هذه النسخة فقط بعد "
+                        "حذف التفاصيل الحساسة."),
+            "block": ("لا ترسل هذا",
+                      "يحتوي على سر مثل كلمة مرور أو مفتاح API، ولا يجوز إدخال الأسرار في أي مساعد "
+                      "ذكاء اصطناعي. إن احتجت مساعدة فيه، فأرسل هذه النسخة التي استُبدل فيها السر. "
+                      "وإن شاركت السر في أي مكان، فاطلب تغييره."),
+            "error": ("لا شيء للإرسال", "تعذر على سِتر قراءة هذا. جرّب لصق النص بدلًا منه."),
+        },
+        "copy": "نسخ",
+        "copied": "نُسخ",
+        "files_ready": "ملف منقّح جاهز للإرسال:",
+        "pdf_not_safe": "تعذر إنشاء ملف PDF منقّح بأمان لهذا الملف، فاستخدم النسخة النصية أعلاه.",
         "models_title": "النماذج",
         "theme": "تبديل الوضع الفاتح أو الداكن",
         "kpi_inspected": "رسائل فُحصت",

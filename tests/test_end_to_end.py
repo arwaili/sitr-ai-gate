@@ -40,27 +40,29 @@ def test_each_example_gets_its_decision_card(name: str, action: str, word: str) 
     assert result["action_taken"] == action
     card = app.reply(result)
     assert f'class="sitr-seal {action}"' in card and word in card
-    assert "What Sitr found" in card and "What the AI model received" in card
+    assert "What Sitr found" in card and f'class="sitr-next {action}"' in card
 
 
 def test_reply_runs_in_order_decision_findings_sent_answer() -> None:
     card = app.reply(inspect_and_process(text=EXAMPLES["Synthetic CV"]))
     order = [card.index(marker) for marker in
-             ("sitr-seal", "What Sitr found", "What the AI model received", "Answer",
-              "Technical details")]
+             ("sitr-seal", "sitr-next", "What Sitr found", "Answer", "Technical details")]
     assert order == sorted(order)
 
 
 def test_redacted_reply_shows_placeholders_as_what_was_sent() -> None:
     card = app.reply(inspect_and_process(text=EXAMPLES["Synthetic CV"]))
-    sent = card.split("What the AI model received")[1].split("Answer")[0]
-    assert "[EMAIL_1]" in sent and "test.applicant@example.com" not in sent
+    to_send = card.split('class="sitr-next')[1].split("What Sitr found")[0]
+    assert "Send this version instead" in to_send
+    assert "[EMAIL_1]" in to_send and "test.applicant@example.com" not in to_send
     assert '<mark class="medium">test.applicant@example.com<small>EMAIL</small></mark>' in card
 
 
 def test_blocked_reply_says_nothing_was_sent_and_has_no_answer() -> None:
     card = app.reply(inspect_and_process(text=EXAMPLES["Code with a synthetic API key"]))
-    assert "Nothing. No AI model received this message." in card
+    to_send = card.split('class="sitr-next')[1].split("What Sitr found")[0]
+    assert "Don&#x27;t send this" in to_send
+    assert "[API_KEY_1]" in to_send and "sk-synthetic" not in to_send
     assert "<h4>Answer</h4>" not in card
 
 
@@ -82,9 +84,23 @@ def test_send_shows_the_message_first_then_the_reply(tmp_path) -> None:
     pending, final = _chat(path=str(upload))
     assert "Checking your message" in pending[0][1]["content"]
     assert "Attached: cv.pdf" in final[0][0]["content"]
+    files = [Path(f).name for f in final[2][-1]["files"]]
+    assert files == ["cv-redacted.pdf", "cv-redacted.txt"]
+    assert {"path": final[2][-1]["files"][0]} in [m["content"] for m in final[0]]
     assert 'class="sitr-seal redact"' in final[0][1]["content"]
     assert final[2][-1]["result"]["action_taken"] == "redact"  # kept for the language switch
     assert not upload.exists()  # the upload is deleted after inspection
+
+
+def test_allowed_text_is_offered_as_it_is_with_no_files() -> None:
+    *_, (chat, _, items, _) = _chat(EXAMPLES["Safe public prompt"], task="answer the request")
+    assert "Safe to send" in chat[1]["content"] and items[0]["files"] == []
+    assert len(chat) == 2
+
+
+def test_error_offers_nothing_to_copy() -> None:
+    card = app.reply(inspect_and_process(text=" "))
+    assert "Nothing to send" in card and "sitr-copy" not in card
 
 
 def test_empty_message_sends_nothing() -> None:
@@ -127,7 +143,8 @@ def test_arabic_shows_only_arabic(name: str, word: str, reason: str) -> None:
     shown = re.sub(r'<div class="sitr-(?:quote|answer)" dir="auto">.*?</div>|<details>.*?'
                    r"</details>", " ", card, flags=re.S)
     visible = re.sub(r"<[^>]+>|\b[A-Z][A-Z_]+\b", " ", shown)
-    leftover = set(re.findall(r"[A-Za-z]{3,}", visible)) - {"Qwen", "Hugging", "Face"}
+    leftover = set(re.findall(r"[A-Za-z]{3,}", visible)) - {"Qwen", "Hugging", "Face", "ChatGPT",
+                                                           "Claude"}
     assert not leftover, leftover
 
 
