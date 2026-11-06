@@ -49,36 +49,38 @@ ACTION_ORDER = ("allow", "redact", "private", "block", "error")
 # Uploads are stored by Gradio on drop, so one that is never sent is purged on this schedule.
 CACHE_PURGE_SECONDS = (600, 600)
 
+MAROON = "#8A1538"
 THEME = gr.themes.Base(
     font=[gr.themes.GoogleFont("Readex Pro"), "system-ui", "sans-serif"],
     radius_size=gr.themes.sizes.radius_md,
 ).set(
-    body_background_fill="#F2F4F3",
-    body_background_fill_dark="#121917",
-    body_text_color="#17201E",
-    body_text_color_dark="#E6ECEA",
+    body_background_fill="#FFFFFF",
+    body_background_fill_dark="#0E0E0F",
+    body_text_color="#1B1718",
+    body_text_color_dark="#ECECEC",
     block_background_fill="#FFFFFF",
-    block_background_fill_dark="#1A2321",
-    block_border_color="#D9E0DD",
-    block_border_color_dark="#2A3532",
-    border_color_primary="#D9E0DD",
-    border_color_primary_dark="#2A3532",
+    block_background_fill_dark="#18181A",
+    block_border_color="#E8E3E4",
+    block_border_color_dark="#2C2C30",
+    border_color_primary="#E8E3E4",
+    border_color_primary_dark="#2C2C30",
     input_background_fill="#FFFFFF",
-    input_background_fill_dark="#1A2321",
-    block_label_text_color="#52615C",
-    block_label_text_color_dark="#9DB0AA",
-    color_accent="#8A1538",
-    color_accent_soft="#F3E3E8",
-    color_accent_soft_dark="#3A1824",
-    button_primary_background_fill="#8A1538",
+    input_background_fill_dark="#1C1C1F",
+    block_label_text_color="#5E5A5B",
+    block_label_text_color_dark="#A3A3A8",
+    color_accent=MAROON,
+    color_accent_soft="#F6E8EC",
+    color_accent_soft_dark="#3A1220",
+    button_primary_background_fill=MAROON,
     button_primary_background_fill_hover="#6F102D",
-    button_primary_background_fill_dark="#A8274E",
-    button_primary_background_fill_hover_dark="#8A1538",
+    button_primary_background_fill_dark=MAROON,
+    button_primary_background_fill_hover_dark="#A01A43",
     button_primary_text_color="#FFFFFF",
+    button_primary_text_color_dark="#FFFFFF",
     button_secondary_background_fill="#FFFFFF",
-    button_secondary_background_fill_dark="#1A2321",
-    button_secondary_border_color="#C9D2CE",
-    button_secondary_border_color_dark="#34423E",
+    button_secondary_background_fill_dark="#1C1C1F",
+    button_secondary_border_color="#E2DCDD",
+    button_secondary_border_color_dark="#323236",
 )
 HEAD = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
@@ -95,26 +97,42 @@ _LATTICE = (
 )
 CSS = f"""
 :root {{
+  --sitr-maroon: #8A1538; --sitr-side: #FAF7F8;
   --sitr-allow: #2F7A5B; --sitr-redact: #A8661B; --sitr-private: #24527A;
-  --sitr-block: #8A1538; --sitr-error: #5B6763; --sitr-muted: #52615C;
+  --sitr-block: #8A1538; --sitr-error: #6B6566; --sitr-muted: #5E5A5B;
   --sitr-medium: #F3DDB4; --sitr-high: #D3E1EE; --sitr-critical: #F1D0D9;
 }}
+/* Dark keeps the same maroon on near-black, with dark grey panels. */
 .dark {{
+  --sitr-side: #141416;
   --sitr-allow: #5FB48D; --sitr-redact: #E0A24E; --sitr-private: #7FA8D2;
-  --sitr-block: #E0708F; --sitr-error: #9DB0AA; --sitr-muted: #9DB0AA;
-  --sitr-medium: #5A4220; --sitr-high: #233A52; --sitr-critical: #5A2333;
+  --sitr-block: #8A1538; --sitr-error: #A3A3A8; --sitr-muted: #A3A3A8;
+  --sitr-medium: #5A4220; --sitr-high: #233A52; --sitr-critical: #4A1424;
 }}
 /* A full-page app: a sidebar for navigation and a centered reading column, like a chat app. */
 .gradio-container {{ max-width: none !important; width: 100% !important; }}
 footer {{ display: none !important; }}
 #sitr-main {{ max-width: 820px; width: 100%; margin: 0 auto; padding: 0 8px; }}
 .sitr-page-title {{ font-size: 1.6rem; font-weight: 600; margin: 18px 0 6px; }}
-.sitr-brand {{ display: flex; align-items: baseline; gap: 10px; padding: 14px 12px 12px;
-  border-radius: 10px; background: url("{_LATTICE}") repeat;
-  border-bottom: 2px solid var(--sitr-block); }}
-.sitr-brand .ar {{ font-family: "Reem Kufi", "Readex Pro", sans-serif; font-weight: 700;
-  font-size: 2.3rem; line-height: 1; color: var(--sitr-block); }}
-.sitr-brand .en {{ font-weight: 600; }}
+#sitr-sidebar {{ background: var(--sitr-side) !important;
+  border-inline-end: 1px solid var(--border-color-primary); }}
+#sitr-sidebar .sidebar-content {{ flex: 1 1 auto; display: flex; flex-direction: column; }}
+#sitr-sidebar .sidebar-content > .column {{ flex: 1 1 auto; }}
+.sitr-nav, #sitr-foot {{ flex: 0 0 auto !important; }}
+#sitr-foot {{ margin-top: auto !important; gap: 10px !important; padding-top: 14px;
+  border-top: 1px solid var(--border-color-primary); }}
+#sitr-foot .block {{ background: transparent !important; border: 0 !important;
+  box-shadow: none !important; padding: 0 !important; }}
+.sitr-brand {{ position: relative; overflow: hidden; padding: 18px 16px 16px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(138, 21, 56, .07), transparent 70%),
+    url("{_LATTICE}") repeat;
+  border: 1px solid var(--border-color-primary); }}
+.sitr-brand .ar {{ display: block; font-family: "Reem Kufi", "Readex Pro", sans-serif;
+  font-weight: 700; font-size: 2.6rem; line-height: 1; color: var(--sitr-maroon); }}
+.sitr-brand .en {{ display: block; margin-top: 8px; font-weight: 600; font-size: .95rem; }}
+.sitr-brand .tag {{ display: block; margin-top: 2px; font-size: .8rem; color: var(--sitr-muted); }}
+.sitr-brand::after {{ content: ""; position: absolute; inset-inline: 16px; bottom: 0; height: 3px;
+  border-radius: 3px 3px 0 0; background: var(--sitr-maroon); }}
 #sitr-new {{ justify-content: flex-start !important; }}
 .sitr-nav {{ gap: 2px !important; margin-top: 10px; }}
 .sitr-nav button {{ justify-content: flex-start !important; text-align: start;
@@ -122,16 +140,20 @@ footer {{ display: none !important; }}
   color: var(--body-text-color) !important; font-weight: 500; }}
 .sitr-nav button:hover {{ background: var(--border-color-primary) !important; }}
 .sitr-nav button.primary {{ background: var(--color-accent-soft) !important;
-  color: var(--sitr-block) !important; }}
-.sitr-status h4 {{ margin: 18px 0 6px; font-size: .78rem; font-weight: 600;
+  color: var(--sitr-maroon) !important; font-weight: 600; }}
+.dark .sitr-nav button.primary {{ background: var(--sitr-maroon) !important;
+  color: #FFFFFF !important; }}
+.sitr-status h4 {{ margin: 0 0 6px; font-size: .76rem; font-weight: 600;
   color: var(--sitr-muted); }}
-.sitr-ready {{ display: flex; flex-direction: column; gap: 4px; font-size: .85rem; }}
-.sitr-ready span::before {{ content: ""; display: inline-block; width: 8px; height: 8px;
+.sitr-models {{ display: flex; flex-direction: column; gap: 4px; font-size: .85rem; }}
+.sitr-models span::before {{ content: ""; display: inline-block; width: 8px; height: 8px;
   border-radius: 50%; margin-inline-end: 7px; background: var(--sitr-redact); }}
-.sitr-ready span.ready::before {{ background: var(--sitr-allow); }}
-.sitr-ready span.down::before {{ background: var(--sitr-block); }}
-#sitr-toggles {{ gap: 8px; margin-top: 14px; }}
-#sitr-toggles button {{ min-width: 0 !important; }}
+.sitr-models span.ready::before {{ background: var(--sitr-allow); }}
+.sitr-models span.down::before {{ background: var(--sitr-block); }}
+#sitr-toggles {{ gap: 8px; }}
+#sitr-toggles button {{ min-width: 0 !important; background: transparent !important;
+  border: 1px solid var(--border-color-primary) !important; box-shadow: none !important; }}
+#sitr-toggles button:hover {{ border-color: var(--sitr-maroon) !important; }}
 #sitr-theme {{ flex: 0 0 44px !important; font-size: 1.1rem; }}
 
 .sitr-kpis {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
@@ -238,8 +260,8 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
   margin-inline-end: 6px; }}
 /* Claude-style conversation: Sitr's replies sit on the page with no bubble, the user's
    messages are small right-aligned bubbles, and the type is set at reading size. */
-:root {{ --sitr-user-bubble: #E6ECE9; }}
-.dark {{ --sitr-user-bubble: #26302D; }}
+:root {{ --sitr-user-bubble: #F4ECEE; }}
+.dark {{ --sitr-user-bubble: #232326; }}
 #sitr-chat, #sitr-chat .bubble-wrap, #sitr-chat .message-wrap {{
   background: transparent !important; }}
 #sitr-chat .message-row {{ margin: 6px 0 !important; }}
@@ -286,6 +308,8 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-chip.redact {{ --chip: var(--sitr-redact); }}
 .sitr-chip.private {{ --chip: var(--sitr-private); }}
 .sitr-chip.block {{ --chip: var(--sitr-block); }}
+.dark .sitr-chip.block {{ background: var(--sitr-maroon); color: #FFFFFF; }}
+.dark .sitr-chip.block::before {{ background: #FFFFFF; }}
 .sitr-chip.error {{ --chip: var(--sitr-error); }}
 .sitr-headline {{ margin: 0 !important; font-size: 1.05rem; font-weight: 600; }}
 .sitr-why {{ margin: 0 !important; color: var(--body-text-color); }}
@@ -608,13 +632,14 @@ def readiness(lang: str = "en") -> str:
         state = module.status()["state"]
         css = "ready" if state == "ready" else "down" if state == "unavailable" else ""
         parts.append(f'<span class="{css}">{name} {t["states"].get(state, state)}</span>')
-    return f'<div class="sitr-ready">{"".join(parts)}</div>'
+    return f'<div class="sitr-models">{"".join(parts)}</div>'
 
 
 def brand(lang: str = "en") -> str:
+    t = TEXT[lang]
     return (
         f'<div class="sitr-brand" dir="{_dir(lang)}"><span class="ar" lang="ar">سِتر</span>'
-        f'<span class="en">{TEXT[lang]["product"]}</span></div>'
+        f'<span class="en">{t["product"]}</span><span class="tag">{t["tagline"]}</span></div>'
     )
 
 
@@ -756,10 +781,13 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
                 gr.Button(EN["tab_dashboard"], variant="secondary"),
                 gr.Button(EN["tab_how"], variant="secondary"),
             ]
-        status_output = gr.HTML(status())
-        with gr.Row(elem_id="sitr-toggles"):
-            lang_button = gr.Button(EN["switch"], size="sm", variant="secondary")
-            theme_button = gr.Button("☾", size="sm", variant="secondary", elem_id="sitr-theme")
+        with gr.Column(elem_id="sitr-foot"):
+            status_output = gr.HTML(status())
+            with gr.Row(elem_id="sitr-toggles"):
+                lang_button = gr.Button(EN["switch"], size="sm", variant="secondary")
+                theme_button = gr.Button(
+                    "☾", size="sm", variant="secondary", elem_id="sitr-theme"
+                )
     with gr.Column(elem_id="sitr-main"):
         with gr.Column(visible=True) as chat_page:
             chat = gr.Chatbot(

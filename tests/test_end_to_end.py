@@ -33,10 +33,10 @@ def _visible(html: str) -> str:
 @pytest.mark.parametrize(
     ("index", "action", "headline"),
     [
-        (0, "allow", "Yes, you can send it to ChatGPT."),
-        (1, "redact", "Not as it is. Send this version to ChatGPT instead."),
+        (0, "allow", "Yes, you can send it to an AI assistant."),
+        (1, "redact", "Not as it is. Send this version to an AI assistant instead."),
         (2, "private", "No, keep this one inside the company."),
-        (3, "block", "No, don&#x27;t send this to ChatGPT."),
+        (3, "block", "No, don&#x27;t send this to an AI assistant."),
     ],
 )
 def test_each_question_gets_a_plain_answer(index: int, action: str, headline: str) -> None:
@@ -56,7 +56,7 @@ def test_redacted_answer_offers_only_the_safe_version_without_the_question() -> 
     *_, (chat, _, items, _) = _ask(app.chat_examples()[1]["text"])
     ready = chat[1]["content"].split('class="sitr-ready"')[1].split("</div></div>")[0]
     assert "[EMAIL_1]" in ready and "test.applicant@example.com" not in ready
-    assert "Can I send" not in ready
+    assert "Can I" not in ready
     assert Path(items[-1]["files"][0]).read_text(encoding="utf-8").startswith("Curriculum")
     assert Path(items[-1]["files"][0]).name == "sitr-redacted.txt"
 
@@ -148,8 +148,8 @@ def test_empty_dashboard_invites_a_first_message() -> None:
 
 @pytest.mark.parametrize(
     ("index", "headline"),
-    [(0, "نعم، يمكنك إرساله إلى ChatGPT."), (1, "ليس كما هو."), (2, "لا، أبقِ هذا داخل المؤسسة."),
-     (3, "لا، لا ترسل هذا إلى ChatGPT.")],
+    [(0, "نعم، يمكنك إرساله إلى مساعد الذكاء الاصطناعي."), (1, "ليس كما هو."),
+     (2, "لا، أبقِ هذا داخل المؤسسة."), (3, "لا، لا ترسل هذا إلى مساعد الذكاء الاصطناعي.")],
 )
 def test_arabic_answers_are_in_arabic(index: int, headline: str) -> None:
     *_, (chat, _, _, _) = _ask(app.chat_examples("ar")[index]["text"], lang="ar")
@@ -224,3 +224,19 @@ def test_only_the_content_under_a_question_is_checked(monkeypatch) -> None:
                         lambda text=None, **kw: seen.append(text) or real(text=text, **kw))
     _ask("Can I upload this to Claude?\n\nEmail: test.applicant@example.com")
     assert seen == ["Email: test.applicant@example.com"]
+
+
+def test_interface_text_names_no_ai_product() -> None:
+    # Product names are trademarks; Sitr names one only when the user's own question does.
+    import json
+
+    from ui_text import TEXT
+    shown = json.dumps(TEXT, ensure_ascii=False)
+    for name in ("ChatGPT", "Claude", "Gemini", "Copilot"):
+        assert name not in shown
+    assert app.destination("Can I paste this into ChatGPT?") == "ChatGPT"
+
+
+def test_sidebar_keeps_status_and_toggles_at_the_bottom() -> None:
+    assert 'id="sitr-foot"' not in app.brand()  # the footer is its own column, not the brand
+    assert "Check before you share" in app.brand() and "افحص قبل أن تشارك" in app.brand("ar")
