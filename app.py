@@ -236,6 +236,60 @@ div:has(> #sitr-composer), div:has(> #sitr-tools) {{ background: transparent !im
 .sitr-legend b {{ font-size: 1.4rem; margin-inline-start: 6px; }}
 .sitr-legend i {{ display: inline-block; width: 10px; height: 10px; border-radius: 2px;
   margin-inline-end: 6px; }}
+/* Claude-style conversation: Sitr's replies sit on the page with no bubble, the user's
+   messages are small right-aligned bubbles, and the type is set at reading size. */
+:root {{ --sitr-user-bubble: #E6ECE9; }}
+.dark {{ --sitr-user-bubble: #26302D; }}
+#sitr-chat, #sitr-chat .bubble-wrap, #sitr-chat .message-wrap {{
+  background: transparent !important; }}
+#sitr-chat .message-row {{ margin: 6px 0 !important; }}
+/* The new-chat icon floats over the conversation, so it sits on the page color. */
+#sitr-chat .icon-button-wrapper, #sitr-chat .top-panel {{
+  background: var(--body-background-fill) !important; border-radius: 8px; }}
+#sitr-chat .message {{ font-size: .95rem !important; line-height: 1.6 !important; }}
+#sitr-chat .bot-row .message {{ background: transparent !important; border: 0 !important;
+  box-shadow: none !important; padding: 4px 0 !important; width: 100% !important;
+  max-width: 100% !important; }}
+#sitr-chat .user-row .message {{ background: var(--sitr-user-bubble) !important;
+  border: 0 !important; box-shadow: none !important; border-radius: 18px !important;
+  padding: 10px 14px !important; width: fit-content !important;
+  max-width: min(78%, 560px) !important; }}
+#sitr-chat .user-row .flex-wrap {{ width: auto !important; max-width: 100% !important;
+  align-items: flex-end !important; }}
+.sitr-user {{ overflow-wrap: break-word; word-break: normal; }}
+#sitr-chat .user-row {{ justify-content: flex-end !important; }}
+#sitr-chat .bot-row, #sitr-chat .bot-row .flex-wrap {{ width: 100% !important;
+  max-width: 100% !important; }}
+#sitr-chat .bot-row {{ justify-content: flex-start !important; }}
+.sitr-reply {{ gap: 12px !important; }}
+.sitr-seal {{ padding: 10px 14px !important; border-width: 1px !important;
+  border-inline-start-width: 4px !important; }}
+.sitr-seal .word {{ font-size: 1.55rem !important; }}
+.sitr-seal .word.latin {{ font-size: 1.2rem !important; font-weight: 600 !important; }}
+.sitr-seal .what {{ font-size: .92rem; }}
+.sitr-next {{ padding: 12px 14px !important; }}
+.sitr-next h3 {{ font-size: .98rem !important; }}
+.sitr-next p, .sitr-facts, .sitr-answer {{ font-size: .92rem; }}
+.sitr-quote {{ font-size: .9rem; line-height: 1.65 !important; padding: 8px 12px !important; }}
+.sitr-reply h4 {{ font-size: .78rem !important; }}
+.sitr-user .meta {{ font-size: .76rem !important; }}
+.sitr-empty .ar {{ font-size: 2.6rem !important; }}
+.sitr-empty h3 {{ font-size: 1.1rem !important; }}
+
+/* Composer: the +, the text and the send arrow share one centered line. */
+#sitr-composer {{ border: 1px solid var(--border-color-primary) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04) !important; padding: 6px 8px !important; }}
+#sitr-composer .input-row {{ align-items: center !important; gap: 8px !important; }}
+#sitr-composer .upload-button, #sitr-composer .submit-button {{ flex: 0 0 34px !important;
+  margin: 0 !important; align-self: center !important; }}
+#sitr-composer .upload-button::before {{ display: block; transform: translateY(-1px); }}
+#sitr-composer .textarea-wrapper {{ display: flex !important; align-items: center !important;
+  flex: 1 1 auto !important; }}
+#sitr-composer textarea {{ padding: 6px 2px !important; line-height: 1.5 !important;
+  font-size: .95rem !important; min-height: 0 !important; }}
+#sitr-tools {{ max-width: 100%; }}
+#sitr-task {{ width: 230px !important; font-size: .88rem; }}
+
 /* Gradio stamps dir="ltr" on every block; in Arabic mode the page direction wins. */
 html[dir="rtl"] .gradio-container [dir="ltr"] {{ direction: rtl; }}
 """
@@ -255,6 +309,11 @@ THEME_LOAD_JS = """() => { let saved = null;
   try { saved = localStorage.getItem("sitr-theme"); } catch (e) {}
   if (saved) document.body.classList.toggle("dark", saved === "dark");
   return document.body.classList.contains("dark") ? "☀" : "☾"; }"""
+# On a phone the sidebar covers the chat, so it starts closed and closes after each choice.
+CLOSE_SIDEBAR_ON_PHONE_JS = """() => { const s = document.querySelector("#sitr-sidebar");
+  if (window.innerWidth < 900 && s && s.classList.contains("open"))
+    (s.querySelector(".toggle-button") || s.parentElement.querySelector(".toggle-button"))
+      ?.click(); }"""
 PAGES = ("chat", "dashboard", "how")
 
 # Dashboard counts: decisions and entity types only, in memory, shared by every visitor.
@@ -680,7 +739,7 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
         button.click(
             lambda lang, page=page: show_page(page, lang), lang_state,
             [page_state, *pages, *nav_buttons, dashboard_output],
-        )
+        ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
     outputs = [chat, composer, conversation, dashboard_output]
     composer.submit(send, [composer, task_input, conversation, lang_state], outputs)
     chat.example_select(send_example, [conversation, lang_state], outputs)
@@ -689,7 +748,7 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
     new_chat_button.click(
         lambda lang: ([], [], *show_page("chat", lang)), lang_state,
         [chat, conversation, page_state, *pages, *nav_buttons, dashboard_output],
-    )
+    ).then(None, js=CLOSE_SIDEBAR_ON_PHONE_JS)
     lang_button.click(
         switch_language, [lang_state, conversation],
         [lang_state, lang_button, brand_output, status_output, new_chat_button, *nav_buttons,
@@ -697,7 +756,9 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
          refresh_button, how_title, how_output],
     ).then(None, lang_button, js=SET_DIRECTION_JS)
     theme_button.click(None, None, theme_button, js=THEME_TOGGLE_JS)
-    demo.load(None, None, theme_button, js=THEME_LOAD_JS)
+    demo.load(None, None, theme_button, js=THEME_LOAD_JS).then(
+        None, js=CLOSE_SIDEBAR_ON_PHONE_JS
+    )
     gr.Timer(5).tick(status, lang_state, status_output)
     demo.load(status, lang_state, status_output)
 
