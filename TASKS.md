@@ -77,10 +77,10 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 | ID | Task | Owner | Claimed by | Status | PR |
 |---|---|---|---|---|---|
-| H1 | `OpenMed/privacy-filter-multilingual-v2` loads lazily on CPU (bfloat16), cached, 30 s timeout, rules-only fallback; 18 OpenMed labels mapped to Sitr types; split words grown to whole words; threshold tuned on dev | Mohammed | Abdulaziz | in review | |
-| H2 | `Horizon-Labs/multilingual-zeroshot-small` scores one English description per risk level (works for Arabic); keyword fallback on failure or timeout | Mohammed | Abdulaziz | in review | |
-| H3 | `data/evaluate.py` runs locally on CPU (no GPU needed); results in `data/eval_results_test.json` and `README.md` | Mohammed | Abdulaziz | in review | |
-| H4 | Dataset card rewritten (filter checks, phone range); Qwen sentences scanned with OpenMed (no real names); phones moved to `+974 0000` locally. Republishing to the Hub is part of this PR's push | Mohammed | Abdulaziz | in review | |
+| H1 | `OpenMed/privacy-filter-multilingual-v2` loads lazily on CPU (bfloat16), cached, 30 s timeout, rules-only fallback; 18 OpenMed labels mapped to Sitr types; split words grown to whole words; threshold tuned on dev | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H2 | `Horizon-Labs/multilingual-zeroshot-small` scores one English description per risk level (works for Arabic); keyword fallback on failure or timeout | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H3 | `data/evaluate.py` runs locally on CPU (no GPU needed); results in `data/eval_results_test.json` and `README.md` | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
+| H4 | Dataset card rewritten (filter checks, phone range); Qwen sentences scanned with OpenMed (no real names); phones moved to `+974 0000` locally. Republished to the Hub (commit `97553b09`) | Mohammed | Abdulaziz | in review | [#11](https://github.com/arwaili/sitr-ai-gate/pull/11) |
 
 ## Phase 5 - Policy, routing and integration (Rashid)
 
@@ -119,7 +119,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
-- 2026-11-06 - Abdulaziz - Phase 4 (H1-H4) built on `feature/hf-intelligence`. Held-out test split (60 rows), rules plus models: entity precision 0.967, recall 0.927; names 0.897/0.897; action accuracy 0.95 (all misses are public prompts with a false Arabic name); risk model alone 0.85. Median latency: PII model 234 ms, risk model 146 ms. 132 tests pass locally; CI skips the 7 real-model tests.
+- 2026-11-06 - Abdulaziz - Phase 4 (H1-H4) built on `feature/hf-intelligence`. Held-out test split (60 rows), rules plus models: entity precision 0.967, recall 0.927; names 0.897/0.897; action accuracy 0.95 (all misses are public prompts with a false Arabic name); risk model alone 0.85. Median latency: PII model 234 ms, risk model 146 ms. 132 tests pass locally; CI skips the 7 real-model tests. Dataset republished with `+974 0000` phones. [#11](https://github.com/arwaili/sitr-ai-gate/pull/11)
 - 2026-11-06 - Abdulaziz - PR #8 merged into `main` (117 tests pass after merge), I1-I7 marked done in [#9](https://github.com/arwaili/sitr-ai-gate/pull/9), lane branches synced to `main`, docs brought up to date.
 - 2026-11-06 - Abdulaziz - Phase 3 (I1-I7) built on `feature/ingestion`: real PDF ingestion, 27 deterministic patterns, demo files. 117 tests pass plus T7 (xfail until P1). On the 240-row dev split, structured entities (names excluded) score precision 1.000, recall 0.962; the four demo files give allow, redact, private, block through the policy engine. Worst-case inputs run in about 1 s per 2 MB. [#8](https://github.com/arwaili/sitr-ai-gate/pull/8)
 - 2026-11-06 - Abdulaziz - PRs #1, #2, #5, #3, #4 merged in order. Merged `main`: 62 tests pass plus 1 expected failure (T7); Ruff, compile, offline four-scenario check (allow, redact, private, block) and secret scan all pass; contracts unchanged since `887963c`. Clean-venv install confirmed (S7). Collaborators invited (S6). Team HF org skipped (S8): dataset, jobs and the Space stay on `arwaili`.
