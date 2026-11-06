@@ -25,7 +25,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
    pytest
    ```
 4. Open the folder in Claude Code. It reads `CLAUDE.md` automatically. Tell it your name and ask it what to work on.
-5. Run the app with `python app.py` and open http://localhost:7860. It is a chat: ask whether you can share something with an AI assistant, typing the text or pressing + to attach a PDF, code or text file, and press Enter. Sitr answers yes or no, says what it found, and gives the safe version: redacted text to copy for a typed message, a redacted PDF for a PDF, or a redacted text file for other files. The buttons at the bottom of the sidebar switch between English and Arabic and between light and dark. The chat only checks: the detectors read the text locally, and nothing is sent to Qwen or any outside service.
+5. Run the app with `python app.py` and open http://localhost:7860. It is a chat: ask whether you can share something with an AI assistant, typing the text or pressing + to attach a PDF, code or text file, and press Enter. Sitr answers yes or no, says what it found, and gives the safe version: redacted text to copy for a typed message, a redacted PDF for a PDF, or a redacted text file for other files. The buttons at the bottom of the sidebar switch between English and Arabic and between light and dark. Every message is checked first, by the detectors running locally. Short small talk with nothing sensitive in it ("hello", "what can you do?") is then answered by Qwen through Hugging Face Inference Providers; anything with findings, any file, and any content pasted under a question gets Sitr's verdict instead and is not sent to Qwen.
 
 ## Where things are
 

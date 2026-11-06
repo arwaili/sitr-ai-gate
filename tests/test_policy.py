@@ -570,3 +570,39 @@ def test_arabic_contract_name_is_redacted_with_real_models() -> None:
     text = "عقد عمل / Employment contract\nالموظف: مريم المثال\nالراتب: 15000 ريال"
     result = inspect_and_process(text=text, route_to_model=False)
     assert "مريم المثال" not in result["redaction"]["safe_text"]
+
+
+def test_chat_failure_returns_none_without_quoting_the_text(monkeypatch, caplog) -> None:
+    import huggingface_hub
+
+    class Broken:
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError("boom: hello secret-ish text")
+
+    monkeypatch.setenv("SITR_LLM", "live")
+    monkeypatch.setattr(huggingface_hub, "InferenceClient", Broken)
+    assert router.chat([], "hello") is None
+    assert "hello" not in caplog.text and "RuntimeError" in caplog.text
+
+
+def test_chat_retries_a_reply_in_the_wrong_script(monkeypatch) -> None:
+    from types import SimpleNamespace
+
+    import huggingface_hub
+
+    replies = iter(["一切安好。", "وعليكم السلام!"])
+    seen = []
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def chat_completion(self, messages, **kwargs):
+            seen.append(messages[0]["content"])
+            message = SimpleNamespace(content=next(replies))
+            return SimpleNamespace(choices=[SimpleNamespace(message=message)])
+
+    monkeypatch.setenv("SITR_LLM", "live")
+    monkeypatch.setattr(huggingface_hub, "InferenceClient", Client)
+    assert router.chat([], "السلام عليكم") == "وعليكم السلام!"
+    assert seen[0].endswith("Reply only in Arabic.") and len(seen) == 2

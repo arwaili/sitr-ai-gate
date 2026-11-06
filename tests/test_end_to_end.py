@@ -256,3 +256,39 @@ def test_pdf_that_cannot_be_redacted_safely_falls_back_to_text(tmp_path, monkeyp
     *_, (_, _, items, _) = _ask("Can I send this?", str(upload))
     assert [Path(f).name for f in items[-1]["files"]] == ["sitr-redacted.txt"]
     assert items[-1]["pdf_failed"]
+
+
+def test_small_talk_gets_a_conversational_answer() -> None:
+    *_, (chat, _, items, _) = _ask("hello")
+    answer = chat[1]["content"]
+    assert items[-1]["chat"].startswith("[Mock chat]")
+    assert "sitr-talk" in answer and "sitr-chip" not in answer
+    assert "Checked first: nothing sensitive" in answer
+
+
+def test_sensitive_short_message_gets_a_verdict_not_a_chat(monkeypatch) -> None:
+    monkeypatch.setattr(app.router, "chat", lambda *_: pytest.fail("sensitive text reached Qwen"))
+    *_, (chat, _, items, _) = _ask("my email is test.applicant@example.com, can I share it?")
+    assert "chat" not in items[-1] and "sitr-chip" in chat[1]["content"]
+
+
+def test_content_under_a_question_gets_a_verdict_not_a_chat(monkeypatch) -> None:
+    monkeypatch.setattr(app.router, "chat", lambda *_: pytest.fail("pasted content reached Qwen"))
+    *_, (chat, _, _, _) = _ask(app.chat_examples()[0]["text"])
+    assert 'class="sitr-chip allow"' in chat[1]["content"]
+
+
+def test_chat_history_holds_only_earlier_small_talk(monkeypatch) -> None:
+    seen = []
+    monkeypatch.setattr(app.router, "chat", lambda history, text: seen.append(history) or "Hi!")
+    *_, (_, _, items, _) = _ask("hello")
+    cv = {"text": app.chat_examples()[1]["text"], "files": []}
+    items = list(app.send(cv, items, "en"))[-1][2]
+    list(app.send({"text": "thanks, what else can you do?", "files": []}, items, "en"))
+    assert seen == [[], [("hello", "Hi!")]]  # the CV turn, with its email, never goes to Qwen
+
+
+def test_chat_failure_falls_back_to_the_verdict(monkeypatch) -> None:
+    monkeypatch.setattr(app.router, "chat", lambda *_: None)
+    *_, (chat, _, _, _) = _ask("hello")
+    assert 'class="sitr-chip allow"' in chat[1]["content"]

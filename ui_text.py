@@ -77,6 +77,7 @@ TEXT = {
         "empty_hint": "Paste text or attach a file and ask. Sitr tells you if it is safe to share "
         "with an AI assistant, and gives you a safe version if it is not.",
         "pending": "Checking it…",
+        "talk_checked": "Checked first: nothing sensitive, so Qwen answered.",
         "attached": "Attached",
         "private_note": "Qwen inside Sitr received the original. Nothing left Sitr.",
         "decisions": {"allow": "Allowed", "redact": "Redacted", "private": "Private route",
@@ -200,6 +201,7 @@ TEXT = {
         "empty_hint": "الصق النص أو أرفق ملفًا واسأل. يخبرك سِتر إن كان آمنًا لمشاركته مع مساعد ذكاء "
         "اصطناعي، ويعطيك نسخة آمنة إن لم يكن كذلك.",
         "pending": "جارٍ الفحص…",
+        "talk_checked": "فُحصت أولًا: لا شيء حساس، فأجاب Qwen.",
         "attached": "مرفق",
         "private_note": "استلم Qwen داخل سِتر النص الأصلي، ولم يخرج شيء من سِتر.",
         "decisions": {"allow": "مسموح", "redact": "منقّح", "private": "مسار خاص",
