@@ -14,7 +14,6 @@ TEXT = {
         "states": {"ready": "ready", "not loaded": "loading", "unavailable": "unavailable",
                    "disabled": "off"},
         "tab_inspect": "Chat",
-        "new_chat": "New chat",
         "answer": {
             "allow": ("Safe", "Yes, you can send it to {dest}.",
                       "I didn't find anything personal, confidential or secret in it."),
@@ -139,7 +138,6 @@ TEXT = {
         "states": {"ready": "جاهز", "not loaded": "قيد التحميل", "unavailable": "غير متاح",
                    "disabled": "متوقف"},
         "tab_inspect": "المحادثة",
-        "new_chat": "محادثة جديدة",
         "answer": {
             "allow": ("آمن", "نعم، يمكنك إرساله إلى {dest}.",
                       "لم أجد فيه شيئًا شخصيًا أو سريًا أو أي أسرار."),
