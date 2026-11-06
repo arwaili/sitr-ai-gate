@@ -21,7 +21,7 @@ def test_redacted_pdf_removes_every_value_including_arabic_line_numbers() -> Non
                            ("25,000 ريال", "[SALARY_2]"),
                            ("QA00SYNT000000000000000000001", "[IBAN_1]"))
     path = redacted_pdf(str(EXAMPLES / "synthetic_contract.pdf"), redaction)
-    assert path is not None and path.name == "synthetic_contract-redacted.pdf"
+    assert path is not None and path.name == "sitr-redacted.pdf"
     text = "\n".join(page.get_text() for page in pymupdf.open(path))
     for value in ("28400001234", "25,000", "QA00SYNT000000000000000000001"):
         assert value not in text
@@ -46,5 +46,41 @@ def test_leak_check_catches_numbers_on_their_own() -> None:
 
 
 def test_redacted_text_file_holds_only_the_safe_text() -> None:
-    path = redacted_text_file(_redaction(("a@example.com", "[EMAIL_1]")), "notes.txt")
-    assert path.name == "notes-redacted.txt" and path.read_text(encoding="utf-8") == "safe"
+    path = redacted_text_file(_redaction(("a@example.com", "[EMAIL_1]")))
+    assert path.name == "sitr-redacted.txt" and path.read_text(encoding="utf-8") == "safe"
+
+
+def test_hidden_parts_of_the_pdf_are_scrubbed(tmp_path) -> None:
+    # Regression (R1): values were removed from the page text only. Metadata, the outline, links,
+    # comments and attachments travel with the file and can hold the same name or email.
+    name, email = "Mariam Al-Example", "mariam.al-example@example.com"
+    source = tmp_path / "leaky.pdf"
+    doc = pymupdf.open()
+    page = doc.new_page()
+    page.insert_text((72, 72), f"Contact {name} at {email}")
+    page.insert_link({"kind": pymupdf.LINK_URI, "from": pymupdf.Rect(72, 60, 300, 80),
+                      "uri": f"mailto:{email}"})
+    page.add_text_annot((72, 120), f"Ask {name}")
+    doc.set_metadata({"author": name, "title": f"CV of {name}", "subject": email})
+    doc.set_toc([[1, f"About {name}", 1]])
+    doc.embfile_add(f"{name}.txt", email.encode())
+    doc.save(source)
+
+    path = redacted_pdf(str(source), _redaction((name, "[PERSON_1]"), (email, "[EMAIL_1]")))
+    assert path is not None
+    with pymupdf.open(path) as out:
+        everything = "\n".join([
+            *(page.get_text() for page in out), *map(str, out.metadata.values()),
+            out.get_xml_metadata() or "", *(str(e[1]) for e in out.get_toc()),
+            *(link.get("uri") or "" for page in out for link in page.get_links()),
+            *(a.info.get("content", "") for page in out for a in page.annots() or []),
+            *out.embfile_names(),
+        ])
+    assert name not in everything and email not in everything
+    assert "Mariam" not in everything
+
+
+def test_exported_files_do_not_carry_the_uploaded_name() -> None:
+    # Regression (R1): "Mariam_CV.pdf" became "Mariam_CV-redacted.pdf", leaking the name.
+    path = redacted_pdf(str(EXAMPLES / "synthetic_cv.pdf"), _redaction(("+974 0000 0100", "[P]")))
+    assert path is not None and path.name == "sitr-redacted.pdf"

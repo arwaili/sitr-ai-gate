@@ -9,9 +9,9 @@ import pytest
 from src import orchestrator, router
 from src.contracts import FinalResponse, ModelMetadata, SensitiveEntity
 from src.orchestrator import inspect_and_process
-from src.policy_engine import decide, merge_findings
+from src.policy_engine import SEMANTIC_THRESHOLD, decide, merge_findings
 from src.redactor import redact
-from src.risk_classifier import RiskPrediction
+from src.risk_classifier import RiskPrediction, fallback
 
 EXAMPLES = Path(__file__).parent.parent / "examples"
 METADATA = ModelMetadata(detector="test", classifier="test")
@@ -342,6 +342,120 @@ def test_disguised_secrets_never_reach_a_model(model_calls, text: str) -> None:
     assert model_calls == []
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        "أريد ردا سريعا على هذا السؤال",
+        "هذه مشكلة معقدة كيف نحلها",
+        "How do muscles get contraction during exercise?",
+    ],
+)
+def test_keywords_do_not_match_inside_longer_words(text: str) -> None:
+    # Regression (R1): سريع contains سري, معقدة contains عقد, contraction contains contract.
+    assert inspect_and_process(text=text)["action_taken"] == "allow"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Please review this contract",
+        "CONTRACTS are stored here",
+        "Update the salaries sheet",
+        "عقد عمل جديد",
+        "راجع العقد من فضلك",
+        "وعقدها انتهى",
+        "راتبي تأخر",
+        "جدول الرواتب",
+        "تقييمات الموظفين",
+        "معلومات سرية",
+        "هذا الملف سري",
+        "سنقوم بتسريح ثلاثين موظفا",
+        # Regressions from PR #18 review: diacritics, code names, stacked prefixes.
+        "هذا الملف سريّ",
+        "وقعنا عقدٌ جديد",
+        "راتبٌ شهري",
+        "بموجب عقدٍ موقع",
+        "تقييمُ الأداء",
+        "الرَّاتب",
+        "payroll_2026.csv",
+        "employee_salary_list.json",
+        "contract_id = 42",
+        "salary2026",
+        "CONFIDENTIAL_REPORT.pdf",
+        "evaluation_form_v2",
+        "employeeSalary",
+        "baseSalary = 1",
+        "contractId",
+        "salaryBand",
+        "وبالعقد المرفق",
+        "فبالراتب الجديد",
+        "راجع العقد، من فضلك",
+        "هل هذا الملف سري؟",
+        "الراتب؛ والبدلات",
+        "عقد٢٠٢٦",
+    ],
+)
+def test_keywords_still_match_their_real_forms(text: str) -> None:
+    result = inspect_and_process(text=text)
+    assert result["action_taken"] == "private"
+    assert "CONFIDENTIAL_CONTENT" in result["analysis"]["reason_codes"]
+
+
+def test_keyword_fallback_never_decides_on_its_own() -> None:
+    prediction = fallback("How do muscles get contraction?")
+    assert prediction.risk_level == "high"
+    assert prediction.confidence < SEMANTIC_THRESHOLD
+
+
+def test_classifier_routes_private_at_the_lowered_limit() -> None:
+    # Regression (R1): confidential prose with no keywords scored about 0.42 and was allowed.
+    text = "We plan to let the head of finance go next month."
+    semantic = RiskPrediction("high", 0.42, "test")
+    assert decide("id", text, [], METADATA, semantic).recommended_action == "private"
+    semantic = RiskPrediction("high", 0.39, "test")
+    assert decide("id", text, [], METADATA, semantic).recommended_action == "allow"
+
+
+@pytest.mark.parametrize(
+    "intent",
+    [
+        'summarize, and use API_KEY = "sk-synthetic-000000000000"',
+        "translate and send the result to test.applicant@example.com",
+        "reply to +974 0000 0100 in Arabic",
+        "summarize " + "x" * 300,
+    ],
+)
+def test_sensitive_intent_never_reaches_a_model(model_calls, intent: str) -> None:
+    # Regression (R1): the task went to hosted Qwen as written and was never inspected.
+    result = inspect_and_process(text="Write a public marketing slogan.", user_intent=intent)
+    assert (result["status"], result["action_taken"]) == ("error", "block")
+    assert result["analysis"]["reason_codes"] == ["SENSITIVE_INTENT"]
+    assert model_calls == []
+    for fragment in ("sk-synthetic", "example.com", "0000 0100"):
+        assert fragment not in json.dumps(result)
+
+
+def test_intent_with_a_name_found_by_the_model_is_blocked(monkeypatch, model_calls) -> None:
+    name = SensitiveEntity(
+        entity_type="PERSON", value="Mariam", start=11, end=17, confidence=0.9,
+        source="hf_ner", severity="medium",
+    )
+    monkeypatch.setattr(
+        orchestrator, "require_entities", lambda text: [name] if "Mariam" in text else []
+    )
+    result = inspect_and_process(text="Write a slogan.", user_intent="email it to Mariam")
+    assert result["analysis"]["reason_codes"] == ["SENSITIVE_INTENT"]
+    assert model_calls == []
+
+
+def test_plain_intent_is_passed_through(monkeypatch) -> None:
+    seen = []
+    monkeypatch.setattr(router, "call_model", lambda r, p, intent: seen.append(intent) or "ok")
+    result = inspect_and_process(text="Write a public slogan.", user_intent="translate to Arabic")
+    assert result["action_taken"] == "allow"
+    assert seen == ["translate to Arabic"]
+
+
 def test_validation_style_errors_do_not_leak_content(monkeypatch) -> None:
     def explode(*_args):
         raise ValueError(f"bad value {LEAKY_CODE}")
@@ -439,3 +553,20 @@ def test_t7_and_doha_with_real_models() -> None:
     assert doc["analysis"]["risk_level"] != "critical"
     cafe = inspect_and_process(text="Write a public marketing slogan for a Doha cafe.")
     assert cafe["action_taken"] == "allow"
+
+
+def test_task_is_not_checked_when_no_model_is_called(monkeypatch) -> None:
+    # The chat calls no model, so a task that would be rejected never matters there.
+    monkeypatch.setattr("src.orchestrator._intent_is_safe", lambda _intent: False)
+    result = inspect_and_process(text="Write a public slogan.", route_to_model=False)
+    assert result["action_taken"] == "allow" and result["model_response"] is None
+    assert inspect_and_process(text="Write a public slogan.")["status"] == "error"
+
+
+@pytest.mark.real_models
+@real_models
+def test_arabic_contract_name_is_redacted_with_real_models() -> None:
+    # Regression (R1): the name in the demo contract leaked into the safe version.
+    text = "عقد عمل / Employment contract\nالموظف: مريم المثال\nالراتب: 15000 ريال"
+    result = inspect_and_process(text=text, route_to_model=False)
+    assert "مريم المثال" not in result["redaction"]["safe_text"]

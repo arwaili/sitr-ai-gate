@@ -451,8 +451,7 @@ def copy_box(text: str, label: str, lang: str = "en") -> str:
     )
 
 
-def reply(result: dict, lang: str = "en", dest: str | None = None, from_file: bool = False,
-          question: str = "") -> str:
+def reply(result: dict, lang: str = "en", dest: str | None = None, from_file: bool = False) -> str:
     """The answer to "can I send this?": a verdict, why, and the version that is safe to use."""
     t, analysis, key = TEXT[lang], result["analysis"], _decision(result)
     dest = dest or t["default_dest"]
@@ -465,10 +464,7 @@ def reply(result: dict, lang: str = "en", dest: str | None = None, from_file: bo
     redaction = result["redaction"]
     ready = ""
     if redaction and key != "error":
-        # The question the user typed is not part of what they would send.
-        content = split_question(redaction["original_text"])[1] if question else (
-            redaction["original_text"])
-        safe = split_question(redaction["safe_text"])[1] if question else redaction["safe_text"]
+        content, safe = redaction["original_text"], redaction["safe_text"]
         if key == "allow":
             ready = f'<p class="sitr-note">{t["original_ok"]}</p>' if from_file else copy_box(
                 content, t["ready_text"], lang)
@@ -491,23 +487,18 @@ def reply(result: dict, lang: str = "en", dest: str | None = None, from_file: bo
     )
 
 
-def exports(
-    result: dict, path: str | None, lang: str = "en", question: str = ""
-) -> tuple[list[str], bool]:
+def exports(result: dict, path: str | None, lang: str = "en") -> tuple[list[str], bool]:
     """Redacted files to take to an outside assistant, and whether a redacted PDF failed."""
     key, redaction = _decision(result), result["redaction"]
     if key in ("allow", "error") or not redaction or not redaction["replacements"]:
         return [], False
     safe = RedactionResult(**redaction)
-    if question:
-        # The typed question is not part of what the user would send.
-        safe = safe.model_copy(update={"safe_text": split_question(safe.safe_text)[1]})
     files, pdf_failed = [], False
     if path and Path(path).suffix.lower() == ".pdf":
         pdf = redacted_pdf(path, safe)
         pdf_failed = pdf is None
         files += [str(pdf)] if pdf else []
-    files.append(str(redacted_text_file(safe, Path(path).name if path else "message")))
+    files.append(str(redacted_text_file(safe)))
     return files, pdf_failed
 
 
@@ -554,8 +545,7 @@ def messages(items: list[dict], lang: str = "en") -> list[dict]:
         content = (
             f'<div class="sitr-pending">{TEXT[lang]["pending"]}</div>'
             if item["result"] is None else reply(
-                item["result"], lang, destination(item["text"], lang), bool(item["filename"]),
-                item.get("question", ""),
+                item["result"], lang, destination(item["text"], lang), bool(item["filename"])
             )
         )
         chat.append({"role": "assistant", "content": content})
@@ -677,9 +667,11 @@ def send(message: dict | None, items: list[dict], lang: str = "en"):
     if not text and not path:
         yield messages(items, lang), gr.MultimodalTextbox(), items, dashboard(lang)
         return
-    question = "" if path else split_question(text)[0]
-    item = {"text": text, "filename": Path(path).name if path else None, "question": question,
-            "result": None}
+    # A question typed above the content is not part of what the user would send, and checking
+    # it with the content misleads the model ("Claude" read as a name, a real name missed), so
+    # only the content is checked.
+    content = split_question(text)[1] if not path else None
+    item = {"text": text, "filename": Path(path).name if path else None, "result": None}
     pending = [*items, item]
     yield messages(pending, lang), gr.MultimodalTextbox(value=None, interactive=False), items, \
         dashboard(lang)
@@ -687,10 +679,8 @@ def send(message: dict | None, items: list[dict], lang: str = "en"):
     # called: Sitr answers, and the user takes the safe version to their own assistant. Uploads
     # are Gradio temp copies, kept until their redacted copy is made, then deleted.
     try:
-        item["result"] = inspect_and_process(
-            text=None if path else text, file_path=path, route_to_model=False
-        )
-        item["files"], item["pdf_failed"] = exports(item["result"], path, lang, question)
+        item["result"] = inspect_and_process(text=content, file_path=path, route_to_model=False)
+        item["files"], item["pdf_failed"] = exports(item["result"], path, lang)
     finally:
         if path:
             Path(path).unlink(missing_ok=True)

@@ -274,3 +274,11 @@ def test_model_risk_levels_for_the_demo_scenarios(text: str, level: str) -> None
     prediction = classify_risk(text)
     assert prediction.risk_level == level
     assert not prediction.explanation.startswith("Fallback")
+
+
+@needs_pii_model
+def test_ai_product_names_are_not_people() -> None:
+    # Regression (R1): "Claude" in "can I upload this to Claude?" was found as a name.
+    people = [e for e in detect_entities("Can I upload this contract to Claude or ChatGPT?")
+              if e.entity_type == "PERSON"]
+    assert people == []

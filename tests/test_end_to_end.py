@@ -1,3 +1,4 @@
+import logging
 import re
 import shutil
 from pathlib import Path
@@ -57,6 +58,7 @@ def test_redacted_answer_offers_only_the_safe_version_without_the_question() -> 
     assert "[EMAIL_1]" in ready and "test.applicant@example.com" not in ready
     assert "Can I send" not in ready
     assert Path(items[-1]["files"][0]).read_text(encoding="utf-8").startswith("Curriculum")
+    assert Path(items[-1]["files"][0]).name == "sitr-redacted.txt"
 
 
 def test_blocked_answer_says_no_and_hides_the_secret() -> None:
@@ -84,7 +86,8 @@ def test_file_question_checks_the_file_and_offers_redacted_copies(tmp_path) -> N
     assert "Checking it" in pending[0][1]["content"]
     assert "Attached: cv.pdf" in final[0][0]["content"]
     assert "Send this version to Claude instead." in final[0][1]["content"]
-    assert [Path(f).name for f in final[2][-1]["files"]] == ["cv-redacted.pdf", "cv-redacted.txt"]
+    names = [Path(f).name for f in final[2][-1]["files"]]
+    assert names == ["sitr-redacted.pdf", "sitr-redacted.txt"]
     assert {"path": final[2][-1]["files"][0]} in [m["content"] for m in final[0]]
     assert not upload.exists()  # the upload is deleted after the check
 
@@ -191,3 +194,33 @@ def test_every_example_is_a_question_in_both_languages() -> None:
         for example in app.chat_examples(lang):
             question, content = app.split_question(example["text"])
             assert question == example["display_text"] and content
+
+
+def test_uploads_never_inspected_are_purged() -> None:
+    # Regression (R1, Saad): Gradio stores a file on drop, so an abandoned upload stayed on disk.
+    assert app.demo.delete_cache is not None
+
+
+def test_audit_events_are_written_when_enabled(monkeypatch, capfd) -> None:
+    # Regression (R1, Saad): nothing enabled INFO, so the app wrote no audit events at all.
+    logger = logging.getLogger("sitr")
+    monkeypatch.setattr(logger, "handlers", [])
+    monkeypatch.setattr(logger, "level", logging.NOTSET)
+    app.enable_audit_log()
+    app.enable_audit_log()
+    assert len(logger.handlers) == 1
+    inspect_and_process(text="Curriculum vitae: test.applicant@example.com")
+    err = capfd.readouterr().err
+    assert '"action": "redact"' in err
+    assert "test.applicant" not in err
+
+
+def test_only_the_content_under_a_question_is_checked(monkeypatch) -> None:
+    # Regression (R1): checking the question with the content made the model read "Claude" as
+    # a name and miss the real name in the contract, which then leaked into the safe version.
+    seen = []
+    real = app.inspect_and_process
+    monkeypatch.setattr(app, "inspect_and_process",
+                        lambda text=None, **kw: seen.append(text) or real(text=text, **kw))
+    _ask("Can I upload this to Claude?\n\nEmail: test.applicant@example.com")
+    assert seen == ["Email: test.applicant@example.com"]

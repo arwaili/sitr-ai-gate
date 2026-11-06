@@ -8,6 +8,8 @@
 2. **`redaction` is filled in on every non-error response.** `FinalResponse` has no field for the extracted text, and the UI needs it to highlight findings in uploaded files. `redaction.original_text` is the inspected text, and `redaction.safe_text` has every finding replaced, whatever the action. On allow it equals the original. Only the router decides which of the two text versions reaches a model.
 3. **Placeholders** are `[ENTITY_TYPE_N]`, numbered per type in order of first appearance. A repeated value reuses its placeholder, and overlapping findings merge into one span.
 4. **A failed detector fails closed.** Rules cannot see names, so if the PII model times out or fails, `inspect_and_process` returns the error response in decision 1 and nothing reaches a model. A secret found by the rules still blocks as usual, because the model is skipped. `SITR_HF_MODELS=0` is a deliberate switch, not a failure, and stays rules-only: never set it where text can reach hosted Qwen. A failed classifier still falls back to keywords.
+5. **Uploads and audit events.** The app deletes an upload after inspection and clears the file box. Gradio stores a file as soon as it is dropped, so an upload that is never inspected is purged after about 10 minutes. `python app.py` writes audit events to the console; they hold metadata only.
+6. **The intended task is inspected too.** `user_intent` reaches the model as written on every route, so `inspect_and_process` checks it with the rules and the PII model first. A task longer than 200 characters, or one with any finding, returns the error response in decision 1 with reason code `SENSITIVE_INTENT` instead of `PROCESSING_ERROR`, and nothing reaches a model. The UI should offer a short task field and keep details in the prompt.
 
 ## Lane interfaces
 
@@ -19,13 +21,14 @@
 | 2 | `src.hf_detection.require_entities(text)` | same as `detect_entities`, but raises `DetectorUnavailable` (no input content) if the model could not run. The orchestrator uses this one |
 | 2 | `src.hf_detection.status()`, `src.risk_classifier.status()` | `{model, state, detail}`; state is `not loaded`, `ready`, `unavailable` or `disabled` (`SITR_HF_MODELS=0`) |
 | 2 | `src.hf_detection.warm_up()`, `src.risk_classifier.warm_up()` | load the model in the background at app start |
-| 2 | `src.risk_classifier.classify_risk(text)` | `RiskPrediction(risk_level, confidence, explanation)`. Never raises: on failure a keyword fallback answers and its explanation starts with `Fallback` |
-| 3 | `src.policy_engine.decide(document_id, text, entities, metadata, semantic=None)` | `AnalysisResult`; `semantic` is an optional `RiskPrediction` that can raise the action to private, never block or lower it |
+| 2 | `src.risk_classifier.classify_risk(text)` | `RiskPrediction(risk_level, confidence, explanation)`. Never raises: on failure a keyword fallback answers and its explanation starts with `Fallback`; its confidence stays below the policy limit, so it never decides on its own |
+| 3 | `src.policy_engine.decide(document_id, text, entities, metadata, semantic=None)` | `AnalysisResult`; `semantic` is an optional `RiskPrediction` that can raise the action to private at confidence 0.4 or above, never block or lower it. Confidential keywords match whole words, with Arabic prefixes and pronoun endings. Arabic diacritics are ignored, and code names such as `payroll_2026` or `employeeSalary` count as whole words |
 | 3 | `src.policy_engine.merge_findings(rules, model)` | rules plus the model findings that overlap no rule finding |
 | 3 | `src.redactor.redact(text, entities)` | `RedactionResult` |
 | 3 | `src.router.route(action, redaction, user_intent)` | model response, or `None` on block |
+| 3 | `src.export.redacted_pdf(source, redaction)`, `src.export.redacted_text_file(redaction)` | safe copies for the user; the PDF is scrubbed (page text, metadata, outline, links, comments, attachments), read back, and `None` if any value remains |
 | 3 | `src.router.call_model(route, prompt, user_intent)` | the replaceable model adapter; never raises. `SITR_LLM=mock` returns canned text (tests set it) |
-| 3 | `src.orchestrator.inspect_and_process(text=None, file_path=None, user_intent="summarize", delete_file=False)` | `FinalResponse` as a dict |
+| 3 | `src.orchestrator.inspect_and_process(text=None, file_path=None, user_intent="summarize", delete_file=False, route_to_model=True)` | `FinalResponse` as a dict |
 
 Entity offsets are Python string indices into the exact inspected text. Every occurrence is a separate entity.
 

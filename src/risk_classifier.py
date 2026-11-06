@@ -26,7 +26,12 @@ LABELS: dict[str, RiskLevel] = {
     "source code or text containing passwords, API keys or secret credentials": "critical",
 }
 _MAX_CHARS = 4000
+# Below the policy's SEMANTIC_THRESHOLD: the policy runs its own keyword check, so the fallback
+# is informational and never decides on its own.
+_FALLBACK_CONFIDENCE = 0.3
 
+# Substrings are enough here: the fallback sits below the policy limit, so it never decides alone.
+# src/policy_engine.py holds the whole-word list that does: change the two together.
 _CONFIDENTIAL_TERMS = (
     "contract", "salary", "payroll", "evaluation", "appraisal", "confidential", "termination",
     "عقد", "راتب", "رواتب", "تقييم", "سري", "إنهاء الخدمة",
@@ -73,10 +78,16 @@ def fallback(text: str) -> RiskPrediction:
     """Keyword rules used when the model is off or fails."""
     lowered = text.lower()
     if any(term in lowered for term in _CREDENTIAL_TERMS):
-        return RiskPrediction("critical", 0.5, "Fallback rules: the text mentions credentials.")
+        return RiskPrediction(
+            "critical", _FALLBACK_CONFIDENCE, "Fallback rules: the text mentions credentials."
+        )
     if any(term in lowered for term in _CONFIDENTIAL_TERMS):
-        return RiskPrediction("high", 0.5, "Fallback rules: the text mentions confidential terms.")
-    return RiskPrediction("low", 0.5, "Fallback rules: no confidential terms were found.")
+        return RiskPrediction(
+            "high", _FALLBACK_CONFIDENCE, "Fallback rules: the text mentions confidential terms."
+        )
+    return RiskPrediction(
+        "low", _FALLBACK_CONFIDENCE, "Fallback rules: no confidential terms were found."
+    )
 
 
 def classify_risk(text: str) -> RiskPrediction:
