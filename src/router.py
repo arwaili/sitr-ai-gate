@@ -33,8 +33,9 @@ PRIVATE_LABEL = "[Private route: answered by Qwen running inside Sitr, not by an
 _SYSTEM = (
     "You are a helpful workplace assistant. Text in square brackets such as [EMAIL_1] stands "
     "for a value that was removed for privacy: keep it unchanged and never guess it. Reply "
-    "briefly, only in English or Arabic, matching the text. If the text is itself a request, "
-    "answer it."
+    "briefly, only in English or Arabic, matching the text. Copy names, numbers and currencies "
+    "exactly as written, in their original script (ريال stays ريال), and never invent details. "
+    "If the text is itself a request, answer it."
 )
 
 logger = logging.getLogger("sitr.router")
