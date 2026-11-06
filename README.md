@@ -58,7 +58,9 @@ The live demo covers four synthetic scenarios:
 
 ## Deploying the Space
 
-1. `python space/deploy_space.py` creates or updates the Space `arwaili/sitr-ai-gate` (private; add `--public` for judging). It uploads `app.py`, `src/`, `examples/` and the files in `space/`.
+Hugging Face requires a PRO subscription (or an organization with a plan) to host Gradio Spaces, even on free CPU Basic hardware.
+
+1. `python space/deploy_space.py` creates or updates the Space `arwaili/sitr-ai-gate` (private; add `--public` for judging, or `--repo <owner>/sitr-ai-gate` for another account). It uploads `app.py`, `src/`, `examples/` and the files in `space/`.
 2. In the Space settings, add a secret named `HF_TOKEN` so the allow and redact routes can call hosted Qwen.
 3. The first start downloads about 6.5 GB of models. Wait until the header shows `PII detector: ready` before the demo; requests that arrive earlier are blocked on purpose.
 
