@@ -6,6 +6,7 @@ TEXT = {
     "en": {
         "switch": "العربية",
         "product": "Sitr AI Gate",
+        "tagline": "Check before you share",
         "purpose": "Checks what employees send to AI before it leaves: it lets safe text through, "
         "hides personal data, keeps confidential work in-house, and stops secrets.",
         "detector": "Privacy detector",
@@ -14,33 +15,15 @@ TEXT = {
                    "disabled": "off"},
         "tab_inspect": "Chat",
         "new_chat": "New chat",
-        "next": {
-            "allow": ("Safe to send",
-                      "Nothing sensitive was found. You can paste this into ChatGPT, Claude or "
-                      "any AI assistant as it is."),
-            "redact": ("Send this version instead",
-                       "Personal data is replaced with placeholders. Give the AI assistant this "
-                       "version, or the redacted file below, not the original."),
-            "private": ("Don't send this to ChatGPT or Claude",
-                        "This is confidential work. Use your organization's approved internal AI "
-                        "tool instead. If your policy allows outside tools, send only this "
-                        "version, with the sensitive details removed."),
-            "block": ("Don't send this",
-                      "It contains a secret such as a password or API key, and secrets must never "
-                      "go into an AI assistant. If you need help with it, send this version, "
-                      "where the secret is replaced. If the secret was shared anywhere, ask for "
-                      "it to be changed."),
-            "error": ("Nothing to send", "Sitr could not read this. Try pasting the text instead."),
-        },
         "answer": {
             "allow": ("Safe", "Yes, you can send it to {dest}.",
                       "I didn't find anything personal, confidential or secret in it."),
             "redact": ("Needs changes", "Not as it is. Send this version to {dest} instead.",
                        "It has {things}. I replaced them with placeholders such as [EMAIL_1], so "
                        "this version is safe to share."),
-            "private": ("Keep private", "No, keep this one inside the company.",
-                        "It's confidential work{with_things}. Use your organization's approved "
-                        "internal AI tool for it."),
+            "private": ("Keep private", "Better not. Keep this one private.",
+                        "It has sensitive details{with_things}. Keep it to yourself, or use a "
+                        "private AI tool you trust."),
             "block": ("Don't send", "No, don't send this to {dest}.",
                       "It contains {things}, and secrets should never go into an AI assistant. "
                       "If the secret was shared anywhere, have it changed."),
@@ -62,23 +45,24 @@ TEXT = {
             "INTERNAL_HOST": "internal server addresses",
         },
         "ready_text": "Ready to paste",
-        "ready_text_limited": "If your policy allows outside tools, share only this version",
+        "ready_text_limited": "If you still want to ask, share only this version",
         "ready_secret": "If you need help with it, send this version, with the secret removed",
         "original_ok": "You can upload the original file as it is.",
         "see_found": "See what I found",
         "copy": "Copy",
         "copied": "Copied",
         "files_ready": "Redacted file, ready to send:",
-        "pdf_not_safe": "A redacted PDF could not be made safely for this file, so use the text "
-        "version above.",
+        "pdf_not_safe": "A redacted PDF could not be made safely for this file, so here is a "
+        "redacted text version instead.",
         "models_title": "Models",
         "theme": "Switch light or dark",
         "kpi_inspected": "Messages checked",
         "tab_dashboard": "Dashboard",
         "tab_how": "How it works",
-        "examples": ["Can I ask ChatGPT for a cafe slogan?", "Can I send this CV to ChatGPT?",
-                     "Can I upload this Arabic contract to Claude?",
-                     "Can I ask ChatGPT to fix this code?"],
+        "examples": ["Can I use AI to write a cafe slogan?",
+                     "Can I share this CV with an AI assistant?",
+                     "Can I upload this Arabic contract to an AI tool?",
+                     "Can I ask an AI to fix this code?"],
         "placeholder": "Ask Sitr, or attach a file with +",
         "task_label": "Task",
         "tasks": ["Summarize", "Answer the request", "Rewrite professionally",
@@ -89,7 +73,7 @@ TEXT = {
         "sent_label": "What the AI model received",
         "details_label": "Technical details",
         "refresh": "Refresh",
-        "empty_title": "Can I send this to ChatGPT?",
+        "empty_title": "Is it safe to share with AI?",
         "empty_hint": "Paste text or attach a file and ask. Sitr tells you if it is safe to share "
         "with an AI assistant, and gives you a safe version if it is not.",
         "pending": "Checking it…",
@@ -146,6 +130,7 @@ TEXT = {
     "ar": {
         "switch": "English",
         "product": "بوابة الذكاء الاصطناعي",
+        "tagline": "افحص قبل أن تشارك",
         "purpose": "يفحص سِتر ما يرسله الموظفون إلى الذكاء الاصطناعي قبل أن يغادر: يمرّر النص "
         "الآمن، ويُخفي البيانات الشخصية، ويُبقي العمل السري داخل المؤسسة، ويوقف الأسرار.",
         "detector": "كاشف الخصوصية",
@@ -154,32 +139,15 @@ TEXT = {
                    "disabled": "متوقف"},
         "tab_inspect": "المحادثة",
         "new_chat": "محادثة جديدة",
-        "next": {
-            "allow": ("آمن للإرسال",
-                      "لم يُعثر على شيء حساس. يمكنك لصقه في ChatGPT أو Claude أو أي مساعد ذكاء "
-                      "اصطناعي كما هو."),
-            "redact": ("أرسل هذه النسخة بدلًا منه",
-                       "استُبدلت البيانات الشخصية بعناصر بديلة. أعطِ المساعد هذه النسخة أو الملف "
-                       "المنقّح أدناه، وليس الأصل."),
-            "private": ("لا ترسل هذا إلى ChatGPT أو Claude",
-                        "هذا عمل سري. استخدم أداة الذكاء الاصطناعي الداخلية المعتمدة في "
-                        "مؤسستك. وإن سمحت سياستك بالأدوات الخارجية، فأرسل هذه النسخة فقط بعد "
-                        "حذف التفاصيل الحساسة."),
-            "block": ("لا ترسل هذا",
-                      "يحتوي على سر مثل كلمة مرور أو مفتاح API، ولا يجوز إدخال الأسرار في أي مساعد "
-                      "ذكاء اصطناعي. إن احتجت مساعدة فيه، فأرسل هذه النسخة التي استُبدل فيها السر. "
-                      "وإن شاركت السر في أي مكان، فاطلب تغييره."),
-            "error": ("لا شيء للإرسال", "تعذر على سِتر قراءة هذا. جرّب لصق النص بدلًا منه."),
-        },
         "answer": {
             "allow": ("آمن", "نعم، يمكنك إرساله إلى {dest}.",
                       "لم أجد فيه شيئًا شخصيًا أو سريًا أو أي أسرار."),
             "redact": ("يحتاج تعديلًا", "ليس كما هو. أرسل هذه النسخة إلى {dest} بدلًا منه.",
                        "فيه {things}. استبدلتها بعناصر بديلة مثل [EMAIL_1]، فهذه النسخة آمنة "
                        "للمشاركة."),
-            "private": ("أبقِه خاصًا", "لا، أبقِ هذا داخل المؤسسة.",
-                        "هذا عمل سري{with_things}. استخدم أداة الذكاء الاصطناعي الداخلية المعتمدة "
-                        "في مؤسستك."),
+            "private": ("أبقِه خاصًا", "الأفضل لا. أبقِ هذا خاصًا.",
+                        "فيه معلومات حساسة{with_things}. احتفظ بها لنفسك، أو استخدم أداة ذكاء "
+                        "اصطناعي خاصة تثق بها."),
             "block": ("لا ترسله", "لا، لا ترسل هذا إلى {dest}.",
                       "فيه {things}، ولا يجوز إدخال الأسرار في أي مساعد ذكاء اصطناعي. وإن شاركت "
                       "السر في أي مكان، فاطلب تغييره."),
@@ -201,21 +169,23 @@ TEXT = {
             "INTERNAL_HOST": "عناوين خوادم داخلية",
         },
         "ready_text": "جاهز للصق",
-        "ready_text_limited": "إن سمحت سياستك بالأدوات الخارجية، فشارك هذه النسخة فقط",
+        "ready_text_limited": "إن أردت السؤال رغم ذلك، فشارك هذه النسخة فقط",
         "ready_secret": "إن احتجت مساعدة فيه، فأرسل هذه النسخة بعد حذف السر",
         "original_ok": "يمكنك رفع الملف الأصلي كما هو.",
         "see_found": "اعرض ما وجدته",
         "copy": "نسخ",
         "copied": "نُسخ",
         "files_ready": "ملف منقّح جاهز للإرسال:",
-        "pdf_not_safe": "تعذر إنشاء ملف PDF منقّح بأمان لهذا الملف، فاستخدم النسخة النصية أعلاه.",
+        "pdf_not_safe": "تعذر إنشاء ملف PDF منقّح بأمان لهذا الملف، فهذه نسخة نصية منقّحة بدلًا منه.",
         "models_title": "النماذج",
         "theme": "تبديل الوضع الفاتح أو الداكن",
         "kpi_inspected": "رسائل فُحصت",
         "tab_dashboard": "لوحة المتابعة",
         "tab_how": "كيف يعمل",
-        "examples": ["هل أطلب من ChatGPT شعارًا لمقهى؟", "هل أرسل هذه السيرة الذاتية إلى ChatGPT؟",
-                     "هل أرفع هذا العقد إلى Claude؟", "هل أطلب من ChatGPT إصلاح هذا الكود؟"],
+        "examples": ["هل أستخدم الذكاء الاصطناعي لكتابة شعار مقهى؟",
+                     "هل أشارك هذه السيرة الذاتية مع مساعد ذكاء اصطناعي؟",
+                     "هل أرفع هذا العقد إلى أداة ذكاء اصطناعي؟",
+                     "هل أطلب من الذكاء الاصطناعي إصلاح هذا الكود؟"],
         "placeholder": "اسأل سِتر، أو أرفق ملفًا بالضغط على +",
         "task_label": "المهمة",
         "tasks": ["لخّص", "أجب عن الطلب", "أعد الصياغة بأسلوب مهني", "ترجم إلى الإنجليزية",
@@ -226,7 +196,7 @@ TEXT = {
         "sent_label": "ما وصل إلى نموذج الذكاء الاصطناعي",
         "details_label": "التفاصيل التقنية",
         "refresh": "تحديث",
-        "empty_title": "هل يمكنني إرسال هذا إلى ChatGPT؟",
+        "empty_title": "هل من الآمن مشاركته مع الذكاء الاصطناعي؟",
         "empty_hint": "الصق النص أو أرفق ملفًا واسأل. يخبرك سِتر إن كان آمنًا لمشاركته مع مساعد ذكاء "
         "اصطناعي، ويعطيك نسخة آمنة إن لم يكن كذلك.",
         "pending": "جارٍ الفحص…",
