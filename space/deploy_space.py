@@ -1,7 +1,7 @@
 """Publish the app to a Hugging Face Space: python space/deploy_space.py [--public]
 
-Uploads app.py, src/, examples/, and this folder's README.md and requirements.txt. Tests, data
-and docs stay on GitHub. The Space starts private unless --public is given.
+Uploads app.py, ui_text.py, src/, examples/, and this folder's README.md and requirements.txt.
+Tests, data and docs stay on GitHub. The Space starts private unless --public is given.
 
 After the first deploy, add an HF_TOKEN secret in the Space settings (Settings > Variables and
 secrets) so the allow and redact routes can call hosted Qwen.
@@ -15,7 +15,7 @@ SPACE_FILES = {"README.md": "space/README.md", "requirements.txt": "space/requir
 
 
 def files_to_upload() -> dict[str, Path]:
-    files = {"app.py": ROOT / "app.py"}
+    files = {"app.py": ROOT / "app.py", "ui_text.py": ROOT / "ui_text.py"}
     files |= {f"src/{p.name}": p for p in sorted((ROOT / "src").glob("*.py"))}
     files |= {
         f"examples/{p.name}": p
