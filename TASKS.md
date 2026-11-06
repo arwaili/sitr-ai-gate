@@ -5,11 +5,11 @@
 - **Deadline:** Saturday, November 7, 2026, 2:00 PM Qatar time. Internal deadline: **12:30 PM**.
 - **Repository:** https://github.com/arwaili/sitr-ai-gate
 - **Dataset:** https://huggingface.co/datasets/arwaili/sitr-synthetic-dlp
-- **Space:** not deployed yet
+- **Space:** not deployed yet. The repository is ready to push; see [Deploying the Space](README.md#deploying-the-space). The push itself needs a Hugging Face login (see **Blockers**).
 
 ## Current status
 
-Updated 2026-11-06 after PR #14.
+Updated 2026-11-06 after PR #14 and the U3 preparation.
 
 | Phase | State |
 |---|---|
@@ -18,10 +18,10 @@ Updated 2026-11-06 after PR #14.
 | 3 - Ingestion and deterministic security | Done, merged in PR #8 |
 | 4 - Hugging Face intelligence | Done, merged in PR #11; dataset republished on the Hub |
 | 5 - Policy, routing, integration | Done, merged in PR #14 |
-| 6-7 - Product and deployment | Not started (U1-U4); **everything can start now**, including the Space deployment (U3) |
+| 6-7 - Product and deployment | U3 prepared (Space metadata, runtime requirements, deploy and secret steps); the push needs a Hugging Face login. U1, U2, U4 open |
 | 8-9 - Review and submission | R1 in progress (Saad); R2-R3 not started |
 
-What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 196 tests pass locally, including T7. Measured results are in `README.md`.
+What works on `main` now: Phases 1-5. `python app.py` runs the real pipeline end to end: text and file uploads (PDF, code, text) go through the rules, both models and the full policy; allow and redact get answers from hosted Qwen (redact sees placeholders only), private gets an answer from Qwen inside the app, block reaches no model. Uploads are deleted after processing. If the PII detector is down, requests are blocked instead of continuing on rules alone. Disguised secrets and login phrases are blocked too. 207 tests: 195 pass and the 12 real-model tests skip without the models, including T7. Measured results are in `README.md`.
 
 ## Team
 
@@ -98,7 +98,7 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 |---|---|---|---|---|---|
 | U1 | Dashboard: requests inspected, redacted, private, blocked; entity categories | Abdulaziz | | open | |
 | U2 | Arabic RTL rendering, intended-task input, entity counts, route used, collapsible technical details | Abdulaziz | | open | |
-| U3 | Deploy the Hugging Face Space: Space metadata in README, slim Space requirements, secrets in Space settings | Abdulaziz | | open | |
+| U3 | Deploy the Hugging Face Space: Space metadata in README, slim Space requirements, secrets in Space settings | Abdulaziz | Rashid | in review | |
 | U4 | Test the Space from a clean browser and another device; measure cold and warm latency | anyone | | open | |
 
 ## Phase 8 and 9 - Security review and submission (everyone)
@@ -115,11 +115,15 @@ Mocks for every lane, the mock pipeline with all four decisions, the Gradio shel
 - GitHub usernames are not yet matched to people, so `CODEOWNERS` is not filled in.
 - Requests are blocked until the PII model has loaded, so open the Space and run one inspection before any demo.
 - The Space needs an `HF_TOKEN` secret for hosted Qwen, and about 6.5 GB of RAM for the three models (CPU Basic has 16 GB).
+- **U3 stops here:** creating the Space and `git push space main` need `hf auth login` as someone with write access to `arwaili`. No agent can do that step; everything else for U3 is in the repository.
+- The repository has no license file, so the Space metadata declares no license. Agree one before making the repository public for judging.
 
 ## Log
 
 Newest first. One line per finished piece of work: date and time (Qatar), name, what changed, PR.
 
+- 2026-11-06 - Rashid - U3 prepared: Space metadata (entry point, SDK 6.31.0, the three models and the dataset listed so they show on the Space page), `requirements.txt` slimmed to runtime only with CPU-only torch wheels and Pytest/Ruff moved to `requirements-dev.txt`, `.env.example` corrected to the variables the code reads, and `README.md` given the deploy and secret steps plus the model licenses. `tests/test_deployment.py` guards the metadata and the runtime list: 195 pass, 12 model tests skip. The Space is not pushed: that needs a Hugging Face login.
+- 2026-11-06 - Rashid - Reviewed [#18](https://github.com/arwaili/sitr-ai-gate/pull/18) as policy lane owner and requested changes. The new whole-word keyword rule drops three classes of real confidential content to `allow`: Arabic diacritics defeat every Arabic keyword (`سريّ`, `عقدٌ`), `\b` breaks on `_` and digits (`payroll_2026.csv`, `CONFIDENTIAL_REPORT.pdf`), and only one Arabic prefix letter is allowed (`وبالعقد`). Not demo-blocking: the demo contract's own lines still match. Posted a verified replacement pattern (44/44 confidential strings match, every false positive the PR fixes stays fixed). Agreed the 0.4 threshold as lane owner; Mohammed still needs to confirm it.
 - 2026-11-06 - Saad - R1 findings fixed: secrets written as login phrases (English and Arabic), spaced out, broken up with zero-width characters, or base64-encoded were allowed or sent to the private route. They now block. Dataset (240 rows): no new false blocks, all 60 block rows still caught. Private route checked on a Mac: about 4 s per answer after 17 s to load.
 - 2026-11-06 - Saad - R1 finding fixed: when the PII detector timed out or failed, requests continued on rules only, so a name-only prompt showed ALLOWED and would go to hosted Qwen unredacted. Requests now block (`PROCESSING_ERROR`) and nothing reaches a model; the detector status also returns to ready after a failure. 166 tests pass locally. Reproduce on old code with `SITR_MODEL_TIMEOUT=0.01 python app.py`.
 - 2026-11-06 - Abdulaziz - PR #14 merged into `main` (160 tests pass after merge, CI green), P1-P5 marked done, lane branches synced, docs updated to match.
