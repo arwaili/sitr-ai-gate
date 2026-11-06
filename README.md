@@ -25,7 +25,7 @@ Built for the Qai x Hugging Face Hackathon in Qatar by Abdulaziz, Saad, Mohammed
    pytest
    ```
 4. Open the folder in Claude Code. It reads `CLAUDE.md` automatically. Tell it your name and ask it what to work on.
-5. Run the app with `python app.py` and open http://localhost:7860. It runs the full pipeline: text or file (PDF, code, text) goes through the rules, both models and the policy, then to Qwen. Hosted Qwen needs a Hugging Face token (`hf auth login` or `HF_TOKEN`); without one, the response box shows a notice and the decision still stands.
+5. Run the app with `python app.py` and open http://localhost:7860. It is a chat: type a message and press Enter, or press + to attach a PDF, code or text file. Each reply shows Sitr's decision, what it found, exactly what the AI model received, and the answer. The button in the header switches between English and Arabic. Hosted Qwen needs a Hugging Face token (`hf auth login` or `HF_TOKEN`); without one, the reply says the model could not answer and the decision still stands.
 
 ## Where things are
 
