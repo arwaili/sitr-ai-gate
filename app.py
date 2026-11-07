@@ -126,6 +126,25 @@ footer {{ display: none !important; }}
 @media (max-width: 768px) {{ #sitr-main {{ padding-right: 14px !important; }} }}
 .sitr-copy {{ white-space: nowrap; }}
 .sitr-talk p[dir="auto"] {{ margin: 0; white-space: pre-line; }}
+/* The Arabic name is too long to sit beside the wordmark, so it stacks under it. */
+#sitr-sidebar .sitr-brand[dir="rtl"] .en {{ flex-basis: 100%; }}
+#sitr-sidebar .sitr-brand[dir="rtl"] .ar {{ border: 0; padding: 0; }}
+/* Dashboard tiles and table, scoped by id so Gradio's prose styles on Spaces don't flatten them;
+   page text lines up with the page title. */
+#sitr-main .sitr-kpi {{ border: 1px solid var(--sitr-ready-line) !important;
+  border-top: 4px solid var(--kpi) !important; border-radius: 12px !important;
+  padding: 14px 16px !important; background: var(--sitr-ready-bg) !important; }}
+#sitr-main .sitr-kpi span {{ color: var(--sitr-muted) !important; }}
+#sitr-main .sitr-table {{ border: 0 !important; min-width: 280px; }}
+#sitr-main .sitr-table th, #sitr-main .sitr-table td {{ border: 0 !important;
+  border-bottom: 1px solid var(--sitr-ready-line) !important; background: transparent !important;
+  padding: 8px 32px 8px 0 !important; }}
+#sitr-main .sitr-table tr {{ border: 0 !important; }}
+#sitr-main .block.sitr-md {{ padding-inline: 12px !important; }}
+#sitr-refresh {{ align-self: flex-start; width: auto !important; flex: 0 0 auto !important;
+  margin-inline-start: 12px; border: 1px solid var(--sitr-ready-line) !important;
+  border-radius: 10px !important; padding: 6px 16px !important; }}
+#sitr-refresh:hover {{ border-color: var(--sitr-maroon) !important; }}
 /* The chat's reset button (top right) is the way to start over, so it is easy to see. */
 #sitr-chat .top-panel {{ top: 12px !important; right: 16px !important; padding: 0 !important; }}
 #sitr-chat .top-panel, #sitr-chat .top-panel button {{ background: transparent !important;
@@ -139,6 +158,7 @@ footer {{ display: none !important; }}
   background: currentColor; -webkit-mask: url("{_RESET_ICON}") center / contain no-repeat;
   mask: url("{_RESET_ICON}") center / contain no-repeat; }}
 #sitr-chat .top-panel button:hover {{ opacity: .75; }}
+@media (max-width: 768px) {{ #sitr-chat .message-wrap {{ padding-top: 44px !important; }} }}
 /* Copy buttons appear when the pointer is over their message; touch screens always show them. */
 @media (hover: hover) {{
   #sitr-chat .message-buttons-left, #sitr-chat .message-buttons-right, #sitr-chat .sitr-copy {{
@@ -902,13 +922,15 @@ with gr.Blocks(title="Sitr AI Gate", delete_cache=CACHE_PURGE_SECONDS) as demo:
             )
         with gr.Column(visible=False) as dashboard_page:
             dashboard_title = gr.HTML(page_title("dashboard"))
-            dashboard_intro = gr.Markdown(EN["dashboard_intro"])
+            dashboard_intro = gr.Markdown(EN["dashboard_intro"], elem_classes="sitr-md")
             dashboard_output = gr.HTML(dashboard())
-            refresh_button = gr.Button(EN["refresh"], size="sm", variant="secondary")
+            refresh_button = gr.Button(
+                EN["refresh"], size="sm", variant="secondary", elem_id="sitr-refresh"
+            )
             refresh_button.click(dashboard, lang_state, dashboard_output)
         with gr.Column(visible=False) as how_page:
             how_title = gr.HTML(page_title("how"))
-            how_output = gr.Markdown(EN["how"])
+            how_output = gr.Markdown(EN["how"], elem_classes="sitr-md")
 
     pages = [chat_page, dashboard_page, how_page]
     page_outputs = [page_state, *pages, *nav_buttons, dashboard_output]

@@ -71,3 +71,14 @@ def test_the_example_environment_file_holds_no_value_for_the_secret() -> None:
     for line in (ROOT / ".env.example").read_text(encoding="utf-8").splitlines():
         if line.startswith("HF_TOKEN"):
             assert line.strip() == "HF_TOKEN=", "the token goes in Space secrets, never in a file"
+
+
+def test_every_image_on_the_space_page_is_uploaded() -> None:
+    import sys
+
+    sys.path.insert(0, str(ROOT / "space"))
+    from deploy_space import files_to_upload
+
+    images = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", README)
+    assert images, "the Space page shows screenshots"
+    assert set(images) <= set(files_to_upload()), "a linked image would be missing on the Space"
